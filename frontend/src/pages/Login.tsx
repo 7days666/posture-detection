@@ -55,8 +55,8 @@ export default function Login() {
           <div className="icon">
             <LogoIcon />
           </div>
-          <h1>儿童青少年体态检测平台</h1>
-          <p>专业守护孩子健康成长</p>
+          <h1>脊安守护</h1>
+          <p>儿童青少年体态检测平台</p>
         </div>
 
         {justRegistered && (

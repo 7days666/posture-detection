@@ -70,8 +70,8 @@ export default function Register() {
           <div className="icon">
             <LogoIcon />
           </div>
-          <h1>儿童青少年体态检测平台</h1>
-          <p>创建账号，开启健康管理</p>
+          <h1>脊安守护</h1>
+          <p>儿童青少年体态检测平台</p>
         </div>
 
         {error && (

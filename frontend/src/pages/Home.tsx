@@ -97,7 +97,7 @@ export default function Home() {
     <div className="home-container">
       <header className="home-header">
         <div className="header-bg"></div>
-        <h1>儿童青少年体态检测平台</h1>
+        <h1>脊安守护</h1>
       </header>
 
       <div className="home-content">
