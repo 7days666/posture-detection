@@ -97,7 +97,12 @@ export default function AIDetect() {
 
   // 介绍页面
   const renderIntro = () => (
-    <motion.div className="detect-content intro-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div 
+      className="detect-content intro-page" 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+    >
       {/* 正面检测 */}
       <div className="pose-card">
         <div className="pose-figure">
@@ -106,7 +111,7 @@ export default function AIDetect() {
         <div className="pose-info">
           <h4 className="pose-title">正面检测</h4>
           <p className="pose-desc">双脚合拢自然站立，光脚站立镜头对准胸部下部的位置，水平拍摄全身</p>
-          <p className="pose-tip">提示:不可俯身拍摄或者仰视拍摄，脚跟应水平位置(不可一个在前一个在后)</p>
+          <p className="pose-tip">提示:不可俯身拍摄或者仰视拍摄，脚跟应水平位置</p>
         </div>
       </div>
 
@@ -118,7 +123,7 @@ export default function AIDetect() {
         <div className="pose-info">
           <h4 className="pose-title">侧面检测</h4>
           <p className="pose-desc">镜头对准腰部位置，水平进行拍摄或者对准骨盆的位置</p>
-          <p className="pose-tip">提示:双脚合拢拍摄，两脚跟应水平位置(不可一个在前一个在后)</p>
+          <p className="pose-tip">提示:双脚合拢拍摄，两脚跟应水平位置</p>
         </div>
       </div>
 
@@ -130,7 +135,7 @@ export default function AIDetect() {
         <div className="pose-info">
           <h4 className="pose-title">背面检测</h4>
           <p className="pose-desc">镜头对准腰底的位置(臀部最上部中间)进行拍摄或者水平对准骨盆的位置</p>
-          <p className="pose-tip">提示:不可俯身拍摄或者仰视拍摄，脚跟应水平位置(不可一个在前一个在后)</p>
+          <p className="pose-tip">提示:不可俯身拍摄或者仰视拍摄，脚跟应水平位置</p>
         </div>
       </div>
     </motion.div>
@@ -138,7 +143,12 @@ export default function AIDetect() {
 
   // 正面拍摄页面
   const renderFrontCapture = () => (
-    <motion.div className="detect-content capture-content" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
+    <motion.div 
+      className="detect-content capture-content" 
+      initial={{ opacity: 0, x: 50 }} 
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -50 }}
+    >
       <div className="capture-header">
         <div className="step-badge">1/2</div>
         <h2>正面拍摄</h2>
@@ -189,7 +199,12 @@ export default function AIDetect() {
 
   // 侧面拍摄页面
   const renderSideCapture = () => (
-    <motion.div className="detect-content capture-content" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
+    <motion.div 
+      className="detect-content capture-content" 
+      initial={{ opacity: 0, x: 50 }} 
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -50 }}
+    >
       <div className="capture-header">
         <div className="step-badge">2/2</div>
         <h2>侧面拍摄</h2>
@@ -239,7 +254,12 @@ export default function AIDetect() {
 
   // 分析中页面
   const renderAnalyzing = () => (
-    <motion.div className="detect-content analyzing-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div 
+      className="detect-content analyzing-content" 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <div className="analyzing-animation">
         <div className="scan-container">
           <div className="body-silhouette">
@@ -274,7 +294,11 @@ export default function AIDetect() {
 
   // 结果页面
   const renderResult = () => (
-    <motion.div className="detect-content result-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div 
+      className="detect-content result-content" 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }}
+    >
       <div className="result-header">
         <div className="result-score">
           <motion.div 
@@ -301,28 +325,28 @@ export default function AIDetect() {
               <span className="item-name">头部前倾</span>
               <span className="item-status normal">正常</span>
             </div>
-            <div className="item-bar"><div className="item-fill" style={{ width: '20%' }}></div></div>
+            <div className="item-bar"><motion.div className="item-fill" initial={{ width: 0 }} animate={{ width: '20%' }} transition={{ duration: 1, delay: 0.5 }}></motion.div></div>
           </div>
           <div className="result-item">
             <div className="item-header">
               <span className="item-name">高低肩</span>
               <span className="item-status warning">轻微</span>
             </div>
-            <div className="item-bar"><div className="item-fill warning" style={{ width: '40%' }}></div></div>
+            <div className="item-bar"><motion.div className="item-fill warning" initial={{ width: 0 }} animate={{ width: '40%' }} transition={{ duration: 1, delay: 0.6 }}></motion.div></div>
           </div>
           <div className="result-item">
             <div className="item-header">
               <span className="item-name">脊柱侧弯</span>
               <span className="item-status normal">正常</span>
             </div>
-            <div className="item-bar"><div className="item-fill" style={{ width: '15%' }}></div></div>
+            <div className="item-bar"><motion.div className="item-fill" initial={{ width: 0 }} animate={{ width: '15%' }} transition={{ duration: 1, delay: 0.7 }}></motion.div></div>
           </div>
           <div className="result-item">
             <div className="item-header">
               <span className="item-name">骨盆倾斜</span>
               <span className="item-status normal">正常</span>
             </div>
-            <div className="item-bar"><div className="item-fill" style={{ width: '25%' }}></div></div>
+            <div className="item-bar"><motion.div className="item-fill" initial={{ width: 0 }} animate={{ width: '25%' }} transition={{ duration: 1, delay: 0.8 }}></motion.div></div>
           </div>
         </div>
       </div>
@@ -406,13 +430,13 @@ export default function AIDetect() {
               <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M5 12l5 5L20 7" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg>
             ) : '1'}
           </div>
-          <div className="step-line"></div>
+          <div className={`step-line ${step !== 'intro' ? 'active' : ''}`}></div>
           <div className={`step-dot ${step === 'front' ? 'active' : step === 'side' ? 'done' : ''}`}>
             {step === 'side' ? (
               <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M5 12l5 5L20 7" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg>
             ) : '2'}
           </div>
-          <div className="step-line"></div>
+          <div className={`step-line ${step === 'side' ? 'active' : ''}`}></div>
           <div className={`step-dot ${step === 'side' ? 'active' : ''}`}>
             3
           </div>
