@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { login } from '../api/auth'
 import { AIDetectIcon, HealthRecordIcon, GuidanceIcon, PhoneIcon, LockIcon, ErrorIcon, CheckCircleIcon } from '../components/Icons'
@@ -10,8 +10,16 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [logoLoaded, setLogoLoaded] = useState(false)
   
   const justRegistered = location.state?.registered
+
+  // 预加载 logo
+  useEffect(() => {
+    const img = new Image()
+    img.src = '/logo.png'
+    img.onload = () => setLogoLoaded(true)
+  }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -52,8 +60,20 @@ export default function Login() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <div className="logo-img">
-            <img src="/logo.png" alt="脊安守护" />
+          <div className={`logo-img ${logoLoaded ? 'loaded' : ''}`}>
+            {!logoLoaded && (
+              <div className="logo-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" width="40" height="40">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#4ecdc4" strokeWidth="2"/>
+                </svg>
+              </div>
+            )}
+            <img 
+              src="/logo.png" 
+              alt="脊安守护" 
+              onLoad={() => setLogoLoaded(true)}
+              style={{ opacity: logoLoaded ? 1 : 0 }}
+            />
           </div>
           <h1>脊安守护</h1>
           <p>儿童青少年体态检测平台</p>
