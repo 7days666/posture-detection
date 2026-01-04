@@ -1,0 +1,197 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import TabBar from '../components/TabBar'
+import { getProfile, Profile } from '../api/profile'
+import {
+  ReportIcon, ArchiveIcon, EducationIcon, AppointmentIcon,
+  AIIcon, FollowUpIcon, SurveyIcon, ShopIcon, ConsultIcon,
+  SelfTestIcon
+} from '../components/Icons'
+import './Home.css'
+
+interface User {
+  id: number
+  name: string
+  phone: string
+}
+
+const features = [
+  { icon: ReportIcon, label: '我的报告', color: '#4ecdc4', path: '/report' },
+  { icon: ArchiveIcon, label: '档案管理', color: '#f6ad55', path: '/archive' },
+  { icon: EducationIcon, label: '健康宣教', color: '#fc8181', path: '/education' },
+  { icon: AppointmentIcon, label: '预约挂号', color: '#63b3ed', path: '/appointment' },
+  { icon: AIIcon, label: 'AI检测', color: '#68d391', path: '/ai-detect' },
+  { icon: FollowUpIcon, label: '随访管理', color: '#b794f4', path: '/follow-up' },
+  { icon: SurveyIcon, label: '问卷调查', color: '#f687b3', path: '/survey' },
+  { icon: ShopIcon, label: '商城', color: '#fbd38d', path: '/shop' },
+  { icon: ConsultIcon, label: '在线咨询', color: '#90cdf4', path: '/consult' },
+  { icon: SelfTestIcon, label: '居家自测', color: '#9f7aea', path: '/self-test' },
+]
+
+export default function Home() {
+  const navigate = useNavigate()
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const userData = localStorage.getItem('user')
+    
+    if (!token) {
+      navigate('/login')
+      return
+    }
+    
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
+
+    // 从后端获取档案
+    fetchProfile()
+  }, [navigate])
+
+  const fetchProfile = async () => {
+    try {
+      const res = await getProfile()
+      if (res.data.success && res.data.data) {
+        setProfile(res.data.data)
+        localStorage.setItem('onboarded', 'true')
+      } else {
+        // 没有档案，跳转到引导页
+        navigate('/onboarding')
+      }
+    } catch (error) {
+      console.error('获取档案失败:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFeatureClick = (path: string) => {
+    console.log('Navigate to:', path)
+  }
+
+  const handleEditProfile = () => {
+    navigate('/onboarding', { state: { edit: true, profile } })
+  }
+
+  const getAgeGroupLabel = () => {
+    return profile?.ageGroup === 'child' ? '儿童' : '青少年'
+  }
+
+  const getGenderLabel = () => {
+    return profile?.gender === 'male' ? '男' : '女'
+  }
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="home-container">
+      <header className="home-header">
+        <div className="header-bg"></div>
+        <h1>儿童青少年体态检测平台</h1>
+      </header>
+
+      <div className="home-content">
+        {/* 用户档案卡片 */}
+        <div className="profile-card">
+          <div className="profile-card-header">
+            <div className="profile-avatar-home">
+              <span>{user?.name?.charAt(0) || 'U'}</span>
+            </div>
+            <div className="profile-info">
+              <h3>{user?.name || '用户'}</h3>
+              <span className="profile-tag">{getAgeGroupLabel()} · {getGenderLabel()} · {profile?.age}</span>
+            </div>
+            <button className="edit-btn" onClick={handleEditProfile}>
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div className="profile-stats">
+            <div className="stat-item">
+              <span className="stat-value">{profile?.age || '--'}</span>
+              <span className="stat-label">年龄</span>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-item">
+              <span className="stat-value">{profile?.height || '--'}</span>
+              <span className="stat-label">身高(cm)</span>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-item">
+              <span className="stat-value">{profile?.weight || '--'}</span>
+              <span className="stat-label">体重(kg)</span>
+            </div>
+          </div>
+
+          <div className="profile-extra">
+            <div className="extra-item">
+              <span className="extra-label">年级</span>
+              <span className="extra-value">{profile?.grade || '--'}</span>
+            </div>
+            <div className="extra-item">
+              <span className="extra-label">运动频率</span>
+              <span className="extra-value">{profile?.exerciseFrequency || '--'}</span>
+            </div>
+          </div>
+
+          {profile?.hasSpineIssue && profile.hasSpineIssue !== '没有任何问题' && (
+            <div className="health-alert">
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+                <circle cx="12" cy="12" r="10" stroke="#f6ad55" strokeWidth="2"/>
+                <path d="M12 8v4M12 16h.01" stroke="#f6ad55" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              <span>体态状况：{profile.hasSpineIssue}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 功能网格 */}
+        <div className="feature-grid">
+          {features.map((item, index) => (
+            <div
+              key={item.label}
+              className="feature-item"
+              style={{ '--delay': `${index * 0.05}s` } as React.CSSProperties}
+              onClick={() => handleFeatureClick(item.path)}
+            >
+              <div className="feature-icon" style={{ '--icon-color': item.color } as React.CSSProperties}>
+                <item.icon color={item.color} />
+              </div>
+              <span className="feature-label">{item.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* 健康提示 */}
+        <div className="health-tip">
+          <div className="tip-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" className="tip-svg">
+              <circle cx="12" cy="12" r="10" stroke="#4ecdc4" strokeWidth="2"/>
+              <path d="M12 7V13" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="17" r="1" fill="#4ecdc4"/>
+            </svg>
+          </div>
+          <div className="tip-content">
+            <span className="tip-title">健康小贴士</span>
+            <p>定期进行体态检测，及早发现脊柱侧弯等问题，是保护孩子健康成长的重要措施。</p>
+          </div>
+        </div>
+      </div>
+
+      <TabBar />
+    </div>
+  )
+}
