@@ -81,7 +81,21 @@ export default function Home() {
   }
 
   const getGenderLabel = () => {
-    return profile?.gender === 'male' ? '男' : '女'
+    return profile?.gender === '男' ? '男' : '女'
+  }
+
+  // 获取运动频率
+  const getExerciseFreq = () => {
+    if (profile?.ageGroup === 'child') {
+      return profile?.exerciseFreqChild || '--'
+    }
+    return profile?.exerciseFreqTeen || '--'
+  }
+
+  // 获取体态问题
+  const getSpineIssues = () => {
+    if (!profile?.spineIssues || profile.spineIssues === '无') return null
+    return profile.spineIssues
   }
 
   // 计算BMI
@@ -129,7 +143,7 @@ export default function Home() {
             </div>
             <div className="profile-info">
               <h3>{user?.name || '用户'}</h3>
-              <span className="profile-tag">{getAgeGroupLabel()} · {getGenderLabel()} · {profile?.age}</span>
+              <span className="profile-tag">{getAgeGroupLabel()} · {getGenderLabel()} · {profile?.age}岁</span>
             </div>
             <button className="edit-btn" onClick={handleEditProfile}>
               <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
@@ -169,22 +183,24 @@ export default function Home() {
 
           <div className="profile-extra">
             <div className="extra-item">
-              <span className="extra-label">年级</span>
-              <span className="extra-value">{profile?.grade || '--'}</span>
+              <span className="extra-label">{profile?.ageGroup === 'teen' ? '学段' : '生长期'}</span>
+              <span className="extra-value">
+                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : (profile?.isRapidGrowth || '--')}
+              </span>
             </div>
             <div className="extra-item">
               <span className="extra-label">运动频率</span>
-              <span className="extra-value">{profile?.exerciseFrequency || '--'}</span>
+              <span className="extra-value">{getExerciseFreq()}</span>
             </div>
           </div>
 
-          {profile?.hasSpineIssue && profile.hasSpineIssue !== '没有任何问题' && (
+          {getSpineIssues() && (
             <div className="health-alert">
               <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
                 <circle cx="12" cy="12" r="10" stroke="#f6ad55" strokeWidth="2"/>
                 <path d="M12 8v4M12 16h.01" stroke="#f6ad55" strokeWidth="2" strokeLinecap="round"/>
               </svg>
-              <span>体态状况：{profile.hasSpineIssue}</span>
+              <span>体态状况：{getSpineIssues()}</span>
             </div>
           )}
         </div>
