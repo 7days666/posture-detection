@@ -11,9 +11,9 @@ export const authRoutes = new Hono<{ Bindings: Bindings }>()
 // 注册
 authRoutes.post('/register', async (c) => {
   try {
-    const { phone, password, name } = await c.req.json()
+    const { phone, password } = await c.req.json()
 
-    if (!phone || !password || !name) {
+    if (!phone || !password) {
       return c.json({ success: false, message: '请填写完整信息' }, 400)
     }
 
@@ -26,11 +26,18 @@ authRoutes.post('/register', async (c) => {
       return c.json({ success: false, message: '该手机号已注册' }, 400)
     }
 
+    // 获取当前用户数量生成编号
+    const countResult = await c.env.DB.prepare(
+      'SELECT COUNT(*) as count FROM users'
+    ).first<{ count: number }>()
+    const userCount = countResult?.count || 0
+    const userNo = `U${String(userCount + 1).padStart(6, '0')}` // 生成编号如 U000001
+
     // 加密密码并创建用户
     const hashedPassword = await hashPassword(password)
     await c.env.DB.prepare(
       'INSERT INTO users (phone, password, name) VALUES (?, ?, ?)'
-    ).bind(phone, hashedPassword, name).run()
+    ).bind(phone, hashedPassword, userNo).run()
 
     return c.json({ success: true, message: '注册成功' })
   } catch (error) {
