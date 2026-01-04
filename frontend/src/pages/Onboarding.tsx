@@ -107,13 +107,25 @@ export default function Onboarding() {
   const childGrades = ['幼儿园小班', '幼儿园中班', '幼儿园大班', '一年级', '二年级', '三年级', '四年级', '五年级', '六年级']
   const teenGrades = ['初一', '初二', '初三', '高一', '高二', '高三', '大一', '大二', '其他']
 
-  // 身高选项
-  const childHeights = ['80-90', '90-100', '100-110', '110-120', '120-130', '130-140', '140-150', '150-160']
-  const teenHeights = ['140-150', '150-160', '160-170', '170-180', '180-190', '190以上']
+  // 计算BMI
+  const calculateBMI = () => {
+    const height = parseFloat(formData.height)
+    const weight = parseFloat(formData.weight)
+    if (height > 0 && weight > 0) {
+      const heightM = height / 100
+      const bmi = weight / (heightM * heightM)
+      return bmi.toFixed(1)
+    }
+    return null
+  }
 
-  // 体重选项
-  const childWeights = ['10-15', '15-20', '20-25', '25-30', '30-35', '35-40', '40-50', '50以上']
-  const teenWeights = ['30-40', '40-50', '50-60', '60-70', '70-80', '80以上']
+  // 获取BMI状态
+  const getBMIStatus = (bmi: number) => {
+    if (bmi < 18.5) return { text: '偏瘦', color: '#63b3ed' }
+    if (bmi < 24) return { text: '正常', color: '#68d391' }
+    if (bmi < 28) return { text: '偏胖', color: '#f6ad55' }
+    return { text: '肥胖', color: '#fc8181' }
+  }
 
   return (
     <div className="onboarding-container">
@@ -257,33 +269,48 @@ export default function Onboarding() {
 
             <div className="form-section">
               <label className="section-label">身高 (cm)</label>
-              <div className="option-grid">
-                {(formData.ageGroup === 'child' ? childHeights : teenHeights).map(h => (
-                  <div 
-                    key={h}
-                    className={`option-chip ${formData.height === h ? 'selected' : ''}`}
-                    onClick={() => handleOptionSelect('height', h)}
-                  >
-                    {h}
-                  </div>
-                ))}
+              <div className="input-row">
+                <input
+                  type="number"
+                  className="number-input"
+                  placeholder="请输入身高"
+                  value={formData.height}
+                  onChange={e => setFormData({ ...formData, height: e.target.value })}
+                  min="50"
+                  max="250"
+                />
+                <span className="input-unit">cm</span>
               </div>
             </div>
 
             <div className="form-section">
               <label className="section-label">体重 (kg)</label>
-              <div className="option-grid">
-                {(formData.ageGroup === 'child' ? childWeights : teenWeights).map(w => (
-                  <div 
-                    key={w}
-                    className={`option-chip ${formData.weight === w ? 'selected' : ''}`}
-                    onClick={() => handleOptionSelect('weight', w)}
-                  >
-                    {w}
-                  </div>
-                ))}
+              <div className="input-row">
+                <input
+                  type="number"
+                  className="number-input"
+                  placeholder="请输入体重"
+                  value={formData.weight}
+                  onChange={e => setFormData({ ...formData, weight: e.target.value })}
+                  min="10"
+                  max="200"
+                />
+                <span className="input-unit">kg</span>
               </div>
             </div>
+
+            {/* BMI 显示 */}
+            {calculateBMI() && (
+              <div className="bmi-card">
+                <div className="bmi-label">BMI 指数</div>
+                <div className="bmi-value" style={{ color: getBMIStatus(parseFloat(calculateBMI()!)).color }}>
+                  {calculateBMI()}
+                </div>
+                <div className="bmi-status" style={{ backgroundColor: getBMIStatus(parseFloat(calculateBMI()!)).color }}>
+                  {getBMIStatus(parseFloat(calculateBMI()!)).text}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

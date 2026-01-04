@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { login } from '../api/auth'
-import { LogoIcon, AIDetectIcon, HealthRecordIcon, GuidanceIcon, PhoneIcon, LockIcon, ErrorIcon, CheckCircleIcon } from '../components/Icons'
+import { AIDetectIcon, HealthRecordIcon, GuidanceIcon, PhoneIcon, LockIcon, ErrorIcon, CheckCircleIcon } from '../components/Icons'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -52,8 +52,8 @@ export default function Login() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <div className="icon">
-            <LogoIcon />
+          <div className="logo-img">
+            <img src="/logo.png" alt="脊安守护" />
           </div>
           <h1>脊安守护</h1>
           <p>儿童青少年体态检测平台</p>
