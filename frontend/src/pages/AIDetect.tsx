@@ -11,7 +11,6 @@ export default function AIDetect() {
   const [agreed, setAgreed] = useState(false)
   const [frontImage, setFrontImage] = useState<string | null>(null)
   const [sideImage, setSideImage] = useState<string | null>(null)
-  const [analyzing, setAnalyzing] = useState(false)
   const [showDisclaimer, setShowDisclaimer] = useState(false)
 
   const handleImageUpload = (type: 'front' | 'side') => {
@@ -49,10 +48,8 @@ export default function AIDetect() {
 
   const startAnalysis = () => {
     setStep('analyzing')
-    setAnalyzing(true)
     // 模拟分析过程
     setTimeout(() => {
-      setAnalyzing(false)
       setStep('result')
     }, 3000)
   }
