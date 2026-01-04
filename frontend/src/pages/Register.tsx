@@ -1,11 +1,10 @@
 import { useState, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../api/auth'
-import { LogoIcon, SuccessIcon, PhoneIcon, LockIcon, UserIcon, ErrorIcon } from '../components/Icons'
+import { LogoIcon, SuccessIcon, PhoneIcon, LockIcon, ErrorIcon } from '../components/Icons'
 
 export default function Register() {
   const navigate = useNavigate()
-  const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPwd, setConfirmPwd] = useState('')
@@ -17,7 +16,7 @@ export default function Register() {
     e.preventDefault()
     setError('')
 
-    if (!name || !phone || !password || !confirmPwd) {
+    if (!phone || !password || !confirmPwd) {
       setError('请填写完整信息')
       return
     }
@@ -39,7 +38,7 @@ export default function Register() {
 
     setLoading(true)
     try {
-      const res = await register({ phone, password, name })
+      const res = await register({ phone, password })
       if (res.data.success) {
         setShowSuccess(true)
       } else {
@@ -82,20 +81,6 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>姓名</label>
-            <div className="input-wrapper">
-              <span className="input-icon"><UserIcon /></span>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="请输入您的姓名"
-                value={name}
-                onChange={e => setName(e.target.value)}
-              />
-            </div>
-          </div>
-
           <div className="form-group">
             <label>手机号</label>
             <div className="input-wrapper">

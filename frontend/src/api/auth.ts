@@ -15,7 +15,6 @@ export interface LoginData {
 export interface RegisterData {
   phone: string
   password: string
-  name: string
 }
 
 export interface AuthResponse {
