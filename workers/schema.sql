@@ -1,9 +1,9 @@
 -- 用户表
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_no TEXT UNIQUE NOT NULL,
   phone TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
+  name TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,5 +44,4 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 -- 创建索引
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
-CREATE INDEX IF NOT EXISTS idx_users_user_no ON users(user_no);
 CREATE INDEX IF NOT EXISTS idx_profiles_user_id ON profiles(user_id);
