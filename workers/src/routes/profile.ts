@@ -1,113 +1,126 @@
 import { Hono } from 'hono'
 import { verifyJWT } from '../utils/jwt'
 
-type Bindings = {
+type Env = {
   DB: D1Database
 }
 
-export const profileRoutes = new Hono<{ Bindings: Bindings }>()
+const profileRoutes = new Hono<{ Bindings: Env }>()
 
-// 验证中间件
-async function getAuthUser(c: any): Promise<{ id: number; phone: string } | null> {
-  const token = c.req.header('Authorization')?.replace('Bearer ', '')
-  if (!token) return null
-  return verifyJWT(token)
-}
+// JWT 验证中间件
+profileRoutes.use('/*', async (c, next) => {
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return c.json({ success: false, message: '未授权' }, 401)
+  }
+  
+  const token = authHeader.substring(7)
+  const payload = verifyJWT(token)
+  
+  if (!payload) {
+    return c.json({ success: false, message: 'Token 无效' }, 401)
+  }
+  
+  c.set('userId' as never, payload.id as never)
+  await next()
+})
+
+// 保存档案
+profileRoutes.post('/', async (c) => {
+  try {
+    const userId = c.get('userId' as never) as number
+    const data = await c.req.json()
+    
+    // 检查是否已有档案
+    const existing = await c.env.DB.prepare(
+      'SELECT id FROM profiles WHERE user_id = ?'
+    ).bind(userId).first()
+
+    if (existing) {
+      // 更新档案
+      await c.env.DB.prepare(`
+        UPDATE profiles SET
+          age_group = ?, gender = ?, birth_year = ?, age = ?,
+          height = ?, weight = ?,
+          is_rapid_growth = ?, screen_time_child = ?, exercise_freq_child = ?, daily_posture = ?,
+          school_stage = ?, height_growth = ?, sitting_hours = ?, exercise_freq_teen = ?, posture_symptoms = ?,
+          spine_issues = ?, consent_agreed = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = ?
+      `).bind(
+        data.ageGroup, data.gender, data.birthYear || null, data.age || null,
+        data.height, data.weight,
+        data.isRapidGrowth || null, data.screenTimeChild || null, data.exerciseFreqChild || null, data.dailyPosture || null,
+        data.schoolStage || null, data.heightGrowth || null, data.sittingHours || null, data.exerciseFreqTeen || null, data.postureSymptoms || null,
+        data.spineIssues, data.consentAgreed ? 1 : 0,
+        userId
+      ).run()
+    } else {
+      // 创建新档案
+      await c.env.DB.prepare(`
+        INSERT INTO profiles (
+          user_id, age_group, gender, birth_year, age, height, weight,
+          is_rapid_growth, screen_time_child, exercise_freq_child, daily_posture,
+          school_stage, height_growth, sitting_hours, exercise_freq_teen, posture_symptoms,
+          spine_issues, consent_agreed
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        userId, data.ageGroup, data.gender, data.birthYear || null, data.age || null,
+        data.height, data.weight,
+        data.isRapidGrowth || null, data.screenTimeChild || null, data.exerciseFreqChild || null, data.dailyPosture || null,
+        data.schoolStage || null, data.heightGrowth || null, data.sittingHours || null, data.exerciseFreqTeen || null, data.postureSymptoms || null,
+        data.spineIssues, data.consentAgreed ? 1 : 0
+      ).run()
+    }
+
+    return c.json({ success: true, message: '保存成功' })
+  } catch (error) {
+    console.error('Save profile error:', error)
+    return c.json({ success: false, message: '保存失败' }, 500)
+  }
+})
 
 // 获取档案
 profileRoutes.get('/', async (c) => {
   try {
-    const user = await getAuthUser(c)
-    if (!user) {
-      return c.json({ success: false, message: '未登录' }, 401)
-    }
-
-    const profile = await c.env.DB.prepare(
-      `SELECT id, user_id as userId, age_group as ageGroup, gender, age, height, weight, 
-       grade, sitting_hours as sittingHours, screen_time as screenTime, 
-       sleep_hours as sleepHours, exercise_frequency as exerciseFrequency, 
-       has_spine_issue as hasSpineIssue, created_at as createdAt, updated_at as updatedAt
-       FROM profiles WHERE user_id = ?`
-    ).bind(user.id).first()
-
-    return c.json({ success: true, data: profile || null })
-  } catch (error) {
-    console.error('获取档案错误:', error)
-    return c.json({ success: false, message: '服务器错误' }, 500)
-  }
-})
-
-// 创建或更新档案
-profileRoutes.post('/', async (c) => {
-  try {
-    const user = await getAuthUser(c)
-    if (!user) {
-      return c.json({ success: false, message: '未登录' }, 401)
-    }
-
-    const body = await c.req.json()
-    const { ageGroup, gender, age, height, weight, grade, sittingHours, screenTime, sleepHours, exerciseFrequency, hasSpineIssue } = body
-
-    if (!ageGroup || !gender || !age || !height || !weight) {
-      return c.json({ success: false, message: '请填写完整信息' }, 400)
-    }
-
-    // 检查是否已有档案
-    const existing = await c.env.DB.prepare(
-      'SELECT id FROM profiles WHERE user_id = ?'
-    ).bind(user.id).first()
-
-    if (existing) {
-      // 更新
-      await c.env.DB.prepare(
-        `UPDATE profiles SET age_group = ?, gender = ?, age = ?, height = ?, weight = ?, 
-         grade = ?, sitting_hours = ?, screen_time = ?, sleep_hours = ?, 
-         exercise_frequency = ?, has_spine_issue = ?, updated_at = datetime('now')
-         WHERE user_id = ?`
-      ).bind(ageGroup, gender, age, height, weight, grade || '', sittingHours || '', screenTime || '', sleepHours || '', exerciseFrequency || '', hasSpineIssue || '', user.id).run()
-
-      return c.json({ success: true, message: '更新成功' })
-    } else {
-      // 创建
-      await c.env.DB.prepare(
-        `INSERT INTO profiles (user_id, age_group, gender, age, height, weight, grade, 
-         sitting_hours, screen_time, sleep_hours, exercise_frequency, has_spine_issue)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      ).bind(user.id, ageGroup, gender, age, height, weight, grade || '', sittingHours || '', screenTime || '', sleepHours || '', exerciseFrequency || '', hasSpineIssue || '').run()
-
-      return c.json({ success: true, message: '创建成功' })
-    }
-  } catch (error) {
-    console.error('保存档案错误:', error)
-    return c.json({ success: false, message: '服务器错误' }, 500)
-  }
-})
-
-// 更新档案
-profileRoutes.put('/', async (c) => {
-  try {
-    const user = await getAuthUser(c)
-    if (!user) {
-      return c.json({ success: false, message: '未登录' }, 401)
-    }
-
-    const body = await c.req.json()
-    const { ageGroup, gender, age, height, weight, grade, sittingHours, screenTime, sleepHours, exerciseFrequency, hasSpineIssue } = body
-
+    const userId = c.get('userId' as never) as number
+    
     const result = await c.env.DB.prepare(
-      `UPDATE profiles SET age_group = ?, gender = ?, age = ?, height = ?, weight = ?, 
-       grade = ?, sitting_hours = ?, screen_time = ?, sleep_hours = ?, 
-       exercise_frequency = ?, has_spine_issue = ?, updated_at = datetime('now')
-       WHERE user_id = ?`
-    ).bind(ageGroup, gender, age, height, weight, grade || '', sittingHours || '', screenTime || '', sleepHours || '', exerciseFrequency || '', hasSpineIssue || '', user.id).run()
+      'SELECT * FROM profiles WHERE user_id = ?'
+    ).bind(userId).first()
 
-    if (result.meta.changes === 0) {
-      return c.json({ success: false, message: '档案不存在' }, 404)
+    if (!result) {
+      return c.json({ success: true, data: null })
     }
 
-    return c.json({ success: true, message: '更新成功' })
+    // 转换字段名为驼峰
+    const profileData = {
+      id: result.id,
+      userId: result.user_id,
+      ageGroup: result.age_group,
+      gender: result.gender,
+      birthYear: result.birth_year,
+      age: result.age,
+      height: result.height,
+      weight: result.weight,
+      isRapidGrowth: result.is_rapid_growth,
+      screenTimeChild: result.screen_time_child,
+      exerciseFreqChild: result.exercise_freq_child,
+      dailyPosture: result.daily_posture,
+      schoolStage: result.school_stage,
+      heightGrowth: result.height_growth,
+      sittingHours: result.sitting_hours,
+      exerciseFreqTeen: result.exercise_freq_teen,
+      postureSymptoms: result.posture_symptoms,
+      spineIssues: result.spine_issues,
+      consentAgreed: result.consent_agreed === 1
+    }
+
+    return c.json({ success: true, data: profileData })
   } catch (error) {
-    console.error('更新档案错误:', error)
-    return c.json({ success: false, message: '服务器错误' }, 500)
+    console.error('Get profile error:', error)
+    return c.json({ success: false, message: '获取失败' }, 500)
   }
 })
+
+export default profileRoutes

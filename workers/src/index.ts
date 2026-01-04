@@ -1,13 +1,13 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authRoutes } from './routes/auth'
-import { profileRoutes } from './routes/profile'
+import profileRoutes from './routes/profile'
 
-type Bindings = {
+export type Env = {
   DB: D1Database
 }
 
-const app = new Hono<{ Bindings: Bindings }>()
+const app = new Hono<{ Bindings: Env }>()
 
 // CORS
 app.use('/*', cors({

@@ -97,7 +97,23 @@ export default function Profile() {
   }
 
   const getGenderLabel = () => {
-    return profile?.gender === 'male' ? '男' : '女'
+    return profile?.gender || '--'
+  }
+
+  // 获取运动频率
+  const getExerciseFreq = () => {
+    if (profile?.ageGroup === 'child') {
+      return profile?.exerciseFreqChild || '--'
+    }
+    return profile?.exerciseFreqTeen || '--'
+  }
+
+  // 获取屏幕/久坐时间
+  const getScreenOrSittingTime = () => {
+    if (profile?.ageGroup === 'child') {
+      return { label: '屏幕时间', value: profile?.screenTimeChild || '--' }
+    }
+    return { label: '久坐时间', value: profile?.sittingHours || '--' }
   }
 
   // 计算BMI
@@ -149,7 +165,7 @@ export default function Profile() {
           <div className="info-grid">
             <div className="info-item">
               <span className="info-label">类型</span>
-              <span className="info-value">{getAgeGroupLabel()}期</span>
+              <span className="info-value">{getAgeGroupLabel()}</span>
             </div>
             <div className="info-item">
               <span className="info-label">性别</span>
@@ -157,11 +173,13 @@ export default function Profile() {
             </div>
             <div className="info-item">
               <span className="info-label">年龄</span>
-              <span className="info-value">{profile?.age || '--'}</span>
+              <span className="info-value">{profile?.age || '--'}岁</span>
             </div>
             <div className="info-item">
-              <span className="info-label">年级</span>
-              <span className="info-value">{profile?.grade || '--'}</span>
+              <span className="info-label">{profile?.ageGroup === 'teen' ? '学段' : '生长期'}</span>
+              <span className="info-value">
+                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : (profile?.isRapidGrowth || '--')}
+              </span>
             </div>
             <div className="info-item">
               <span className="info-label">身高</span>
@@ -204,36 +222,13 @@ export default function Profile() {
               <div className="habit-item">
                 <span className="habit-icon">
                   <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-                    <rect x="4" y="5" width="16" height="14" rx="2" stroke="#4ecdc4" strokeWidth="2"/>
-                    <path d="M12 9v4M9 12h6" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </span>
-                <div>
-                  <span className="habit-label">久坐时间</span>
-                  <span className="habit-value">{profile?.sittingHours || '--'}</span>
-                </div>
-              </div>
-              <div className="habit-item">
-                <span className="habit-icon">
-                  <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
                     <rect x="5" y="2" width="14" height="20" rx="2" stroke="#63b3ed" strokeWidth="2"/>
                     <path d="M9 18h6" stroke="#63b3ed" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 </span>
                 <div>
-                  <span className="habit-label">屏幕时间</span>
-                  <span className="habit-value">{profile?.screenTime || '--'}</span>
-                </div>
-              </div>
-              <div className="habit-item">
-                <span className="habit-icon">
-                  <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="#9f7aea" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </span>
-                <div>
-                  <span className="habit-label">睡眠时间</span>
-                  <span className="habit-value">{profile?.sleepHours || '--'}</span>
+                  <span className="habit-label">{getScreenOrSittingTime().label}</span>
+                  <span className="habit-value">{getScreenOrSittingTime().value}</span>
                 </div>
               </div>
               <div className="habit-item">
@@ -245,7 +240,7 @@ export default function Profile() {
                 </span>
                 <div>
                   <span className="habit-label">运动频率</span>
-                  <span className="habit-value">{profile?.exerciseFrequency || '--'}</span>
+                  <span className="habit-value">{getExerciseFreq()}</span>
                 </div>
               </div>
             </div>
@@ -259,7 +254,7 @@ export default function Profile() {
               <span>体态状况</span>
             </div>
             <p className="health-status-text">
-              当前情况：<strong>{profile?.hasSpineIssue || '未填写'}</strong>
+              当前情况：<strong>{profile?.spineIssues || '未填写'}</strong>
             </p>
           </div>
         </div>
