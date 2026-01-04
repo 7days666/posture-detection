@@ -100,6 +100,26 @@ export default function Profile() {
     return profile?.gender === 'male' ? '男' : '女'
   }
 
+  // 计算BMI
+  const calculateBMI = () => {
+    const height = parseFloat(profile?.height || '0')
+    const weight = parseFloat(profile?.weight || '0')
+    if (height > 0 && weight > 0) {
+      const heightM = height / 100
+      const bmi = weight / (heightM * heightM)
+      return bmi.toFixed(1)
+    }
+    return null
+  }
+
+  // 获取BMI状态
+  const getBMIStatus = (bmi: number) => {
+    if (bmi < 18.5) return { text: '偏瘦', color: '#63b3ed' }
+    if (bmi < 24) return { text: '正常', color: '#68d391' }
+    if (bmi < 28) return { text: '偏胖', color: '#f6ad55' }
+    return { text: '肥胖', color: '#fc8181' }
+  }
+
   return (
     <div className="profile-container">
       <header className="profile-header">
@@ -152,6 +172,31 @@ export default function Profile() {
               <span className="info-value">{profile?.weight || '--'} kg</span>
             </div>
           </div>
+
+          {/* BMI 显示 */}
+          {calculateBMI() && (
+            <div className="bmi-section">
+              <div className="bmi-display">
+                <div className="bmi-icon">
+                  <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+                    <circle cx="12" cy="12" r="10" stroke={getBMIStatus(parseFloat(calculateBMI()!)).color} strokeWidth="2"/>
+                    <path d="M12 6v6l4 2" stroke={getBMIStatus(parseFloat(calculateBMI()!)).color} strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div className="bmi-info">
+                  <span className="bmi-label">BMI 指数</span>
+                  <div className="bmi-value-row">
+                    <span className="bmi-number" style={{ color: getBMIStatus(parseFloat(calculateBMI()!)).color }}>
+                      {calculateBMI()}
+                    </span>
+                    <span className="bmi-status-tag" style={{ backgroundColor: getBMIStatus(parseFloat(calculateBMI()!)).color }}>
+                      {getBMIStatus(parseFloat(calculateBMI()!)).text}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="habits-section">
             <h4>生活习惯</h4>

@@ -84,6 +84,26 @@ export default function Home() {
     return profile?.gender === 'male' ? '男' : '女'
   }
 
+  // 计算BMI
+  const calculateBMI = () => {
+    const height = parseFloat(profile?.height || '0')
+    const weight = parseFloat(profile?.weight || '0')
+    if (height > 0 && weight > 0) {
+      const heightM = height / 100
+      const bmi = weight / (heightM * heightM)
+      return bmi.toFixed(1)
+    }
+    return null
+  }
+
+  // 获取BMI状态
+  const getBMIStatus = (bmi: number) => {
+    if (bmi < 18.5) return { text: '偏瘦', color: '#63b3ed' }
+    if (bmi < 24) return { text: '正常', color: '#68d391' }
+    if (bmi < 28) return { text: '偏胖', color: '#f6ad55' }
+    return { text: '肥胖', color: '#fc8181' }
+  }
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -121,11 +141,6 @@ export default function Home() {
           
           <div className="profile-stats">
             <div className="stat-item">
-              <span className="stat-value">{profile?.age || '--'}</span>
-              <span className="stat-label">年龄</span>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-item">
               <span className="stat-value">{profile?.height || '--'}</span>
               <span className="stat-label">身高(cm)</span>
             </div>
@@ -134,6 +149,22 @@ export default function Home() {
               <span className="stat-value">{profile?.weight || '--'}</span>
               <span className="stat-label">体重(kg)</span>
             </div>
+            <div className="stat-divider"></div>
+            {calculateBMI() ? (
+              <div className="stat-item">
+                <span className="stat-value" style={{ color: getBMIStatus(parseFloat(calculateBMI()!)).color }}>
+                  {calculateBMI()}
+                </span>
+                <span className="stat-label">
+                  BMI · {getBMIStatus(parseFloat(calculateBMI()!)).text}
+                </span>
+              </div>
+            ) : (
+              <div className="stat-item">
+                <span className="stat-value">--</span>
+                <span className="stat-label">BMI</span>
+              </div>
+            )}
           </div>
 
           <div className="profile-extra">
