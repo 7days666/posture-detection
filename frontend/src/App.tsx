@@ -4,6 +4,7 @@ import Register from './pages/Register'
 import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
+import AIDetect from './pages/AIDetect'
 
 // 检查是否需要引导流程
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
@@ -50,6 +51,11 @@ function App() {
       <Route path="/profile" element={
         <RequireOnboarding>
           <Profile />
+        </RequireOnboarding>
+      } />
+      <Route path="/ai-detect" element={
+        <RequireOnboarding>
+          <AIDetect />
         </RequireOnboarding>
       } />
       <Route path="/" element={<Navigate to="/home" replace />} />
