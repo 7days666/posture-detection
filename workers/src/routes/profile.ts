@@ -31,6 +31,12 @@ profileRoutes.post('/', async (c) => {
     const userId = c.get('userId' as never) as number
     const data = await c.req.json()
     
+    console.log('Received data:', JSON.stringify(data))
+    
+    // 转换数据类型
+    const birthYear = data.birthYear ? parseInt(data.birthYear) : null
+    const age = data.age ? parseInt(data.age) : null
+    
     // 检查是否已有档案
     const existing = await c.env.DB.prepare(
       'SELECT id FROM profiles WHERE user_id = ?'
@@ -48,11 +54,11 @@ profileRoutes.post('/', async (c) => {
           updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
       `).bind(
-        data.ageGroup, data.gender, data.birthYear || null, data.age || null,
+        data.ageGroup, data.gender, birthYear, age,
         data.height, data.weight,
         data.isRapidGrowth || null, data.screenTimeChild || null, data.exerciseFreqChild || null, data.dailyPosture || null,
         data.schoolStage || null, data.heightGrowth || null, data.sittingHours || null, data.exerciseFreqTeen || null, data.postureSymptoms || null,
-        data.spineIssues, data.consentAgreed ? 1 : 0,
+        data.spineIssues || null, data.consentAgreed ? 1 : 0,
         userId
       ).run()
     } else {
@@ -65,18 +71,18 @@ profileRoutes.post('/', async (c) => {
           spine_issues, consent_agreed
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
-        userId, data.ageGroup, data.gender, data.birthYear || null, data.age || null,
+        userId, data.ageGroup, data.gender, birthYear, age,
         data.height, data.weight,
         data.isRapidGrowth || null, data.screenTimeChild || null, data.exerciseFreqChild || null, data.dailyPosture || null,
         data.schoolStage || null, data.heightGrowth || null, data.sittingHours || null, data.exerciseFreqTeen || null, data.postureSymptoms || null,
-        data.spineIssues, data.consentAgreed ? 1 : 0
+        data.spineIssues || null, data.consentAgreed ? 1 : 0
       ).run()
     }
 
     return c.json({ success: true, message: '保存成功' })
-  } catch (error) {
-    console.error('Save profile error:', error)
-    return c.json({ success: false, message: '保存失败' }, 500)
+  } catch (error: any) {
+    console.error('Save profile error:', error.message || error)
+    return c.json({ success: false, message: '保存失败: ' + (error.message || '未知错误') }, 500)
   }
 })
 
