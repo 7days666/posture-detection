@@ -69,7 +69,11 @@ export default function Home() {
   }
 
   const handleFeatureClick = (path: string) => {
-    console.log('Navigate to:', path)
+    if (path === '/ai-detect') {
+      navigate(path)
+    } else {
+      console.log('Navigate to:', path)
+    }
   }
 
   const handleEditProfile = () => {
