@@ -58,11 +58,9 @@ export default function AIDetect() {
   const FrontBodySvg = () => (
     <svg viewBox="0 0 100 220" fill="none" className="body-svg">
       {/* 头部 */}
-      <path d="M50 20 C44 20 40 25 40 32 C40 39 44 44 50 44 C56 44 60 39 60 32 C60 25 56 20 50 20 Z" stroke="#4ecdc4" strokeWidth="2"/>
-      {/* 身体左侧 */}
-      <path d="M42 42 C30 45 20 50 18 70 L15 95 C14 100 16 102 19 98 L22 75 C24 65 28 60 32 60 L32 100 C30 110 28 120 28 130 L26 190 C25 195 22 198 18 198 L32 198 C34 190 36 180 38 130 L48 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      {/* 身体右侧 */}
-      <path d="M58 42 C70 45 80 50 82 70 L85 95 C86 100 84 102 81 98 L78 75 C76 65 72 60 68 60 L68 100 C70 110 72 120 72 130 L74 190 C75 195 78 198 82 198 L68 198 C66 190 64 180 62 130 L52 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M50 18 C45 18 41 22 41 29 C41 36 45 40 50 40 C55 40 59 36 59 29 C59 22 55 18 50 18 Z" stroke="#4ecdc4" strokeWidth="2"/>
+      {/* 身体 */}
+      <path d="M41 36 C35 38 28 42 25 55 L23 85 L21 95 L26 95 L28 85 L30 60 L30 100 L28 140 L26 190 L22 198 L34 198 L36 140 L48 115 L52 115 L64 140 L66 198 L78 198 L74 190 L72 140 L70 100 L70 60 L72 85 L74 95 L79 95 L77 85 L75 55 C72 42 65 38 59 36" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 
@@ -70,11 +68,11 @@ export default function AIDetect() {
   const SideBodySvg = () => (
     <svg viewBox="0 0 100 220" fill="none" className="body-svg">
       {/* 头部 */}
-      <path d="M45 20 C38 20 35 25 35 32 C35 40 40 44 48 44 C52 44 55 40 55 32 C55 28 52 20 45 20 Z" stroke="#4ecdc4" strokeWidth="2"/>
-      {/* 身体轮廓 */}
-      <path d="M48 44 C52 50 55 60 52 80 C50 95 48 100 50 110 C52 120 55 125 55 140 L52 190 C51 195 55 198 60 198 L40 198 C38 190 40 180 42 140 C42 130 40 120 40 110 C40 90 35 80 35 60 C35 50 40 45 42 44" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M50 18 C44 18 42 23 42 29 C42 36 46 40 50 40 C55 40 58 36 58 29 C58 23 55 18 50 18 Z" stroke="#4ecdc4" strokeWidth="2"/>
+      {/* 身体 */}
+      <path d="M48 40 C45 45 45 55 45 65 C45 80 42 90 40 100 L40 140 L38 190 L35 198 L55 198 L52 190 L52 140 L52 100 L52 65 C52 55 52 45 50 40" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       {/* 手臂 */}
-      <path d="M48 50 C45 60 45 70 48 90 L50 105" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M48 45 C45 55 45 65 48 85 L50 100" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round"/>
     </svg>
   )
 
@@ -82,13 +80,11 @@ export default function AIDetect() {
   const BackBodySvg = () => (
     <svg viewBox="0 0 100 220" fill="none" className="body-svg">
       {/* 头部 */}
-      <path d="M50 20 C44 20 40 25 40 32 C40 39 44 44 50 44 C56 44 60 39 60 32 C60 25 56 20 50 20 Z" stroke="#4ecdc4" strokeWidth="2"/>
-      {/* 身体左侧 */}
-      <path d="M42 42 C30 45 20 50 18 70 L15 95 C14 100 16 102 19 98 L22 75 C24 65 28 60 32 60 L32 100 C30 110 28 120 28 130 L26 190 C25 195 22 198 18 198 L32 198 C34 190 36 180 38 130 L48 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      {/* 身体右侧 */}
-      <path d="M58 42 C70 45 80 50 82 70 L85 95 C86 100 84 102 81 98 L78 75 C76 65 72 60 68 60 L68 100 C70 110 72 120 72 130 L74 190 C75 195 78 198 82 198 L68 198 C66 190 64 180 62 130 L52 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M50 18 C45 18 41 22 41 29 C41 36 45 40 50 40 C55 40 59 36 59 29 C59 22 55 18 50 18 Z" stroke="#4ecdc4" strokeWidth="2"/>
+      {/* 身体 */}
+      <path d="M41 36 C35 38 28 42 25 55 L23 85 L21 95 L26 95 L28 85 L30 60 L30 100 L28 140 L26 190 L22 198 L34 198 L36 140 L48 115 L52 115 L64 140 L66 198 L78 198 L74 190 L72 140 L70 100 L70 60 L72 85 L74 95 L79 95 L77 85 L75 55 C72 42 65 38 59 36" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       {/* 脊柱线暗示 */}
-      <path d="M50 45 L50 110" stroke="#4ecdc4" strokeWidth="1" strokeDasharray="2 2" opacity="0.5"/>
+      <path d="M50 40 L50 110" stroke="#4ecdc4" strokeWidth="1" strokeDasharray="2 2" opacity="0.5"/>
     </svg>
   )
 
@@ -166,11 +162,9 @@ export default function AIDetect() {
             <div className="body-outline front">
               <svg viewBox="0 0 100 220" fill="none">
                 {/* Head */}
-                <path d="M50 20 C44 20 40 25 40 32 C40 39 44 44 50 44 C56 44 60 39 60 32 C60 25 56 20 50 20 Z" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="4 2"/>
-                {/* Body Left */}
-                <path d="M42 42 C30 45 20 50 18 70 L15 95 C14 100 16 102 19 98 L22 75 C24 65 28 60 32 60 L32 100 C30 110 28 120 28 130 L26 190 C25 195 22 198 18 198 L32 198 C34 190 36 180 38 130 L48 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2"/>
-                {/* Body Right */}
-                <path d="M58 42 C70 45 80 50 82 70 L85 95 C86 100 84 102 81 98 L78 75 C76 65 72 60 68 60 L68 100 C70 110 72 120 72 130 L74 190 C75 195 78 198 82 198 L68 198 C66 190 64 180 62 130 L52 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2"/>
+                <path d="M50 18 C45 18 41 22 41 29 C41 36 45 40 50 40 C55 40 59 36 59 29 C59 22 55 18 50 18 Z" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="4 2"/>
+                {/* Body */}
+                <path d="M41 36 C35 38 28 42 25 55 L23 85 L21 95 L26 95 L28 85 L30 60 L30 100 L28 140 L26 190 L22 198 L34 198 L36 140 L48 115 L52 115 L64 140 L66 198 L78 198 L74 190 L72 140 L70 100 L70 60 L72 85 L74 95 L79 95 L77 85 L75 55 C72 42 65 38 59 36" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2"/>
               </svg>
             </div>
             <div className="capture-hint">
@@ -222,11 +216,11 @@ export default function AIDetect() {
             <div className="body-outline side">
               <svg viewBox="0 0 100 220" fill="none">
                 {/* Head */}
-                <path d="M45 20 C38 20 35 25 35 32 C35 40 40 44 48 44 C52 44 55 40 55 32 C55 28 52 20 45 20 Z" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="4 2"/>
+                <path d="M50 18 C44 18 42 23 42 29 C42 36 46 40 50 40 C55 40 58 36 58 29 C58 23 55 18 50 18 Z" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="4 2"/>
                 {/* Body */}
-                <path d="M48 44 C52 50 55 60 52 80 C50 95 48 100 50 110 C52 120 55 125 55 140 L52 190 C51 195 55 198 60 198 L40 198 C38 190 40 180 42 140 C42 130 40 120 40 110 C40 90 35 80 35 60 C35 50 40 45 42 44" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2"/>
+                <path d="M48 40 C45 45 45 55 45 65 C45 80 42 90 40 100 L40 140 L38 190 L35 198 L55 198 L52 190 L52 140 L52 100 L52 65 C52 55 52 45 50 40" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2"/>
                 {/* Arm */}
-                <path d="M48 50 C45 60 45 70 48 90 L50 105" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeDasharray="4 2"/>
+                <path d="M48 45 C45 55 45 65 48 85 L50 100" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeDasharray="4 2"/>
               </svg>
             </div>
             <div className="capture-hint">
@@ -263,11 +257,9 @@ export default function AIDetect() {
           <div className="body-silhouette">
             <svg viewBox="0 0 100 220" fill="none">
               {/* Head */}
-              <path d="M50 20 C44 20 40 25 40 32 C40 39 44 44 50 44 C56 44 60 39 60 32 C60 25 56 20 50 20 Z" stroke="#4ecdc4" strokeWidth="2"/>
-              {/* Body Left */}
-              <path d="M42 42 C30 45 20 50 18 70 L15 95 C14 100 16 102 19 98 L22 75 C24 65 28 60 32 60 L32 100 C30 110 28 120 28 130 L26 190 C25 195 22 198 18 198 L32 198 C34 190 36 180 38 130 L48 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Body Right */}
-              <path d="M58 42 C70 45 80 50 82 70 L85 95 C86 100 84 102 81 98 L78 75 C76 65 72 60 68 60 L68 100 C70 110 72 120 72 130 L74 190 C75 195 78 198 82 198 L68 198 C66 190 64 180 62 130 L52 130" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M50 18 C45 18 41 22 41 29 C41 36 45 40 50 40 C55 40 59 36 59 29 C59 22 55 18 50 18 Z" stroke="#4ecdc4" strokeWidth="2"/>
+              {/* Body */}
+              <path d="M41 36 C35 38 28 42 25 55 L23 85 L21 95 L26 95 L28 85 L30 60 L30 100 L28 140 L26 190 L22 198 L34 198 L36 140 L48 115 L52 115 L64 140 L66 198 L78 198 L74 190 L72 140 L70 100 L70 60 L72 85 L74 95 L79 95 L77 85 L75 55 C72 42 65 38 59 36" stroke="#4ecdc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <motion.div 
