@@ -191,10 +191,6 @@ export default function Onboarding() {
   const RadioItem = ({ selected, onClick, children, desc, delay = 0 }: any) => (
     <motion.div
       className={`option-item ${selected ? 'selected' : ''}`}
-      variants={itemVariants}
-      custom={delay}
-      initial="hidden"
-      animate="visible"
       whileHover={{ backgroundColor: 'rgba(78, 205, 196, 0.05)' }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
@@ -210,10 +206,6 @@ export default function Onboarding() {
   const CheckboxItem = ({ selected, onClick, children, delay = 0 }: any) => (
     <motion.div
       className={`option-item checkbox ${selected ? 'selected' : ''}`}
-      variants={itemVariants}
-      custom={delay}
-      initial="hidden"
-      animate="visible"
       whileHover={{ backgroundColor: 'rgba(78, 205, 196, 0.05)' }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
@@ -435,7 +427,7 @@ export default function Onboarding() {
           </motion.div>
           <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>隐私与授权说明</motion.h2>
           <motion.div className="consent-text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-            <p>本平台所收集的信息仅用于<strong>青少年体态与脊柱健康风险评估及健康指导</strong>，不涉及任何商业用途。</p>
+            <p>本平台所收集的信息仅用于<strong>儿童青少年体态与脊柱健康风险评估及健康指导</strong>，不涉及任何商业用途。</p>
             <p>所有数据将进行<strong>匿名化处理</strong>，仅用于统计分析与健康服务支持。</p>
           </motion.div>
           <motion.div 
