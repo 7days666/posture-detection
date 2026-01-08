@@ -32,39 +32,14 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement) {
   return poses[0] || null
 }
 
-// 关键点名称映射
-const KEYPOINT_NAMES = {
-  nose: '鼻子',
-  left_eye: '左眼',
-  right_eye: '右眼',
-  left_ear: '左耳',
-  right_ear: '右耳',
-  left_shoulder: '左肩',
-  right_shoulder: '右肩',
-  left_elbow: '左肘',
-  right_elbow: '右肘',
-  left_wrist: '左腕',
-  right_wrist: '右腕',
-  left_hip: '左髋',
-  right_hip: '右髋',
-  left_knee: '左膝',
-  right_knee: '右膝',
-  left_ankle: '左踝',
-  right_ankle: '右踝'
-}
+// 关键点名称映射（保留供将来使用）
+// const KEYPOINT_NAMES = { ... }
 
-// 计算两点之间的角度
-function calculateAngle(p1: {x: number, y: number}, p2: {x: number, y: number}, p3: {x: number, y: number}) {
-  const radians = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x)
-  let angle = Math.abs(radians * 180 / Math.PI)
-  if (angle > 180) angle = 360 - angle
-  return angle
-}
+// 计算两点之间的角度（保留供将来使用）
+// function calculateAngle(...) { ... }
 
-// 计算两点之间的距离
-function distance(p1: {x: number, y: number}, p2: {x: number, y: number}) {
-  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2))
-}
+// 计算两点之间的距离（保留供将来使用）
+// function distance(...) { ... }
 
 // 获取关键点
 function getKeypoint(pose: poseDetection.Pose, name: string) {
@@ -187,7 +162,6 @@ export function analyzeFrontPose(pose: poseDetection.Pose): PostureAnalysis {
   // 4. 身体中线偏移
   if (nose && leftHip && rightHip && leftShoulder && rightShoulder) {
     const shoulderCenter = (leftShoulder.x + rightShoulder.x) / 2
-    const hipCenter = (leftHip.x + rightHip.x) / 2
     const bodyWidth = Math.abs(leftShoulder.x - rightShoulder.x)
     const centerOffset = Math.abs(nose.x - shoulderCenter) / bodyWidth * 100
     
