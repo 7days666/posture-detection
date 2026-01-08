@@ -9,6 +9,7 @@ import {
   combineAnalysis,
   PostureAnalysis 
 } from '../utils/poseDetection'
+import { generateAISuggestion } from '../api/aiSuggestion'
 import './AIDetect.css'
 
 type Step = 'intro' | 'front' | 'side' | 'analyzing' | 'result'
@@ -23,6 +24,8 @@ export default function AIDetect() {
   const [analysisResult, setAnalysisResult] = useState<PostureAnalysis | null>(null)
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [modelLoading, setModelLoading] = useState(false)
+  const [aiSuggestion, setAiSuggestion] = useState<string>('')
+  const [aiSuggestionLoading, setAiSuggestionLoading] = useState(false)
   const frontImageRef = useRef<HTMLImageElement>(null)
   const sideImageRef = useRef<HTMLImageElement>(null)
 
@@ -81,60 +84,96 @@ export default function AIDetect() {
     try {
       // 进度动画
       const progressInterval = setInterval(() => {
-        setAnalysisProgress(prev => Math.min(prev + 2, 90))
-      }, 100)
+        setAnalysisProgress(prev => Math.min(prev + 1, 85))
+      }, 150)
 
-      // 创建图片元素进行分析
-      const frontImg = new Image()
-      frontImg.crossOrigin = 'anonymous'
-      frontImg.src = frontImage!
-      await new Promise(resolve => frontImg.onload = resolve)
+      // 创建图片元素进行分析 - 使用更可靠的加载方式
+      const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          img.onload = () => {
+            console.log('[AIDetect] 图片加载完成:', img.naturalWidth, 'x', img.naturalHeight)
+            resolve(img)
+          }
+          img.onerror = (e) => {
+            console.error('[AIDetect] 图片加载失败:', e)
+            reject(new Error('图片加载失败'))
+          }
+          img.src = src
+        })
+      }
 
-      const sideImg = new Image()
-      sideImg.crossOrigin = 'anonymous'
-      sideImg.src = sideImage!
-      await new Promise(resolve => sideImg.onload = resolve)
+      console.log('[AIDetect] 开始加载正面图片...')
+      const frontImg = await loadImage(frontImage!)
+      setAnalysisProgress(20)
+
+      console.log('[AIDetect] 开始加载侧面图片...')
+      const sideImg = await loadImage(sideImage!)
+      setAnalysisProgress(30)
 
       // 检测正面姿态
-      setAnalysisProgress(30)
+      console.log('[AIDetect] 开始检测正面姿态...')
       const frontPose = await detectPoseFromImage(frontImg)
+      setAnalysisProgress(55)
       
       // 检测侧面姿态
-      setAnalysisProgress(60)
+      console.log('[AIDetect] 开始检测侧面姿态...')
       const sidePose = await detectPoseFromImage(sideImg)
+      setAnalysisProgress(80)
 
       clearInterval(progressInterval)
       setAnalysisProgress(100)
 
+      console.log('[AIDetect] 正面姿态检测结果:', frontPose ? '成功' : '失败')
+      console.log('[AIDetect] 侧面姿态检测结果:', sidePose ? '成功' : '失败')
+
       // 分析结果
+      let finalResult: PostureAnalysis
       if (frontPose && sidePose) {
+        console.log('[AIDetect] 综合分析两张图片')
         const frontAnalysis = analyzeFrontPose(frontPose)
         const sideAnalysis = analyzeSidePose(sidePose)
-        const combined = combineAnalysis(frontAnalysis, sideAnalysis)
-        setAnalysisResult(combined)
+        finalResult = combineAnalysis(frontAnalysis, sideAnalysis)
       } else if (frontPose) {
-        const frontAnalysis = analyzeFrontPose(frontPose)
-        setAnalysisResult(frontAnalysis)
+        console.log('[AIDetect] 仅分析正面图片')
+        finalResult = analyzeFrontPose(frontPose)
+      } else if (sidePose) {
+        console.log('[AIDetect] 仅分析侧面图片')
+        const sideAnalysis = analyzeSidePose(sidePose)
+        finalResult = {
+          score: 80 + (sideAnalysis.score || 0),
+          status: 'warning',
+          items: sideAnalysis.items || [],
+          suggestions: sideAnalysis.suggestions || ['建议重新拍摄正面照片以获得更准确的分析']
+        }
       } else {
-        // 无法检测到姿态，使用默认结果
-        setAnalysisResult({
+        // 无法检测到姿态
+        console.warn('[AIDetect] 两张图片都未能检测到姿态')
+        finalResult = {
           score: 75,
           status: 'warning',
           items: [
-            { name: '姿态检测', status: 'warning', value: 50, description: '图片质量可能影响检测精度' }
+            { name: '姿态检测', status: 'warning', value: 50, description: '未能准确识别人体姿态' }
           ],
           suggestions: [
+            '请确保全身在画面中清晰可见',
             '建议在光线充足的环境下重新拍摄',
-            '确保全身在画面中清晰可见',
-            '穿着贴身衣物可提高检测准确度'
+            '穿着贴身衣物可提高检测准确度',
+            '保持与相机约2-3米的距离'
           ]
-        })
+        }
       }
 
-      setTimeout(() => setStep('result'), 500)
+      setAnalysisResult(finalResult)
+      setTimeout(() => {
+        setStep('result')
+        // 异步获取 AI 建议
+        fetchAISuggestion(finalResult)
+      }, 500)
     } catch (error) {
-      console.error('分析失败:', error)
-      setAnalysisResult({
+      console.error('[AIDetect] 分析失败:', error)
+      const errorResult: PostureAnalysis = {
         score: 70,
         status: 'warning',
         items: [
@@ -145,8 +184,22 @@ export default function AIDetect() {
           '建议重新拍摄后再次检测',
           '如问题持续，请联系客服'
         ]
-      })
+      }
+      setAnalysisResult(errorResult)
       setTimeout(() => setStep('result'), 500)
+    }
+  }
+
+  // 获取 AI 健康建议
+  const fetchAISuggestion = async (result: PostureAnalysis) => {
+    setAiSuggestionLoading(true)
+    try {
+      const suggestion = await generateAISuggestion(result)
+      setAiSuggestion(suggestion)
+    } catch (error) {
+      console.error('[AIDetect] AI建议获取失败:', error)
+    } finally {
+      setAiSuggestionLoading(false)
     }
   }
 
@@ -368,6 +421,37 @@ export default function AIDetect() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* AI 健康顾问建议 */}
+        <div className="ai-suggestion-section">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+              <path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 011 1v3a1 1 0 01-1 1h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 01-1-1v-3a1 1 0 011-1h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z" stroke="#4ecdc4" strokeWidth="1.5"/>
+              <circle cx="9" cy="13" r="1" fill="#4ecdc4"/>
+              <circle cx="15" cy="13" r="1" fill="#4ecdc4"/>
+              <path d="M9 17h6" stroke="#4ecdc4" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            AI 健康顾问
+          </h3>
+          {aiSuggestionLoading ? (
+            <div className="ai-suggestion-loading">
+              <div className="typing-indicator">
+                <span></span><span></span><span></span>
+              </div>
+              <p>AI 正在分析并生成个性化建议...</p>
+            </div>
+          ) : aiSuggestion ? (
+            <div className="ai-suggestion-content">
+              {aiSuggestion.split('\n').map((line, index) => (
+                line.trim() && <p key={index}>{line}</p>
+              ))}
+            </div>
+          ) : (
+            <div className="ai-suggestion-content">
+              <p>正在获取 AI 建议...</p>
+            </div>
+          )}
         </div>
       </motion.div>
     )
