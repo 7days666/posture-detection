@@ -813,3 +813,92 @@
   width: 100px;
   height: 180px;
 }
+
+
+/* AI 健康顾问建议区域 */
+.ai-suggestion-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(78, 205, 196, 0.2);
+}
+
+.ai-suggestion-section h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-suggestion-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 12px;
+}
+
+.ai-suggestion-loading p {
+  font-size: 13px;
+  color: #718096;
+}
+
+/* 打字机效果指示器 */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #4ecdc4;
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.ai-suggestion-content {
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.05) 0%, rgba(68, 160, 141, 0.03) 100%);
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 3px solid #4ecdc4;
+}
+
+.ai-suggestion-content p {
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.8;
+  margin: 0 0 12px 0;
+}
+
+.ai-suggestion-content p:last-child {
+  margin-bottom: 0;
+}
