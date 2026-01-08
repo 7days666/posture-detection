@@ -191,7 +191,7 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
   const rightKnee = lm[POSE_LANDMARKS.RIGHT_KNEE]
 
   // 原始数据
-  const rawData = {
+  const rawData: PostureAnalysis['rawData'] = {
     shoulderTilt: 0,
     hipTilt: 0,
     headTilt: 0,
@@ -363,7 +363,7 @@ export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
   const knee = lm[POSE_LANDMARKS.LEFT_KNEE] || lm[POSE_LANDMARKS.RIGHT_KNEE]
   const ankle = lm[POSE_LANDMARKS.LEFT_ANKLE] || lm[POSE_LANDMARKS.RIGHT_ANKLE]
 
-  const rawData = { headForward: 0, shoulderRound: 0 }
+  const rawData: Partial<NonNullable<PostureAnalysis['rawData']>> = { headForward: 0, shoulderRound: 0 }
 
   // 1. 头部前倾检测（耳朵相对于肩膀的前移）
   if (ear && shoulder) {
@@ -448,7 +448,7 @@ export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
     })
   }
 
-  return { items, suggestions, score: -scoreDeduction, rawData }
+  return { items, suggestions, score: -scoreDeduction, rawData: rawData as PostureAnalysis['rawData'] }
 }
 
 // 综合分析
