@@ -85,6 +85,11 @@
   height: 3px;
   background: #e2e8f0;
   margin: 0 8px;
+  transition: background 0.3s ease;
+}
+
+.step-line.active {
+  background: #4ecdc4;
 }
 
 /* 内容区域 */
@@ -115,17 +120,16 @@
 }
 
 .pose-figure {
-  width: 70px;
+  width: 60px;
   flex-shrink: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 8px;
 }
 
 .body-svg {
-  width: 60px;
-  height: 130px;
+  width: 50px;
+  height: 100px;
 }
 
 .pose-info {
@@ -734,4 +738,78 @@
 
 .disclaimer-btn:hover {
   background: #f7fafc;
+}
+
+
+/* 模型加载提示 */
+.model-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(78, 205, 196, 0.1);
+  margin: 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #4ecdc4;
+}
+
+.loading-spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(78, 205, 196, 0.3);
+  border-top-color: #4ecdc4;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 进度条 */
+.progress-bar {
+  width: 200px;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 auto 16px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* 拍摄提示点 */
+.tip-dot {
+  width: 6px;
+  height: 6px;
+  background: #4ecdc4;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 结果项描述 */
+.item-desc {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 6px;
+}
+
+/* 人体轮廓调整 */
+.body-outline .body-svg {
+  width: 80px;
+  height: 160px;
+  opacity: 0.6;
+}
+
+/* 扫描容器调整 */
+.scan-container .body-svg {
+  width: 100px;
+  height: 180px;
 }

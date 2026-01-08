@@ -4,8 +4,7 @@ import TabBar from '../components/TabBar'
 import { getProfile, Profile } from '../api/profile'
 import {
   ReportIcon, ArchiveIcon, EducationIcon, AppointmentIcon,
-  AIIcon, FollowUpIcon, SurveyIcon, ShopIcon, ConsultIcon,
-  SelfTestIcon
+  AIIcon, FollowUpIcon, SurveyIcon, ShopIcon, ConsultIcon
 } from '../components/Icons'
 import './Home.css'
 
@@ -20,12 +19,11 @@ const features = [
   { icon: ArchiveIcon, label: '档案管理', color: '#f6ad55', path: '/archive' },
   { icon: EducationIcon, label: '健康宣教', color: '#fc8181', path: '/education' },
   { icon: AppointmentIcon, label: '预约挂号', color: '#63b3ed', path: '/appointment' },
-  { icon: AIIcon, label: 'AI检测', color: '#68d391', path: '/ai-detect' },
+  { icon: AIIcon, label: 'AI体态检测', color: '#68d391', path: '/ai-detect' },
   { icon: FollowUpIcon, label: '随访管理', color: '#b794f4', path: '/follow-up' },
   { icon: SurveyIcon, label: '问卷调查', color: '#f687b3', path: '/survey' },
   { icon: ShopIcon, label: '商城', color: '#fbd38d', path: '/shop' },
   { icon: ConsultIcon, label: '在线咨询', color: '#90cdf4', path: '/consult' },
-  { icon: SelfTestIcon, label: '居家自测', color: '#9f7aea', path: '/self-test' },
 ]
 
 export default function Home() {
