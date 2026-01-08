@@ -188,7 +188,7 @@ export default function Onboarding() {
   )
 
   // 单选项组件
-  const RadioItem = ({ selected, onClick, children, desc, delay = 0 }: any) => (
+  const RadioItem = ({ selected, onClick, children, desc }: any) => (
     <motion.div
       className={`option-item ${selected ? 'selected' : ''}`}
       whileHover={{ backgroundColor: 'rgba(78, 205, 196, 0.05)' }}
@@ -203,7 +203,7 @@ export default function Onboarding() {
   )
 
   // 复选框组件
-  const CheckboxItem = ({ selected, onClick, children, delay = 0 }: any) => (
+  const CheckboxItem = ({ selected, onClick, children }: any) => (
     <motion.div
       className={`option-item checkbox ${selected ? 'selected' : ''}`}
       whileHover={{ backgroundColor: 'rgba(78, 205, 196, 0.05)' }}
