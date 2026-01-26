@@ -5,6 +5,9 @@ import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import AIDetect from './pages/AIDetect'
+import HealthEducation from './pages/HealthEducation'
+import DataTracking from './pages/DataTracking'
+import HealthReport from './pages/HealthReport'
 
 // 检查是否需要引导流程
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
@@ -56,6 +59,21 @@ function App() {
       <Route path="/ai-detect" element={
         <RequireOnboarding>
           <AIDetect />
+        </RequireOnboarding>
+      } />
+      <Route path="/education" element={
+        <RequireOnboarding>
+          <HealthEducation />
+        </RequireOnboarding>
+      } />
+      <Route path="/tracking" element={
+        <RequireOnboarding>
+          <DataTracking />
+        </RequireOnboarding>
+      } />
+      <Route path="/report" element={
+        <RequireOnboarding>
+          <HealthReport />
         </RequireOnboarding>
       } />
       <Route path="/" element={<Navigate to="/home" replace />} />
