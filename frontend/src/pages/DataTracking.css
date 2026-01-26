@@ -1,0 +1,467 @@
+.data-tracking-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  padding-bottom: 80px;
+}
+
+.data-tracking-page .page-header {
+  padding: 24px 20px 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.data-tracking-page .page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.data-tracking-page .subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.tracking-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  overflow-x: auto;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tracking-tabs .tab-btn {
+  padding: 8px 16px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #6b7280;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tracking-tabs .tab-btn.active {
+  background: #10b981;
+  color: white;
+}
+
+.tracking-content {
+  padding: 20px;
+}
+
+/* Score Card */
+.score-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.score-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.score-circle {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.score-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.score-label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.score-trend {
+  text-align: right;
+}
+
+.trend-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.trend-badge.improving {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.trend-badge.stable {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.trend-badge.declining {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.trend-detail {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+/* Chart Section */
+.chart-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.chart-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 120px;
+  padding: 10px 0;
+}
+
+.bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.bar {
+  width: 24px;
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  border-radius: 4px 4px 0 0;
+  min-height: 10px;
+}
+
+.bar-label {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 8px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.stat-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  display: block;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* AI Analysis */
+.ai-analysis {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.ai-icon {
+  font-size: 24px;
+}
+
+.analysis-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.analysis-content {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.analysis-content ul {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.analysis-content li {
+  margin: 8px 0;
+}
+
+.analysis-content strong {
+  color: #10b981;
+}
+
+/* History Section */
+.history-section,
+.exercise-section {
+  margin-bottom: 20px;
+}
+
+.history-section h2,
+.exercise-section h2,
+.trend-analysis h2,
+.exercise-suggestions h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+.history-list,
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.history-date {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.history-details {
+  margin-bottom: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.detail-row span:first-child {
+  color: #6b7280;
+}
+
+.score.high {
+  color: #dc2626;
+}
+
+.score.medium {
+  color: #d97706;
+}
+
+.score.low {
+  color: #10b981;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.risk-badge.high {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.risk-badge.medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.risk-badge.low {
+  background: #d1fae5;
+  color: #059669;
+}
+
+/* Trend Analysis */
+.trend-analysis {
+  margin-bottom: 20px;
+}
+
+.trend-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trend-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.trend-card.positive {
+  border-left: 4px solid #10b981;
+}
+
+.trend-icon {
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+.trend-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.trend-info p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+/* Exercise Items */
+.exercise-item {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.exercise-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.exercise-info {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.exercise-info h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.exercise-info p {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 2px 0 0;
+}
+
+.exercise-stats {
+  text-align: right;
+}
+
+.duration {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.completion-bar {
+  width: 60px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  margin: 6px 0;
+  overflow: hidden;
+}
+
+.completion-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 3px;
+}
+
+.completion-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Exercise Suggestions */
+.suggestion-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.suggestion-card p {
+  font-size: 14px;
+  color: #374151;
+  margin: 0;
+}
+
+.suggestion-card ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+.suggestion-card li {
+  font-size: 14px;
+  color: #374151;
+  margin: 8px 0;
+}

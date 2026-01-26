@@ -182,3 +182,34 @@ export const SelfTestIcon = ({ color = "#9f7aea" }: { color?: string }) => (
     <path d="M10 24H22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
   </svg>
 )
+
+// 底部导航栏图标
+export const LearnIcon = ({ active = false }: { active?: boolean }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M12 4L2 9L12 14L22 9L12 4Z"
+      stroke={active ? "#4ecdc4" : "#a0aec0"}
+      strokeWidth="2"
+      strokeLinejoin="round"
+      fill={active ? "rgba(78, 205, 196, 0.15)" : "none"}
+    />
+    <path d="M5 11V17C5 17 8 20 12 20C16 20 19 17 19 17V11" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const ChartIcon = ({ active = false }: { active?: boolean }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="12" width="4" height="8" rx="1" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" fill={active ? "rgba(78, 205, 196, 0.15)" : "none"}/>
+    <rect x="10" y="8" width="4" height="12" rx="1" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" fill={active ? "rgba(78, 205, 196, 0.15)" : "none"}/>
+    <rect x="17" y="4" width="4" height="16" rx="1" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" fill={active ? "rgba(78, 205, 196, 0.15)" : "none"}/>
+  </svg>
+)
+
+export const ReportNavIcon = ({ active = false }: { active?: boolean }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="3" width="16" height="18" rx="2" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" fill={active ? "rgba(78, 205, 196, 0.15)" : "none"}/>
+    <path d="M8 8H16" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 12H14" stroke={active ? "#4ecdc4" : "#a0aec0"} strokeWidth="2" strokeLinecap="round"/>
+    <circle cx="16" cy="15" r="3" fill={active ? "#4ecdc4" : "#a0aec0"}/>
+  </svg>
+)

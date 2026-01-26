@@ -1,0 +1,261 @@
+.health-education-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding-bottom: 80px;
+}
+
+.page-header {
+  padding: 24px 20px 16px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.page-header .subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+.education-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  overflow-x: auto;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #6b7280;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.education-content {
+  padding: 20px;
+}
+
+.content-section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-header p {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.education-card {
+  display: flex;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.card-thumbnail {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex: 1;
+  margin-left: 14px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.card-description {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0;
+}
+
+.card-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.card-meta span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.course-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.course-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.course-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.course-info {
+  margin-left: 14px;
+}
+
+.course-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.course-info p {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.course-lessons {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 16px;
+  margin-bottom: 16px;
+}
+
+.lesson-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f9fafb;
+}
+
+.lesson-number {
+  width: 24px;
+  height: 24px;
+  background: #f3f4f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.lesson-title {
+  flex: 1;
+  margin-left: 12px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.lesson-status {
+  font-size: 16px;
+  color: #d1d5db;
+}
+
+.lesson-status.completed {
+  color: #10b981;
+}
+
+.start-course-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.article-content {
+  padding: 20px;
+  background: white;
+  min-height: calc(100vh - 120px);
+}
+
+.article-body {
+  line-height: 1.8;
+  color: #374151;
+}
+
+.article-body h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 24px 0 12px;
+}
+
+.article-body p {
+  margin: 12px 0;
+  font-size: 15px;
+}
+
+.article-body strong {
+  color: #1f2937;
+}
