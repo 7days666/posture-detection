@@ -1,6 +1,17 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
+import {
+  TrendUpIcon,
+  TrendDownIcon,
+  TrendStableIcon,
+  SearchIcon,
+  RunIcon,
+  TimerIcon,
+  CheckmarkIcon,
+  RobotIcon,
+  ImprovementIcon
+} from '../components/Icons'
 import './DataTracking.css'
 
 // 模拟历史检测数据
@@ -98,9 +109,9 @@ export default function DataTracking() {
                 </div>
                 <div className="score-trend">
                   <span className={`trend-badge ${trend}`}>
-                    {trend === 'improving' && '📈 持续改善'}
-                    {trend === 'stable' && '➡️ 保持稳定'}
-                    {trend === 'declining' && '📉 需要关注'}
+                    {trend === 'improving' && <><TrendUpIcon color="#059669" /> 持续改善</>}
+                    {trend === 'stable' && <><TrendStableIcon color="#d97706" /> 保持稳定</>}
+                    {trend === 'declining' && <><TrendDownIcon color="#dc2626" /> 需要关注</>}
                   </span>
                   <p className="trend-detail">
                     相比首次检测 {scoreChange > 0 ? '+' : ''}{scoreChange} 分
@@ -128,24 +139,24 @@ export default function DataTracking() {
               transition={{ delay: 0.2 }}
             >
               <div className="stat-card">
-                <span className="stat-icon">🔍</span>
+                <span className="stat-icon"><SearchIcon color="#10b981" /></span>
                 <span className="stat-value">{mockAssessmentHistory.length}</span>
                 <span className="stat-label">检测次数</span>
               </div>
               <div className="stat-card">
-                <span className="stat-icon">🏃</span>
+                <span className="stat-icon"><RunIcon color="#3b82f6" /></span>
                 <span className="stat-value">{mockExerciseRecords.length}</span>
                 <span className="stat-label">运动次数</span>
               </div>
               <div className="stat-card">
-                <span className="stat-icon">⏱️</span>
+                <span className="stat-icon"><TimerIcon color="#f59e0b" /></span>
                 <span className="stat-value">
                   {mockExerciseRecords.reduce((sum, r) => sum + r.duration, 0)}
                 </span>
                 <span className="stat-label">运动分钟</span>
               </div>
               <div className="stat-card">
-                <span className="stat-icon">✅</span>
+                <span className="stat-icon"><CheckmarkIcon color="#8b5cf6" /></span>
                 <span className="stat-value">
                   {Math.round(mockExerciseRecords.reduce((sum, r) => sum + r.completion, 0) / mockExerciseRecords.length)}%
                 </span>
@@ -161,7 +172,7 @@ export default function DataTracking() {
               transition={{ delay: 0.3 }}
             >
               <div className="analysis-header">
-                <span className="ai-icon">🤖</span>
+                <span className="ai-icon"><RobotIcon color="#8b5cf6" /></span>
                 <h2>AI 行为分析</h2>
               </div>
               <div className="analysis-content">
@@ -220,14 +231,14 @@ export default function DataTracking() {
               <h2>趋势分析</h2>
               <div className="trend-cards">
                 <div className="trend-card positive">
-                  <span className="trend-icon">📉</span>
+                  <span className="trend-icon"><ImprovementIcon color="#10b981" /></span>
                   <div className="trend-info">
                     <h3>头部前倾改善</h3>
                     <p>从22°降至12°，改善45%</p>
                   </div>
                 </div>
                 <div className="trend-card positive">
-                  <span className="trend-icon">📉</span>
+                  <span className="trend-icon"><ImprovementIcon color="#10b981" /></span>
                   <div className="trend-info">
                     <h3>肩膀对称性改善</h3>
                     <p>高低差从7cm降至3cm</p>
@@ -251,7 +262,7 @@ export default function DataTracking() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <div className="exercise-icon">🏃</div>
+                    <div className="exercise-icon"><RunIcon color="#10b981" /></div>
                     <div className="exercise-info">
                       <h3>{record.type}</h3>
                       <p>{record.date}</p>

@@ -213,3 +213,175 @@ export const ReportNavIcon = ({ active = false }: { active?: boolean }) => (
     <circle cx="16" cy="15" r="3" fill={active ? "#4ecdc4" : "#a0aec0"}/>
   </svg>
 )
+
+// 数据追踪页面图标
+export const TrendUpIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <path d="M3 17L9 11L13 15L21 7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M17 7H21V11" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const TrendDownIcon = ({ color = "#ef4444" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <path d="M3 7L9 13L13 9L21 17" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M17 17H21V13" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const TrendStableIcon = ({ color = "#f59e0b" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <path d="M4 12H20" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M16 8L20 12L16 16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const SearchIcon = ({ color = "#6b7280" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="11" cy="11" r="7" stroke={color} strokeWidth="2"/>
+    <path d="M16 16L20 20" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const RunIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="14" cy="4" r="2" fill={color}/>
+    <path d="M7 21L10 14L13 16V21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M10 14L8 11L11 8L16 9L18 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const TimerIcon = ({ color = "#3b82f6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="13" r="8" stroke={color} strokeWidth="2"/>
+    <path d="M12 9V13L15 15" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M9 2H15" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const CheckmarkIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <path d="M8 12L11 15L16 9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const RobotIcon = ({ color = "#8b5cf6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <rect x="4" y="8" width="16" height="12" rx="2" stroke={color} strokeWidth="2"/>
+    <circle cx="9" cy="14" r="2" fill={color}/>
+    <circle cx="15" cy="14" r="2" fill={color}/>
+    <path d="M12 4V8" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <circle cx="12" cy="3" r="1.5" fill={color}/>
+  </svg>
+)
+
+export const ImprovementIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M12 20V4" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M5 11L12 4L19 11" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+// 健康教育页面图标
+export const ArticleIcon = ({ color = "#3b82f6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <rect x="4" y="3" width="16" height="18" rx="2" stroke={color} strokeWidth="2"/>
+    <path d="M8 7H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 11H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 15H12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const PostureIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <circle cx="12" cy="4" r="2" fill={color}/>
+    <path d="M12 6V14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 10H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M9 14L12 14L12 20" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M15 14L12 14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M10 20H14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const PreventionIcon = ({ color = "#ef4444" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
+    <path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const BackpackIcon = ({ color = "#f59e0b" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <rect x="5" y="8" width="14" height="13" rx="2" stroke={color} strokeWidth="2"/>
+    <path d="M8 8V6C8 4.34315 9.34315 3 11 3H13C14.6569 3 16 4.34315 16 6V8" stroke={color} strokeWidth="2"/>
+    <rect x="9" y="12" width="6" height="4" rx="1" stroke={color} strokeWidth="2"/>
+  </svg>
+)
+
+export const VideoIcon = ({ color = "#8b5cf6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth="2"/>
+    <path d="M10 9L15 12L10 15V9Z" fill={color}/>
+  </svg>
+)
+
+export const CourseIcon = ({ color = "#f59e0b" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <path d="M4 6H2V20C2 21.1 2.9 22 4 22H18V20H4V6Z" fill={color} fillOpacity="0.2"/>
+    <rect x="6" y="2" width="16" height="16" rx="2" stroke={color} strokeWidth="2"/>
+    <path d="M10 7H18" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M10 11H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+// 健康报告和AI预测图标
+export const PredictionIcon = ({ color = "#6366f1" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <path d="M12 6V12L16 14" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="12" cy="12" r="3" stroke={color} strokeWidth="2"/>
+  </svg>
+)
+
+export const IncreaseIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M12 19V5" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M5 12L12 5L19 12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const AddIcon = ({ color = "#3b82f6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <path d="M12 8V16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 12H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const MonitorIcon = ({ color = "#8b5cf6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="12" r="3" stroke={color} strokeWidth="2"/>
+    <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" stroke={color} strokeWidth="2"/>
+  </svg>
+)
+
+export const CloseIcon = ({ color = "#6b7280" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+    <path d="M6 6L18 18" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M18 6L6 18" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const LessonCompleteIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <circle cx="12" cy="12" r="10" fill={color}/>
+    <path d="M8 12L11 15L16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const LessonPendingIcon = ({ color = "#d1d5db" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2"/>
+  </svg>
+)

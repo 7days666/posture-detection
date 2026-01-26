@@ -1,4 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  PredictionIcon,
+  IncreaseIcon,
+  AddIcon,
+  MonitorIcon,
+  CloseIcon
+} from './Icons'
 import './AIPrediction.css'
 
 interface AIPredictionProps {
@@ -97,10 +104,10 @@ export default function AIPrediction({ onClose }: AIPredictionProps) {
         >
           <div className="modal-header">
             <div className="header-content">
-              <span className="ai-icon">🔮</span>
+              <span className="ai-icon"><PredictionIcon color="#6366f1" /></span>
               <h2>AI 健康趋势预测</h2>
             </div>
-            <button className="close-btn" onClick={onClose}>✕</button>
+            <button className="close-btn" onClick={onClose}><CloseIcon /></button>
           </div>
 
           <div className="modal-body">
@@ -191,9 +198,9 @@ export default function AIPrediction({ onClose }: AIPredictionProps) {
                 {predictionData.adjustments.map((item, index) => (
                   <div key={index} className={`adjustment-item type-${item.type}`}>
                     <div className="adjustment-icon">
-                      {item.type === 'increase' && '⬆️'}
-                      {item.type === 'add' && '➕'}
-                      {item.type === 'monitor' && '👁️'}
+                      {item.type === 'increase' && <IncreaseIcon color="#10b981" />}
+                      {item.type === 'add' && <AddIcon color="#3b82f6" />}
+                      {item.type === 'monitor' && <MonitorIcon color="#8b5cf6" />}
                     </div>
                     <div className="adjustment-content">
                       <p className="adjustment-suggestion">{item.suggestion}</p>

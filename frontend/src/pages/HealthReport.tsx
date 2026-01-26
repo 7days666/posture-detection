@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
 import AIPrediction from '../components/AIPrediction'
+import { RobotIcon, PredictionIcon } from '../components/Icons'
 import './HealthReport.css'
 
 // 模拟最近一次检测结果
@@ -139,7 +140,7 @@ export default function HealthReport() {
           transition={{ delay: 0.3 }}
         >
           <div className="section-header">
-            <span className="ai-badge">🤖 AI建议</span>
+            <span className="ai-badge"><RobotIcon color="#ffffff" /> AI建议</span>
             <h2>个性化调整方案</h2>
           </div>
           <div className="suggestions-list">
@@ -163,7 +164,7 @@ export default function HealthReport() {
             className="prediction-btn"
             onClick={() => setShowPrediction(true)}
           >
-            <span className="btn-icon">🔮</span>
+            <span className="btn-icon"><PredictionIcon color="#ffffff" /></span>
             <div className="btn-content">
               <span className="btn-title">AI 健康趋势预测</span>
               <span className="btn-desc">基于历史数据预测未来体态变化</span>
