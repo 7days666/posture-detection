@@ -1,7 +1,29 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
+import {
+  ArticleIcon,
+  PostureIcon,
+  PreventionIcon,
+  BackpackIcon,
+  VideoIcon,
+  CourseIcon,
+  LessonCompleteIcon,
+  LessonPendingIcon
+} from '../components/Icons'
 import './HealthEducation.css'
+
+// 图标映射
+const thumbnailIcons: Record<string, React.ReactNode> = {
+  'article-1': <ArticleIcon color="#3b82f6" />,
+  'article-2': <PostureIcon color="#10b981" />,
+  'article-3': <PreventionIcon color="#ef4444" />,
+  'article-4': <BackpackIcon color="#f59e0b" />,
+  'video-1': <VideoIcon color="#8b5cf6" />,
+  'video-2': <VideoIcon color="#8b5cf6" />,
+  'video-3': <VideoIcon color="#8b5cf6" />,
+  'course-1': <CourseIcon color="#f59e0b" />,
+}
 
 // 健康教育内容数据
 const educationContents = {
@@ -189,7 +211,7 @@ export default function HealthEducation() {
         }
       }}
     >
-      <div className="card-thumbnail">{item.thumbnail}</div>
+      <div className="card-thumbnail">{thumbnailIcons[item.id] || <ArticleIcon />}</div>
       <div className="card-content">
         <h3 className="card-title">{item.title}</h3>
         <p className="card-description">{item.description}</p>
@@ -306,7 +328,7 @@ export default function HealthEducation() {
                   whileHover={{ scale: 1.02 }}
                 >
                   <div className="course-header">
-                    <span className="course-icon">{item.thumbnail}</span>
+                    <span className="course-icon">{thumbnailIcons[item.id] || <CourseIcon />}</span>
                     <div className="course-info">
                       <h3>{item.title}</h3>
                       <p>{item.description}</p>
@@ -318,7 +340,7 @@ export default function HealthEducation() {
                         <span className="lesson-number">{index + 1}</span>
                         <span className="lesson-title">{lesson.title}</span>
                         <span className={`lesson-status ${lesson.completed ? 'completed' : ''}`}>
-                          {lesson.completed ? '✓' : '○'}
+                          {lesson.completed ? <LessonCompleteIcon /> : <LessonPendingIcon />}
                         </span>
                       </div>
                     ))}
