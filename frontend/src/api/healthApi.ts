@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -31,25 +31,25 @@ export const assessmentAPI = {
     keypoints_data?: any
     ai_suggestions?: string
   }) => {
-    const response = await api.post('/api/assessments', data)
+    const response = await api.post('/assessments', data)
     return response.data
   },
 
   // 获取检测历史
   getHistory: async (limit = 20, offset = 0) => {
-    const response = await api.get(`/api/assessments/history?limit=${limit}&offset=${offset}`)
+    const response = await api.get(`/assessments/history?limit=${limit}&offset=${offset}`)
     return response.data
   },
 
   // 获取最新检测结果
   getLatest: async () => {
-    const response = await api.get('/api/assessments/latest')
+    const response = await api.get('/assessments/latest')
     return response.data
   },
 
   // 获取统计数据
   getStats: async () => {
-    const response = await api.get('/api/assessments/stats')
+    const response = await api.get('/assessments/stats')
     return response.data
   }
 }
@@ -67,19 +67,19 @@ export const exerciseAPI = {
     user_rating?: number
     notes?: string
   }) => {
-    const response = await api.post('/api/exercises', data)
+    const response = await api.post('/exercises', data)
     return response.data
   },
 
   // 获取运动历史
   getHistory: async (limit = 20, offset = 0) => {
-    const response = await api.get(`/api/exercises/history?limit=${limit}&offset=${offset}`)
+    const response = await api.get(`/exercises/history?limit=${limit}&offset=${offset}`)
     return response.data
   },
 
   // 获取运动统计
   getStats: async () => {
-    const response = await api.get('/api/exercises/stats')
+    const response = await api.get('/exercises/stats')
     return response.data
   }
 }
@@ -88,7 +88,7 @@ export const exerciseAPI = {
 export const educationAPI = {
   // 获取教育内容列表
   getContents: async (category?: string, type?: string) => {
-    let url = '/api/education/contents'
+    let url = '/education/contents'
     const params = new URLSearchParams()
     if (category) params.append('category', category)
     if (type) params.append('type', type)
@@ -99,7 +99,7 @@ export const educationAPI = {
 
   // 获取单个内容详情
   getContent: async (id: string) => {
-    const response = await api.get(`/api/education/contents/${id}`)
+    const response = await api.get(`/education/contents/${id}`)
     return response.data
   },
 
@@ -111,19 +111,19 @@ export const educationAPI = {
     progress: number
     duration_seconds?: number
   }) => {
-    const response = await api.post('/api/education/progress', data)
+    const response = await api.post('/education/progress', data)
     return response.data
   },
 
   // 获取我的学习记录
   getMyProgress: async () => {
-    const response = await api.get('/api/education/my-progress')
+    const response = await api.get('/education/my-progress')
     return response.data
   },
 
   // 获取推荐内容
   getRecommendations: async () => {
-    const response = await api.get('/api/education/recommendations')
+    const response = await api.get('/education/recommendations')
     return response.data
   }
 }
@@ -132,13 +132,13 @@ export const educationAPI = {
 export const predictionAPI = {
   // 获取AI预测分析
   analyze: async () => {
-    const response = await api.get('/api/predictions/analyze')
+    const response = await api.get('/predictions/analyze')
     return response.data
   },
 
   // 获取仪表盘数据
   getDashboard: async () => {
-    const response = await api.get('/api/predictions/dashboard')
+    const response = await api.get('/predictions/dashboard')
     return response.data
   }
 }
