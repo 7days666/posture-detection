@@ -342,6 +342,38 @@
   color: #718096;
 }
 
+/* 动作示范框架 */
+.pose-guide-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pose-guide-svg {
+  width: 90%;
+  height: 95%;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 8px rgba(78, 205, 196, 0.3));
+}
+
+.capture-placeholder:hover .pose-guide-svg {
+  opacity: 0.9;
+  filter: drop-shadow(0 0 12px rgba(78, 205, 196, 0.5));
+}
+
+/* 使拍摄按钮悬浮在最上层 */
+.capture-hint {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+}
+
 .preview-image {
   width: 100%;
   height: 100%;
