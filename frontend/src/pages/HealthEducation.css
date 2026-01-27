@@ -302,8 +302,15 @@
 }
 
 .tip-box .tip-icon {
-  font-size: 20px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip-box svg.tip-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .tip-important {
@@ -441,8 +448,15 @@
 }
 
 .photo-example-placeholder .placeholder-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.photo-example-placeholder svg.placeholder-icon {
+  width: 48px;
+  height: 48px;
 }
 
 .photo-example-placeholder p {

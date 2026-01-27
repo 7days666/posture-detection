@@ -207,7 +207,13 @@ export default function HealthReport() {
         </header>
         <main className="report-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+            <svg viewBox="0 0 64 64" fill="none" width="64" height="64" style={{ margin: '0 auto 16px' }}>
+              <rect x="12" y="8" width="40" height="48" rx="3" stroke="#9ca3af" stroke-width="2.5" fill="#f3f4f6"/>
+              <path d="M20 20h24M20 28h24M20 36h16" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="24" cy="44" r="1.5" fill="#9ca3af"/>
+              <circle cx="32" cy="44" r="1.5" fill="#9ca3af"/>
+              <circle cx="40" cy="44" r="1.5" fill="#9ca3af"/>
+            </svg>
             <p style={{ color: '#6b7280', marginBottom: 20 }}>{error || '暂无数据'}</p>
             <button 
               onClick={() => window.location.href = '/detect'}
