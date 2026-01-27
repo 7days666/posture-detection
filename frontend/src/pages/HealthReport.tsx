@@ -1,31 +1,36 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
 import AIPrediction from '../components/AIPrediction'
 import { RobotIcon, PredictionIcon } from '../components/Icons'
+import { assessmentAPI } from '../api/healthApi'
 import './HealthReport.css'
 
-// 模拟最近一次检测结果
-const latestAssessment = {
-  date: '2024-01-20',
-  overallScore: 72,
-  riskLevel: 'medium' as const,
+interface AssessmentData {
+  id?: number
+  overall_score: number
+  risk_level: string
+  head_forward_angle?: number | null
+  shoulder_level_diff?: number | null
+  spine_curvature?: number | null
+  pelvis_tilt?: number | null
+  ai_suggestions?: string | null
+  keypoints_data?: any
+  created_at: string
+}
+
+interface ReportData {
+  date: string
+  overallScore: number
+  riskLevel: 'low' | 'medium' | 'high'
   details: {
-    headForward: { value: 12, status: 'warning', label: '头部前倾', unit: '°', normal: '< 10°' },
-    shoulderLevel: { value: 3, status: 'warning', label: '肩膀高低差', unit: 'cm', normal: '< 2cm' },
-    spineCurvature: { value: 8, status: 'good', label: '脊柱弯曲', unit: '°', normal: '< 10°' },
-    pelvisTilt: { value: 5, status: 'good', label: '骨盆倾斜', unit: '°', normal: '< 8°' },
-  },
-  improvements: [
-    { metric: '头部前倾', before: 22, after: 12, unit: '°' },
-    { metric: '肩膀高低差', before: 7, after: 3, unit: 'cm' },
-  ],
-  suggestions: [
-    '继续保持每日颈椎操练习，每次10分钟',
-    '注意调整电脑屏幕高度，保持平视',
-    '每隔45分钟起身活动，做肩颈拉伸',
-    '加强核心肌群训练，每周3次',
-  ]
+    headForward?: { value: number; status: string; label: string; unit: string; normal: string }
+    shoulderLevel?: { value: number; status: string; label: string; unit: string; normal: string }
+    spineCurvature?: { value: number; status: string; label: string; unit: string; normal: string }
+    pelvisTilt?: { value: number; status: string; label: string; unit: string; normal: string }
+  }
+  improvements: { metric: string; before: number; after: number; unit: string }[]
+  suggestions: string[]
 }
 
 // 风险等级配置
@@ -35,16 +40,195 @@ const riskConfig = {
   high: { color: '#ef4444', label: '高风险', bg: '#fee2e2' },
 }
 
+// 辅助函数：判断指标状态
+function getMetricStatus(value: number, threshold: number): 'good' | 'warning' | 'danger' {
+  if (value <= threshold) return 'good'
+  if (value <= threshold * 1.5) return 'warning'
+  return 'danger'
+}
+
+// 转换数据库数据为展示格式
+function transformAssessmentData(data: AssessmentData, historyData: AssessmentData[]): ReportData {
+  const details: ReportData['details'] = {}
+  
+  // 头部前倾
+  if (data.head_forward_angle !== null && data.head_forward_angle !== undefined) {
+    const value = Math.round(data.head_forward_angle)
+    details.headForward = {
+      value,
+      status: getMetricStatus(value, 10),
+      label: '头部前倾',
+      unit: '°',
+      normal: '< 10°'
+    }
+  }
+  
+  // 肩膀高低差
+  if (data.shoulder_level_diff !== null && data.shoulder_level_diff !== undefined) {
+    const value = Math.round(data.shoulder_level_diff * 10) / 10
+    details.shoulderLevel = {
+      value,
+      status: getMetricStatus(value, 2),
+      label: '肩膀高低差',
+      unit: 'cm',
+      normal: '< 2cm'
+    }
+  }
+  
+  // 脊柱弯曲
+  if (data.spine_curvature !== null && data.spine_curvature !== undefined) {
+    const value = Math.round(data.spine_curvature)
+    details.spineCurvature = {
+      value,
+      status: getMetricStatus(value, 10),
+      label: '脊柱弯曲',
+      unit: '°',
+      normal: '< 10°'
+    }
+  }
+  
+  // 骨盆倾斜
+  if (data.pelvis_tilt !== null && data.pelvis_tilt !== undefined) {
+    const value = Math.round(data.pelvis_tilt)
+    details.pelvisTilt = {
+      value,
+      status: getMetricStatus(value, 8),
+      label: '骨盆倾斜',
+      unit: '°',
+      normal: '< 8°'
+    }
+  }
+  
+  // 计算改善情况（对比历史数据）
+  const improvements: ReportData['improvements'] = []
+  if (historyData.length >= 2) {
+    const oldestRecord = historyData[historyData.length - 1]
+    
+    if (data.head_forward_angle && oldestRecord.head_forward_angle) {
+      improvements.push({
+        metric: '头部前倾',
+        before: Math.round(oldestRecord.head_forward_angle),
+        after: Math.round(data.head_forward_angle),
+        unit: '°'
+      })
+    }
+    
+    if (data.shoulder_level_diff && oldestRecord.shoulder_level_diff) {
+      improvements.push({
+        metric: '肩膀高低差',
+        before: Math.round(oldestRecord.shoulder_level_diff * 10) / 10,
+        after: Math.round(data.shoulder_level_diff * 10) / 10,
+        unit: 'cm'
+      })
+    }
+  }
+  
+  // 解析 AI 建议
+  const suggestions = data.ai_suggestions 
+    ? data.ai_suggestions.split('\n').filter(s => s.trim()).slice(0, 4)
+    : [
+        '完成首次AI体态检测后，这里会显示个性化建议',
+        '建议定期进行体态检测，跟踪健康变化',
+        '保持良好的坐姿和站姿习惯',
+        '每天进行适量的伸展运动'
+      ]
+  
+  return {
+    date: new Date(data.created_at).toLocaleDateString('zh-CN'),
+    overallScore: Math.round(data.overall_score),
+    riskLevel: data.risk_level as 'low' | 'medium' | 'high',
+    details,
+    improvements,
+    suggestions
+  }
+}
+
 export default function HealthReport() {
   const [showPrediction, setShowPrediction] = useState(false)
-
-  const risk = riskConfig[latestAssessment.riskLevel]
+  const [loading, setLoading] = useState(true)
+  const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  
+  useEffect(() => {
+    fetchReportData()
+  }, [])
+  
+  async function fetchReportData() {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // 获取最新检测结果
+      const latestResponse = await assessmentAPI.getLatest()
+      if (!latestResponse.success || !latestResponse.data) {
+        setError('暂无检测数据，请先完成AI体态检测')
+        setLoading(false)
+        return
+      }
+      
+      // 获取历史数据用于计算改善情况
+      const historyResponse = await assessmentAPI.getHistory(10, 0)
+      const historyData = historyResponse.success ? historyResponse.data : []
+      
+      const transformed = transformAssessmentData(latestResponse.data, historyData)
+      setReportData(transformed)
+    } catch (err) {
+      console.error('获取报告数据失败:', err)
+      setError('获取数据失败，请稍后重试')
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  // 加载中
+  if (loading) {
+    return (
+      <div className="health-report-page">
+        <header className="page-header">
+          <h1>健康报告</h1>
+        </header>
+        <main className="report-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div className="loading-spinner" style={{ width: 40, height: 40, border: '3px solid #e5e7eb', borderTopColor: '#10b981', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+            <p style={{ color: '#6b7280' }}>加载中...</p>
+          </div>
+        </main>
+        <TabBar />
+      </div>
+    )
+  }
+  
+  // 错误或无数据
+  if (error || !reportData) {
+    return (
+      <div className="health-report-page">
+        <header className="page-header">
+          <h1>健康报告</h1>
+        </header>
+        <main className="report-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+            <p style={{ color: '#6b7280', marginBottom: 20 }}>{error || '暂无数据'}</p>
+            <button 
+              onClick={() => window.location.href = '/detect'}
+              style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)', color: 'white', border: 'none', borderRadius: '8px', fontSize: 15, cursor: 'pointer' }}
+            >
+              开始检测
+            </button>
+          </div>
+        </main>
+        <TabBar />
+      </div>
+    )
+  }
+  
+  const risk = riskConfig[reportData.riskLevel]
 
   return (
     <div className="health-report-page">
       <header className="page-header">
         <h1>健康报告</h1>
-        <p className="report-date">检测日期：{latestAssessment.date}</p>
+        <p className="report-date">检测日期：{reportData.date}</p>
       </header>
 
       <main className="report-content">
@@ -62,12 +246,12 @@ export default function HealthReport() {
                 cx="50"
                 cy="50"
                 r="45"
-                strokeDasharray={`${latestAssessment.overallScore * 2.83} 283`}
+                strokeDasharray={`${reportData.overallScore * 2.83} 283`}
                 style={{ stroke: risk.color }}
               />
             </svg>
             <div className="score-content">
-              <span className="score-number">{latestAssessment.overallScore}</span>
+              <span className="score-number">{reportData.overallScore}</span>
               <span className="score-unit">分</span>
             </div>
           </div>
@@ -88,7 +272,7 @@ export default function HealthReport() {
         >
           <h2>体态指标详情</h2>
           <div className="metrics-grid">
-            {Object.entries(latestAssessment.details).map(([key, metric]) => (
+            {Object.entries(reportData.details).map(([key, metric]) => (
               <div key={key} className={`metric-card ${metric.status}`}>
                 <div className="metric-header">
                   <span className="metric-label">{metric.label}</span>
@@ -111,8 +295,9 @@ export default function HealthReport() {
           transition={{ delay: 0.2 }}
         >
           <h2>改善情况</h2>
-          <div className="improvement-list">
-            {latestAssessment.improvements.map((item, index) => (
+          {reportData.improvements.length > 0 ? (
+            <div className="improvement-list">
+              {reportData.improvements.map((item, index) => (
               <div key={index} className="improvement-item">
                 <span className="improvement-label">{item.metric}</span>
                 <div className="improvement-bar">
@@ -128,8 +313,13 @@ export default function HealthReport() {
                   ↓ {Math.round((1 - item.after / item.before) * 100)}%
                 </span>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#9ca3af', fontSize: 14 }}>
+              继续检测以查看改善趋势
+            </div>
+          )}
         </motion.section>
 
         {/* AI 建议 */}
@@ -144,7 +334,7 @@ export default function HealthReport() {
             <h2>个性化调整方案</h2>
           </div>
           <div className="suggestions-list">
-            {latestAssessment.suggestions.map((suggestion, index) => (
+            {reportData.suggestions.map((suggestion, index) => (
               <div key={index} className="suggestion-item">
                 <span className="suggestion-number">{index + 1}</span>
                 <span className="suggestion-text">{suggestion}</span>
