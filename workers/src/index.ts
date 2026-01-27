@@ -2,6 +2,10 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authRoutes } from './routes/auth'
 import profileRoutes from './routes/profile'
+import { assessmentRoutes } from './routes/assessments'
+import { exerciseRoutes } from './routes/exercises'
+import { educationRoutes } from './routes/education'
+import { predictionRoutes } from './routes/predictions'
 
 export type Env = {
   DB: D1Database
@@ -19,6 +23,10 @@ app.use('/*', cors({
 // 路由
 app.route('/api/auth', authRoutes)
 app.route('/api/profile', profileRoutes)
+app.route('/api/assessments', assessmentRoutes)
+app.route('/api/exercises', exerciseRoutes)
+app.route('/api/education', educationRoutes)
+app.route('/api/predictions', predictionRoutes)
 
 // 健康检查
 app.get('/api/health', (c) => {
