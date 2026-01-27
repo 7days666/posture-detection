@@ -33,7 +33,7 @@ const educationContents = {
       title: '如何保持正确的坐姿',
       description: '学习科学坐姿，预防脊柱问题',
       category: 'posture',
-      thumbnail: '📖',
+      thumbnail: null,
       duration: 5,
       content: `
         <div class="article-hero-image">
@@ -65,7 +65,10 @@ const educationContents = {
         </div>
         <h3>正确坐姿的要点</h3>
         <div class="tip-box tip-important">
-          <span class="tip-icon">💡</span>
+          <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 16v-4m0-4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <span>背部挺直，腰部紧贴椅背，双脚平放地面</span>
         </div>
         <p><strong>1. 背部支撑</strong></p>
@@ -99,7 +102,10 @@ const educationContents = {
         <p><strong>5. 定时休息</strong></p>
         <p>每30-45分钟起身活动一下，做做伸展运动。</p>
         <div class="tip-box tip-reminder">
-          <span class="tip-icon">⏰</span>
+          <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <span>建议每30-45分钟休息一次</span>
         </div>
       `
@@ -109,7 +115,7 @@ const educationContents = {
       title: '站姿矫正指南',
       description: '正确站姿让你更挺拔自信',
       category: 'posture',
-      thumbnail: '🧍',
+      thumbnail: null,
       duration: 4,
       content: `
         <div class="article-illustration">
@@ -128,7 +134,9 @@ const educationContents = {
         </div>
         <h3>正确站姿的关键</h3>
         <div class="tip-box tip-important">
-          <span class="tip-icon">✨</span>
+          <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
           <span>想象头顶有根线向上拉，保持身体挺拔</span>
         </div>
         <p><strong>1. 头部位置</strong></p>
@@ -148,7 +156,13 @@ const educationContents = {
                 <line x1="75" y1="160" x2="75" y2="130" stroke="#ef4444" stroke-width="3"/>
                 <text x="60" y="150" text-anchor="middle" fill="#c53030" font-size="12" font-weight="600">驼背</text>
               </svg>
-              <span class="compare-label wrong">❌ 含胸驼背</span>
+              <span class="compare-label wrong">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
+                  <circle cx="8" cy="8" r="7" stroke="#dc2626" stroke-width="2"/>
+                  <path d="M5 5l6 6M11 5l-6 6" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                含胸驼背
+              </span>
             </div>
             <div class="compare-item correct">
               <svg viewBox="0 0 120 160" fill="none">
@@ -160,11 +174,21 @@ const educationContents = {
                 <line x1="75" y1="160" x2="75" y2="130" stroke="#10b981" stroke-width="3"/>
                 <text x="60" y="150" text-anchor="middle" fill="#059669" font-size="12" font-weight="600">挺拔</text>
               </svg>
-              <span class="compare-label correct">✓ 肩膀打开</span>
+              <span class="compare-label correct">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
+                  <circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="2"/>
+                  <path d="M5 8l2 2 4-4" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                肩膀打开
+              </span>
             </div>
           </div>
           <div class="tip-box tip-practice">
-            <span class="tip-icon">📸</span>
+            <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
+              <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+              <path d="M17 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
             <span>对着镜子练习，确保肩膀在耳朵正下方</span>
           </div>
         </div>
@@ -184,7 +208,7 @@ const educationContents = {
       title: '预防脊柱侧弯的方法',
       description: '了解脊柱侧弯，早期预防是关键',
       category: 'prevention',
-      thumbnail: '🏥',
+      thumbnail: null,
       duration: 8,
       content: `
         <div class="article-illustration">
@@ -199,7 +223,10 @@ const educationContents = {
         <h3>什么是脊柱侧弯？</h3>
         <p>脊柱侧弯是指脊柱向左或向右弯曲超过10度的情况。青少年发育期是高发期。</p>
         <div class="tip-box tip-warning">
-          <span class="tip-icon">⚠️</span>
+          <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M12 2L2 20h20L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M12 9v4m0 4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <span>青少年发育期（10-16岁）是脊柱侧弯高发期，需特别注意</span>
         </div>
 
@@ -221,7 +248,13 @@ const educationContents = {
                 <line x1="72" y1="180" x2="72" y2="140" stroke="#ef4444" stroke-width="3"/>
                 <text x="60" y="165" text-anchor="middle" fill="#c53030" font-size="12" font-weight="600">倾斜</text>
               </svg>
-              <span class="compare-label wrong">❌ 单肩背包</span>
+              <span class="compare-label wrong">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
+                  <circle cx="8" cy="8" r="7" stroke="#dc2626" stroke-width="2"/>
+                  <path d="M5 5l6 6M11 5l-6 6" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                单肩背包
+              </span>
             </div>
             <div class="compare-item correct">
               <svg viewBox="0 0 120 180" fill="none">
@@ -233,11 +266,21 @@ const educationContents = {
                 <line x1="75" y1="180" x2="75" y2="140" stroke="#10b981" stroke-width="3"/>
                 <text x="60" y="165" text-anchor="middle" fill="#059669" font-size="12" font-weight="600">平衡</text>
               </svg>
-              <span class="compare-label correct">✓ 双肩背包</span>
+              <span class="compare-label correct">
+                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
+                  <circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="2"/>
+                  <path d="M5 8l2 2 4-4" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                双肩背包
+              </span>
             </div>
           </div>
           <div class="photo-example-placeholder">
-            <div class="placeholder-icon">📷</div>
+            <svg class="placeholder-icon" viewBox="0 0 48 48" fill="none" width="48" height="48">
+              <rect x="6" y="10" width="36" height="28" rx="3" stroke="#a855f7" stroke-width="2"/>
+              <circle cx="24" cy="24" r="6" stroke="#a855f7" stroke-width="2"/>
+              <path d="M32 16h.01" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+            </svg>
             <p>建议：可在此处添加真实儿童背包示范照片</p>
           </div>
         </div>
@@ -257,7 +300,7 @@ const educationContents = {
       title: '书包的正确背法',
       description: '保护脊柱从正确背书包开始',
       category: 'posture',
-      thumbnail: '🎒',
+      thumbnail: null,
       duration: 3,
       content: `
         <div class="article-illustration">
@@ -275,7 +318,10 @@ const educationContents = {
         <h3>书包与脊柱健康</h3>
         <p>书包过重或背法不当是导致青少年脊柱问题的重要原因之一。</p>
         <div class="tip-box tip-important">
-          <span class="tip-icon">📏</span>
+          <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M9 2v4M15 2v4M3 8h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 12h.01M12 16h.01M8 12h.01M16 12h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <span>书包重量不应超过体重的10-15%</span>
         </div>
 
@@ -313,7 +359,7 @@ const educationContents = {
       title: '5分钟颈椎放松操',
       description: '缓解颈部疲劳，预防颈椎病',
       category: 'exercise',
-      thumbnail: '🎬',
+      thumbnail: null,
       duration: 5,
       videoUrl: '#'
     },
@@ -322,7 +368,7 @@ const educationContents = {
       title: '办公室伸展运动',
       description: '适合久坐后的简单拉伸',
       category: 'exercise',
-      thumbnail: '🎬',
+      thumbnail: null,
       duration: 8,
       videoUrl: '#'
     },
@@ -331,7 +377,7 @@ const educationContents = {
       title: '脊柱矫正瑜伽',
       description: '温和的瑜伽动作改善体态',
       category: 'exercise',
-      thumbnail: '🎬',
+      thumbnail: null,
       duration: 15,
       videoUrl: '#'
     }
@@ -342,7 +388,7 @@ const educationContents = {
       title: '青少年体态健康课程',
       description: '系统学习体态健康知识',
       category: 'course',
-      thumbnail: '📚',
+      thumbnail: null,
       duration: 60,
       lessons: [
         { title: '认识你的脊柱', completed: false },
