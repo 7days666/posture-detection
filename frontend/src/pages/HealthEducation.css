@@ -259,3 +259,201 @@
 .article-body strong {
   color: #1f2937;
 }
+
+/* 文章插图样式 */
+.article-illustration {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.article-illustration svg {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+}
+
+.inline-illustration {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.inline-illustration svg {
+  width: 120px;
+  height: 80px;
+}
+
+/* 提示框样式 */
+.tip-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.tip-box .tip-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.tip-important {
+  background: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+.tip-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border-left: 4px solid #f59e0b;
+}
+
+.tip-reminder {
+  background: #dbeafe;
+  color: #1e40af;
+  border-left: 4px solid #3b82f6;
+}
+
+/* 对比框样式 */
+.compare-box {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+  justify-content: center;
+}
+
+.compare-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  flex: 1;
+  max-width: 140px;
+}
+
+.compare-item svg {
+  width: 60px;
+  height: 80px;
+  margin-bottom: 8px;
+}
+
+.compare-item span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.compare-item.wrong {
+  background: #fee2e2;
+}
+
+.compare-item.wrong span {
+  color: #dc2626;
+}
+
+.compare-item.correct {
+  background: #d1fae5;
+}
+
+.compare-item.correct span {
+  color: #059669;
+}
+
+/* 增强的视觉比较区域 */
+.visual-comparison {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 16px;
+}
+
+.visual-comparison .compare-box {
+  margin: 0 0 16px 0;
+}
+
+.visual-comparison .compare-item {
+  background: transparent;
+  padding: 0;
+  max-width: none;
+  flex: 1;
+}
+
+.visual-comparison .compare-item svg {
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.compare-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.compare-label.wrong {
+  background: #fee2e2;
+  color: #dc2626 !important;
+}
+
+.compare-label.correct {
+  background: #d1fae5;
+  color: #059669 !important;
+}
+
+/* 文章主图 */
+.article-hero-image {
+  margin: -20px -20px 20px -20px;
+  overflow: hidden;
+}
+
+.illustration-placeholder {
+  width: 100%;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.illustration-placeholder svg {
+  display: block;
+}
+
+/* 照片示例占位符 */
+.photo-example-placeholder {
+  margin-top: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  border-radius: 12px;
+  text-align: center;
+  border: 2px dashed #a855f7;
+}
+
+.photo-example-placeholder .placeholder-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.photo-example-placeholder p {
+  font-size: 13px;
+  color: #7e22ce;
+  margin: 0;
+}
+
+/* 实践提示框 */
+.tip-practice {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border-left: 4px solid #f59e0b;
+}
