@@ -13,7 +13,7 @@ import { generateAISuggestion } from '../api/aiSuggestion'
 import { assessmentAPI } from '../api/healthApi'
 import './AIDetect.css'
 
-type Step = 'intro' | 'front' | 'side' | 'analyzing' | 'result'
+type Step = 'intro' | 'front' | 'side' | 'back' | 'analyzing' | 'result'
 
 export default function AIDetect() {
   const navigate = useNavigate()
@@ -21,6 +21,7 @@ export default function AIDetect() {
   const [agreed, setAgreed] = useState(false)
   const [frontImage, setFrontImage] = useState<string | null>(null)
   const [sideImage, setSideImage] = useState<string | null>(null)
+  const [backImage, setBackImage] = useState<string | null>(null)
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<PostureAnalysis | null>(null)
   const [analysisProgress, setAnalysisProgress] = useState(0)
@@ -29,6 +30,7 @@ export default function AIDetect() {
   const [aiSuggestionLoading, setAiSuggestionLoading] = useState(false)
   const frontImageRef = useRef<HTMLImageElement>(null)
   const sideImageRef = useRef<HTMLImageElement>(null)
+  const backImageRef = useRef<HTMLImageElement>(null)
 
   // 预加载模型
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function AIDetect() {
     preloadModel()
   }, [])
 
-  const handleImageUpload = (type: 'front' | 'side') => {
+  const handleImageUpload = (type: 'front' | 'side' | 'back') => {
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = 'image/*'
@@ -58,8 +60,10 @@ export default function AIDetect() {
           const result = e.target?.result as string
           if (type === 'front') {
             setFrontImage(result)
-          } else {
+          } else if (type === 'side') {
             setSideImage(result)
+          } else {
+            setBackImage(result)
           }
         }
         reader.readAsDataURL(file)
@@ -74,6 +78,8 @@ export default function AIDetect() {
     } else if (step === 'front' && frontImage) {
       setStep('side')
     } else if (step === 'side' && sideImage) {
+      setStep('back')
+    } else if (step === 'back' && backImage) {
       startAnalysis()
     }
   }
@@ -111,6 +117,10 @@ export default function AIDetect() {
 
       console.log('[AIDetect] 开始加载侧面图片...')
       const sideImg = await loadImage(sideImage!)
+      setAnalysisProgress(25)
+      
+      console.log('[AIDetect] 开始加载背面图片...')
+      const backImg = await loadImage(backImage!)
       setAnalysisProgress(30)
 
       // 检测正面姿态
@@ -121,6 +131,11 @@ export default function AIDetect() {
       // 检测侧面姿态
       console.log('[AIDetect] 开始检测侧面姿态...')
       const sidePose = await detectPoseFromImage(sideImg)
+      setAnalysisProgress(60)
+      
+      // 检测背面姿态
+      console.log('[AIDetect] 开始检测背面姿态...')
+      const backPose = await detectPoseFromImage(backImg)
       setAnalysisProgress(80)
 
       clearInterval(progressInterval)
@@ -128,11 +143,27 @@ export default function AIDetect() {
 
       console.log('[AIDetect] 正面姿态检测结果:', frontPose ? '成功' : '失败')
       console.log('[AIDetect] 侧面姿态检测结果:', sidePose ? '成功' : '失败')
+      console.log('[AIDetect] 背面姿态检测结果:', backPose ? '成功' : '失败')
 
       // 分析结果
       let finalResult: PostureAnalysis
-      if (frontPose && sidePose) {
-        console.log('[AIDetect] 综合分析两张图片')
+      if (frontPose && sidePose && backPose) {
+        console.log('[AIDetect] 综合分析三张图片')
+        const frontAnalysis = analyzeFrontPose(frontPose)
+        const sideAnalysis = analyzeSidePose(sidePose)
+        const backAnalysis = analyzeFrontPose(backPose) // 背面使用和正面类似的分析
+        // 先合并正面和侧面
+        let combined = combineAnalysis(frontAnalysis, sideAnalysis)
+        // 再加入背面的分析结果
+        if (backAnalysis.items && backAnalysis.items.length > 0) {
+          combined.items = [...combined.items, ...backAnalysis.items.filter(item => 
+            item.name.includes('高低肩') || item.name.includes('脊柱') || item.name.includes('骨盆')
+          )]
+          combined.suggestions = [...new Set([...combined.suggestions, ...backAnalysis.suggestions])].slice(0, 6)
+        }
+        finalResult = combined
+      } else if (frontPose && sidePose) {
+        console.log('[AIDetect] 综合分析正面和侧面图片')
         const frontAnalysis = analyzeFrontPose(frontPose)
         const sideAnalysis = analyzeSidePose(sidePose)
         finalResult = combineAnalysis(frontAnalysis, sideAnalysis)
@@ -316,7 +347,7 @@ export default function AIDetect() {
   const renderFrontCapture = () => (
     <motion.div className="detect-content capture-content" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
       <div className="capture-header">
-        <div className="step-badge">1/2</div>
+        <div className="step-badge">1/3</div>
         <h2>正面拍摄</h2>
         <p>请按照示意图姿势拍摄正面全身照</p>
       </div>
@@ -331,7 +362,35 @@ export default function AIDetect() {
           </div>
         ) : (
           <div className="capture-placeholder" onClick={() => handleImageUpload('front')}>
-            <div className="body-outline"><FrontBodySvg /></div>
+            {/* 动作示范框架 */}
+            <div className="pose-guide-frame">
+              <svg viewBox="0 0 200 340" fill="none" className="pose-guide-svg">
+                {/* 外框 */}
+                <rect x="10" y="10" width="180" height="320" rx="10" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="8 4" fill="none"/>
+                {/* 头部区域 */}
+                <circle cx="100" cy="50" r="28" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="6 3" fill="rgba(78, 205, 196, 0.1)"/>
+                <text x="100" y="55" textAnchor="middle" fill="#4ecdc4" fontSize="10">头部</text>
+                {/* 身体中线 */}
+                <line x1="100" y1="78" x2="100" y2="200" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 肩膀线 */}
+                <line x1="45" y1="100" x2="155" y2="100" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                <text x="40" y="95" textAnchor="end" fill="#4ecdc4" fontSize="8">肩</text>
+                <text x="160" y="95" textAnchor="start" fill="#4ecdc4" fontSize="8">肩</text>
+                {/* 手臂 */}
+                <line x1="45" y1="100" x2="30" y2="170" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                <line x1="155" y1="100" x2="170" y2="170" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 髋部线 */}
+                <line x1="60" y1="200" x2="140" y2="200" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 腿部 */}
+                <line x1="75" y1="200" x2="70" y2="300" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                <line x1="125" y1="200" x2="130" y2="300" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 脚部 */}
+                <ellipse cx="70" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
+                <ellipse cx="130" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
+                {/* 提示文字 */}
+                <text x="100" y="335" textAnchor="middle" fill="#4ecdc4" fontSize="10">双脚并拢站在此位置</text>
+              </svg>
+            </div>
             <div className="capture-hint">
               <svg viewBox="0 0 24 24" fill="none" width="28" height="28"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" stroke="#4ecdc4" strokeWidth="2"/><circle cx="12" cy="13" r="4" stroke="#4ecdc4" strokeWidth="2"/></svg>
               <span>点击拍摄或上传</span>
@@ -342,6 +401,7 @@ export default function AIDetect() {
       <div className="capture-tips">
         <div className="tip-item"><span className="tip-dot"></span>双脚合拢自然站立</div>
         <div className="tip-item"><span className="tip-dot"></span>光脚站立，水平拍摄全身</div>
+        <div className="tip-item"><span className="tip-dot"></span>将身体对准框架内的人形轮廓</div>
       </div>
     </motion.div>
   )
@@ -350,7 +410,7 @@ export default function AIDetect() {
   const renderSideCapture = () => (
     <motion.div className="detect-content capture-content" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
       <div className="capture-header">
-        <div className="step-badge">2/2</div>
+        <div className="step-badge">2/3</div>
         <h2>侧面拍摄</h2>
         <p>请按照示意图姿势拍摄侧面全身照</p>
       </div>
@@ -365,7 +425,30 @@ export default function AIDetect() {
           </div>
         ) : (
           <div className="capture-placeholder" onClick={() => handleImageUpload('side')}>
-            <div className="body-outline"><SideBodySvg /></div>
+            {/* 侧面动作示范框架 */}
+            <div className="pose-guide-frame">
+              <svg viewBox="0 0 200 340" fill="none" className="pose-guide-svg">
+                {/* 外框 */}
+                <rect x="10" y="10" width="180" height="320" rx="10" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="8 4" fill="none"/>
+                {/* 头部区域 */}
+                <ellipse cx="110" cy="50" rx="22" ry="28" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="6 3" fill="rgba(78, 205, 196, 0.1)"/>
+                <text x="110" y="55" textAnchor="middle" fill="#4ecdc4" fontSize="10">头部</text>
+                {/* 脊柱线（稍微前倾的自然曲线） */}
+                <path d="M105 78 Q115 120 110 160 Q105 190 108 200" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="4 2" fill="none"/>
+                <text x="130" y="140" fill="#4ecdc4" fontSize="8">脊柱</text>
+                {/* 手臂 */}
+                <line x1="105" y1="100" x2="70" y2="160" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 臀部 */}
+                <ellipse cx="115" cy="210" rx="25" ry="20" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.05)"/>
+                {/* 腿部 */}
+                <line x1="100" y1="225" x2="95" y2="300" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                <line x1="115" y1="225" x2="110" y2="300" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 脚部 */}
+                <ellipse cx="100" cy="310" rx="20" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
+                {/* 提示文字 */}
+                <text x="100" y="335" textAnchor="middle" fill="#4ecdc4" fontSize="10">侧身站立，双脚并拢</text>
+              </svg>
+            </div>
             <div className="capture-hint">
               <svg viewBox="0 0 24 24" fill="none" width="28" height="28"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" stroke="#4ecdc4" strokeWidth="2"/><circle cx="12" cy="13" r="4" stroke="#4ecdc4" strokeWidth="2"/></svg>
               <span>点击拍摄或上传</span>
@@ -376,6 +459,74 @@ export default function AIDetect() {
       <div className="capture-tips">
         <div className="tip-item"><span className="tip-dot"></span>双脚合拢，侧身站立</div>
         <div className="tip-item"><span className="tip-dot"></span>镜头对准腰部位置水平拍摄</div>
+        <div className="tip-item"><span className="tip-dot"></span>将身体对准框架内的人形轮廓</div>
+      </div>
+    </motion.div>
+  )
+
+  // 背面拍摄页面
+  const renderBackCapture = () => (
+    <motion.div className="detect-content capture-content" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
+      <div className="capture-header">
+        <div className="step-badge">3/3</div>
+        <h2>背面拍摄</h2>
+        <p>请按照示意图姿势拍摄背面全身照</p>
+      </div>
+      <div className="capture-area">
+        {backImage ? (
+          <div className="preview-image">
+            <img src={backImage} alt="背面照片" ref={backImageRef} />
+            <button className="retake-btn" onClick={() => setBackImage(null)}>
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              重拍
+            </button>
+          </div>
+        ) : (
+          <div className="capture-placeholder" onClick={() => handleImageUpload('back')}>
+            {/* 背面动作示范框架 */}
+            <div className="pose-guide-frame">
+              <svg viewBox="0 0 200 340" fill="none" className="pose-guide-svg">
+                {/* 外框 */}
+                <rect x="10" y="10" width="180" height="320" rx="10" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="8 4" fill="none"/>
+                {/* 头部区域 */}
+                <circle cx="100" cy="50" r="28" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="6 3" fill="rgba(78, 205, 196, 0.1)"/>
+                <text x="100" y="55" textAnchor="middle" fill="#4ecdc4" fontSize="10">头部</text>
+                {/* 脊柱线（背面可见） */}
+                <line x1="100" y1="78" x2="100" y2="200" stroke="#4ecdc4" strokeWidth="2" strokeDasharray="4 2"/>
+                <text x="120" y="140" fill="#4ecdc4" fontSize="8">脊柱</text>
+                {/* 肩胛骨区域 */}
+                <ellipse cx="70" cy="110" rx="15" ry="20" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.05)"/>
+                <ellipse cx="130" cy="110" rx="15" ry="20" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.05)"/>
+                <text x="70" y="95" textAnchor="middle" fill="#4ecdc4" fontSize="7">肩胛</text>
+                <text x="130" y="95" textAnchor="middle" fill="#4ecdc4" fontSize="7">肩胛</text>
+                {/* 肩膀线 */}
+                <line x1="45" y1="100" x2="155" y2="100" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 手臂 */}
+                <line x1="45" y1="100" x2="30" y2="170" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                <line x1="155" y1="100" x2="170" y2="170" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 髅部线 */}
+                <line x1="60" y1="200" x2="140" y2="200" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 腿部 */}
+                <line x1="75" y1="200" x2="70" y2="300" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                <line x1="125" y1="200" x2="130" y2="300" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2"/>
+                {/* 脚部 */}
+                <ellipse cx="70" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
+                <ellipse cx="130" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
+                {/* 提示文字 */}
+                <text x="100" y="335" textAnchor="middle" fill="#4ecdc4" fontSize="10">背对镜头，双脚并拢</text>
+              </svg>
+            </div>
+            <div className="capture-hint">
+              <svg viewBox="0 0 24 24" fill="none" width="28" height="28"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" stroke="#4ecdc4" strokeWidth="2"/><circle cx="12" cy="13" r="4" stroke="#4ecdc4" strokeWidth="2"/></svg>
+              <span>点击拍摄或上传</span>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="capture-tips">
+        <div className="tip-item"><span className="tip-dot"></span>背对镜头，双脚并拢站立</div>
+        <div className="tip-item"><span className="tip-dot"></span>镜头对准腰部位置水平拍摄</div>
+        <div className="tip-item"><span className="tip-dot"></span>可检测脊柱侧弯、肩胛骨突出等问题</div>
       </div>
     </motion.div>
   )
@@ -493,6 +644,7 @@ export default function AIDetect() {
       case 'intro': return '注意事项'
       case 'front': return '正面拍摄'
       case 'side': return '侧面拍摄'
+      case 'back': return '背面拍摄'
       case 'analyzing': return '分析中'
       case 'result': return '检测结果'
     }
@@ -503,6 +655,7 @@ export default function AIDetect() {
       case 'intro': return agreed && !modelLoading
       case 'front': return !!frontImage
       case 'side': return !!sideImage
+      case 'back': return !!backImage
       default: return false
     }
   }
@@ -512,7 +665,8 @@ export default function AIDetect() {
     switch (step) {
       case 'intro': return '下一步'
       case 'front': return '下一步'
-      case 'side': return '开始分析'
+      case 'side': return '下一步'
+      case 'back': return '开始分析'
       case 'result': return '完成'
       default: return '下一步'
     }
@@ -522,6 +676,7 @@ export default function AIDetect() {
     switch (step) {
       case 'front': setStep('intro'); break
       case 'side': setStep('front'); break
+      case 'back': setStep('side'); break
       case 'result': navigate('/home'); break
       default: navigate('/home')
     }
@@ -541,9 +696,11 @@ export default function AIDetect() {
         <div className="step-indicator">
           <div className={`step-dot ${step === 'intro' ? 'active' : 'done'}`}>{step !== 'intro' ? <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M5 12l5 5L20 7" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg> : '1'}</div>
           <div className={`step-line ${step !== 'intro' ? 'active' : ''}`}></div>
-          <div className={`step-dot ${step === 'front' ? 'active' : step === 'side' ? 'done' : ''}`}>{step === 'side' ? <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M5 12l5 5L20 7" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg> : '2'}</div>
-          <div className={`step-line ${step === 'side' ? 'active' : ''}`}></div>
-          <div className={`step-dot ${step === 'side' ? 'active' : ''}`}>3</div>
+          <div className={`step-dot ${step === 'front' ? 'active' : (step === 'side' || step === 'back') ? 'done' : ''}`}>{(step === 'side' || step === 'back') ? <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M5 12l5 5L20 7" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg> : '2'}</div>
+          <div className={`step-line ${(step === 'side' || step === 'back') ? 'active' : ''}`}></div>
+          <div className={`step-dot ${step === 'side' ? 'active' : step === 'back' ? 'done' : ''}`}>{step === 'back' ? <svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M5 12l5 5L20 7" stroke="white" strokeWidth="3" strokeLinecap="round"/></svg> : '3'}</div>
+          <div className={`step-line ${step === 'back' ? 'active' : ''}`}></div>
+          <div className={`step-dot ${step === 'back' ? 'active' : ''}`}>4</div>
         </div>
       )}
 
@@ -551,6 +708,7 @@ export default function AIDetect() {
         {step === 'intro' && renderIntro()}
         {step === 'front' && renderFrontCapture()}
         {step === 'side' && renderSideCapture()}
+        {step === 'back' && renderBackCapture()}
         {step === 'analyzing' && renderAnalyzing()}
         {step === 'result' && renderResult()}
       </AnimatePresence>
