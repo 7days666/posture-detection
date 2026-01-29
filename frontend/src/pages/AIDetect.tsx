@@ -51,7 +51,7 @@ export default function AIDetect() {
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = 'image/*'
-    input.capture = 'environment'
+    // 不设置 capture 属性，让用户可以选择拍照或从相册上传
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (file) {
