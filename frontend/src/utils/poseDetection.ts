@@ -1,10 +1,14 @@
 import * as poseDetection from '@tensorflow-models/pose-detection'
 import '@tensorflow/tfjs-backend-webgl'
+import '@tensorflow/tfjs-backend-cpu'
 import * as tf from '@tensorflow/tfjs'
 
 let detector: poseDetection.PoseDetector | null = null
 let isInitializing = false
 let initError: string | null = null
+
+// 检测是否是移动端
+const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
 export interface Landmark {
   x: number
@@ -33,24 +37,41 @@ export async function initPoseDetector(): Promise<poseDetection.PoseDetector> {
 
   try {
     console.log('[AI] 初始化 TensorFlow.js...')
-    await tf.ready()
-    console.log('[AI] TensorFlow 后端:', tf.getBackend())
-
-    // 尝试 WebGL
-    if (tf.getBackend() !== 'webgl') {
+    console.log('[AI] 设备类型:', isMobile() ? '移动端' : '桌面端')
+    
+    // 尝试设置后端，优先 WebGL，失败则用 CPU
+    let backendSet = false
+    try {
+      await tf.setBackend('webgl')
+      await tf.ready()
+      backendSet = true
+      console.log('[AI] 使用 WebGL 后端')
+    } catch (e) {
+      console.warn('[AI] WebGL 不可用，尝试 CPU 后端')
+    }
+    
+    if (!backendSet) {
       try {
-        await tf.setBackend('webgl')
+        await tf.setBackend('cpu')
         await tf.ready()
+        console.log('[AI] 使用 CPU 后端')
       } catch (e) {
-        console.warn('[AI] WebGL 不可用')
+        console.error('[AI] CPU 后端也不可用')
       }
     }
+    
+    console.log('[AI] TensorFlow 后端:', tf.getBackend())
 
-    console.log('[AI] 加载 MoveNet Thunder 模型...')
+    // 移动端使用 Lightning 模型（更轻量），桌面端使用 Thunder 模型（更精确）
+    const modelType = isMobile() 
+      ? poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
+      : poseDetection.movenet.modelType.SINGLEPOSE_THUNDER
+    
+    console.log('[AI] 加载 MoveNet', isMobile() ? 'Lightning' : 'Thunder', '模型...')
     detector = await poseDetection.createDetector(
       poseDetection.SupportedModels.MoveNet,
       {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+        modelType: modelType,
         enableSmoothing: false
       }
     )
@@ -87,8 +108,8 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
     const ctx = canvas.getContext('2d')
     if (!ctx) return null
 
-    // 调整尺寸
-    const maxSize = 512
+    // 移动端使用更小的尺寸以提高性能
+    const maxSize = isMobile() ? 384 : 512
     let width = imageElement.naturalWidth
     let height = imageElement.naturalHeight
 
@@ -98,14 +119,32 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
       height = Math.round(height * scale)
     }
 
+    // 确保尺寸是偶数（某些 GPU 要求）
+    width = Math.round(width / 2) * 2
+    height = Math.round(height / 2) * 2
+
     canvas.width = width
     canvas.height = height
     ctx.drawImage(imageElement, 0, 0, width, height)
 
     console.log('[AI] Canvas 尺寸:', width, 'x', height)
 
-    // 检测姿态
-    const poses = await det.estimatePoses(canvas)
+    // 检测姿态 - 移动端多尝试几次
+    let poses: poseDetection.Pose[] = []
+    const maxAttempts = isMobile() ? 3 : 1
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        poses = await det.estimatePoses(canvas)
+        if (poses.length > 0) break
+        if (attempt < maxAttempts - 1) {
+          console.log('[AI] 第', attempt + 1, '次检测未找到姿态，重试...')
+          await new Promise(r => setTimeout(r, 100))
+        }
+      } catch (e) {
+        console.warn('[AI] 检测尝试', attempt + 1, '失败:', e)
+      }
+    }
     console.log('[AI] 检测到姿态数:', poses.length)
 
     if (poses.length > 0) {
@@ -117,16 +156,19 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
         name: kp.name
       }))
 
-      // 打印关键点
-      const validCount = landmarks.filter(lm => lm.score && lm.score > 0.3).length
-      console.log('[AI] 有效关键点:', validCount, '/ 17')
+      // 打印关键点 - 移动端降低置信度阈值
+      const minScore = isMobile() ? 0.2 : 0.3
+      const validCount = landmarks.filter(lm => lm.score && lm.score > minScore).length
+      console.log('[AI] 有效关键点:', validCount, '/ 17', '(阈值:', minScore, ')')
       
       landmarks.forEach(lm => {
-        const status = lm.score && lm.score > 0.3 ? '✓' : '✗'
+        const status = lm.score && lm.score > minScore ? '✓' : '✗'
         console.log(`[AI] ${status} ${lm.name}: score=${lm.score?.toFixed(2)}`)
       })
 
-      if (validCount >= 8) {
+      // 移动端降低关键点数量要求
+      const minValidCount = isMobile() ? 5 : 8
+      if (validCount >= minValidCount) {
         return { landmarks }
       }
     }
