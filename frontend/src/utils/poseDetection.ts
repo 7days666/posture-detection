@@ -1,15 +1,7 @@
-import * as poseDetection from '@tensorflow-models/pose-detection'
-import '@tensorflow/tfjs-backend-webgl'
-import '@tensorflow/tfjs-backend-cpu'
-import '@tensorflow/tfjs-backend-wasm'
-import { setWasmPaths } from '@tensorflow/tfjs-backend-wasm'
-import * as tf from '@tensorflow/tfjs'
+import { Pose } from '@mediapipe/pose'
 
-let detector: poseDetection.PoseDetector | null = null
-let isInitializing = false
-let initError: string | null = null
-let initAttempts = 0
-const MAX_INIT_ATTEMPTS = 3
+let poseInstance: Pose | null = null
+let initPromise: Promise<Pose> | null = null
 
 // 检测是否是移动端
 const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -25,90 +17,73 @@ export interface PoseResult {
   landmarks: Landmark[]
 }
 
-// 初始化 MoveNet 检测器
-export async function initPoseDetector(): Promise<poseDetection.PoseDetector> {
-  if (detector) return detector
-  
-  // 允许重试，而不是永久失败
-  if (initError && initAttempts >= MAX_INIT_ATTEMPTS) {
-    throw new Error(initError)
-  }
-  
-  if (isInitializing) {
-    while (isInitializing) {
-      await new Promise(resolve => setTimeout(resolve, 100))
+// MediaPipe 关键点名称映射
+const KEYPOINT_NAMES = [
+  'nose', 'left_eye_inner', 'left_eye', 'left_eye_outer',
+  'right_eye_inner', 'right_eye', 'right_eye_outer',
+  'left_ear', 'right_ear', 'mouth_left', 'mouth_right',
+  'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow',
+  'left_wrist', 'right_wrist', 'left_pinky', 'right_pinky',
+  'left_index', 'right_index', 'left_thumb', 'right_thumb',
+  'left_hip', 'right_hip', 'left_knee', 'right_knee',
+  'left_ankle', 'right_ankle', 'left_heel', 'right_heel',
+  'left_foot_index', 'right_foot_index'
+]
+
+// 初始化 MediaPipe Pose
+export async function initPoseDetector(): Promise<Pose> {
+  if (poseInstance) return poseInstance
+  if (initPromise) return initPromise
+
+  console.log('[AI] 初始化 MediaPipe Pose...')
+  console.log('[AI] 设备类型:', isMobile() ? '移动端' : '桌面端')
+
+  initPromise = new Promise((resolve, reject) => {
+    try {
+      const pose = new Pose({
+        locateFile: (file) => {
+          const url = `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          console.log('[AI] 加载文件:', url)
+          return url
+        }
+      })
+
+      pose.setOptions({
+        modelComplexity: isMobile() ? 0 : 1, // 移动端用轻量模型
+        smoothLandmarks: false,
+        enableSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      })
+
+      pose.onResults(() => {
+        // 初始化回调，不做任何事
+      })
+
+      // 初始化模型
+      pose.initialize().then(() => {
+        console.log('[AI] MediaPipe Pose 初始化成功')
+        poseInstance = pose
+        resolve(pose)
+      }).catch((err) => {
+        console.error('[AI] MediaPipe 初始化失败:', err)
+        initPromise = null // 允许重试
+        reject(err)
+      })
+    } catch (error) {
+      console.error('[AI] MediaPipe 创建失败:', error)
+      initPromise = null // 允许重试
+      reject(error)
     }
-    if (detector) return detector
-    throw new Error(initError || '初始化失败')
-  }
+  })
 
-  isInitializing = true
-  initAttempts++
-  initError = null // 重置错误状态
-
-  try {
-    console.log('[AI] 初始化 TensorFlow.js... (尝试 #' + initAttempts + ')')
-    console.log('[AI] 设备类型:', isMobile() ? '移动端' : '桌面端')
-    console.log('[AI] User Agent:', navigator.userAgent)
-    
-    // 设置 WASM 路径（使用 CDN）
-    setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/')
-    
-    // 后端优先级：移动端优先 WASM > WebGL > CPU，桌面端优先 WebGL > WASM > CPU
-    const backendPriority = isMobile() 
-      ? ['wasm', 'webgl', 'cpu'] 
-      : ['webgl', 'wasm', 'cpu']
-    
-    let backendSet = false
-    for (const backend of backendPriority) {
-      if (backendSet) break
-      try {
-        console.log('[AI] 尝试设置后端:', backend)
-        await tf.setBackend(backend)
-        await tf.ready()
-        backendSet = true
-        console.log('[AI] 成功使用后端:', backend)
-      } catch (e) {
-        console.warn('[AI]', backend, '后端不可用:', e)
-      }
-    }
-    
-    if (!backendSet) {
-      throw new Error('所有 TensorFlow 后端都不可用')
-    }
-    
-    console.log('[AI] TensorFlow 后端:', tf.getBackend())
-
-    // 移动端使用 Lightning 模型（更轻量），桌面端使用 Thunder 模型（更精确）
-    const modelType = isMobile() 
-      ? poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
-      : poseDetection.movenet.modelType.SINGLEPOSE_THUNDER
-    
-    console.log('[AI] 加载 MoveNet', isMobile() ? 'Lightning' : 'Thunder', '模型...')
-    detector = await poseDetection.createDetector(
-      poseDetection.SupportedModels.MoveNet,
-      {
-        modelType: modelType,
-        enableSmoothing: false
-      }
-    )
-    console.log('[AI] 模型加载成功')
-
-    isInitializing = false
-    return detector
-  } catch (error) {
-    isInitializing = false
-    initError = error instanceof Error ? error.message : '模型加载失败'
-    console.error('[AI] 初始化失败:', error)
-    throw error
-  }
+  return initPromise
 }
-
 
 // 从图片检测姿态
 export async function detectPoseFromImage(imageElement: HTMLImageElement): Promise<PoseResult | null> {
   try {
-    const det = await initPoseDetector()
+    const pose = await initPoseDetector()
 
     console.log('[AI] 检测图片:', imageElement.naturalWidth, 'x', imageElement.naturalHeight)
 
@@ -123,10 +98,13 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
     // 创建 canvas 处理图片
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    if (!ctx) return null
+    if (!ctx) {
+      console.error('[AI] 无法创建 canvas context')
+      return null
+    }
 
-    // 移动端使用更小的尺寸以提高性能
-    const maxSize = isMobile() ? 384 : 512
+    // 调整图片尺寸
+    const maxSize = isMobile() ? 480 : 640
     let width = imageElement.naturalWidth
     let height = imageElement.naturalHeight
 
@@ -136,87 +114,78 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
       height = Math.round(height * scale)
     }
 
-    // 确保尺寸是偶数（某些 GPU 要求）
-    width = Math.round(width / 2) * 2
-    height = Math.round(height / 2) * 2
-
     canvas.width = width
     canvas.height = height
     ctx.drawImage(imageElement, 0, 0, width, height)
 
     console.log('[AI] Canvas 尺寸:', width, 'x', height)
 
-    // 检测姿态 - 移动端多尝试几次
-    let poses: poseDetection.Pose[] = []
-    const maxAttempts = isMobile() ? 3 : 1
-    
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      try {
-        poses = await det.estimatePoses(canvas)
-        if (poses.length > 0) break
-        if (attempt < maxAttempts - 1) {
-          console.log('[AI] 第', attempt + 1, '次检测未找到姿态，重试...')
-          await new Promise(r => setTimeout(r, 100))
+    // 使用 Promise 包装 MediaPipe 的回调式 API
+    return new Promise((resolve) => {
+      let resultLandmarks: Landmark[] | null = null
+
+      pose.onResults((results) => {
+        if (results.poseLandmarks && results.poseLandmarks.length > 0) {
+          console.log('[AI] 检测到姿态，关键点数:', results.poseLandmarks.length)
+          
+          resultLandmarks = results.poseLandmarks.map((lm, idx) => ({
+            x: lm.x,
+            y: lm.y,
+            score: lm.visibility,
+            name: KEYPOINT_NAMES[idx] || `point_${idx}`
+          }))
+
+          // 统计有效关键点
+          const minScore = isMobile() ? 0.3 : 0.5
+          const validCount = resultLandmarks.filter(lm => lm.score && lm.score > minScore).length
+          console.log('[AI] 有效关键点:', validCount, '/', resultLandmarks.length)
+
+          resolve({ landmarks: resultLandmarks })
+        } else {
+          console.warn('[AI] 未检测到姿态')
+          resolve(null)
         }
-      } catch (e) {
-        console.warn('[AI] 检测尝试', attempt + 1, '失败:', e)
-      }
-    }
-    console.log('[AI] 检测到姿态数:', poses.length)
-
-    if (poses.length > 0) {
-      const pose = poses[0]
-      const landmarks: Landmark[] = pose.keypoints.map(kp => ({
-        x: kp.x / width,  // 归一化到 0-1
-        y: kp.y / height,
-        score: kp.score,
-        name: kp.name
-      }))
-
-      // 打印关键点 - 移动端降低置信度阈值
-      const minScore = isMobile() ? 0.2 : 0.3
-      const validCount = landmarks.filter(lm => lm.score && lm.score > minScore).length
-      console.log('[AI] 有效关键点:', validCount, '/ 17', '(阈值:', minScore, ')')
-      
-      landmarks.forEach(lm => {
-        const status = lm.score && lm.score > minScore ? '✓' : '✗'
-        console.log(`[AI] ${status} ${lm.name}: score=${lm.score?.toFixed(2)}`)
       })
 
-      // 移动端降低关键点数量要求
-      const minValidCount = isMobile() ? 5 : 8
-      if (validCount >= minValidCount) {
-        return { landmarks }
-      }
-    }
+      // 发送图片进行检测
+      pose.send({ image: canvas }).catch((err) => {
+        console.error('[AI] 发送图片失败:', err)
+        resolve(null)
+      })
 
-    console.warn('[AI] 未检测到有效姿态')
-    return null
+      // 超时处理
+      setTimeout(() => {
+        if (!resultLandmarks) {
+          console.warn('[AI] 检测超时')
+          resolve(null)
+        }
+      }, 10000)
+    })
   } catch (error) {
     console.error('[AI] 检测失败:', error)
     return null
   }
 }
 
-// 关键点索引
+// MediaPipe Pose 关键点索引
 const KEYPOINTS = {
   NOSE: 0,
-  LEFT_EYE: 1,
-  RIGHT_EYE: 2,
-  LEFT_EAR: 3,
-  RIGHT_EAR: 4,
-  LEFT_SHOULDER: 5,
-  RIGHT_SHOULDER: 6,
-  LEFT_ELBOW: 7,
-  RIGHT_ELBOW: 8,
-  LEFT_WRIST: 9,
-  RIGHT_WRIST: 10,
-  LEFT_HIP: 11,
-  RIGHT_HIP: 12,
-  LEFT_KNEE: 13,
-  RIGHT_KNEE: 14,
-  LEFT_ANKLE: 15,
-  RIGHT_ANKLE: 16
+  LEFT_EYE: 2,
+  RIGHT_EYE: 5,
+  LEFT_EAR: 7,
+  RIGHT_EAR: 8,
+  LEFT_SHOULDER: 11,
+  RIGHT_SHOULDER: 12,
+  LEFT_ELBOW: 13,
+  RIGHT_ELBOW: 14,
+  LEFT_WRIST: 15,
+  RIGHT_WRIST: 16,
+  LEFT_HIP: 23,
+  RIGHT_HIP: 24,
+  LEFT_KNEE: 25,
+  RIGHT_KNEE: 26,
+  LEFT_ANKLE: 27,
+  RIGHT_ANKLE: 28
 }
 
 export interface PostureAnalysis {
