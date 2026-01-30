@@ -1,11 +1,15 @@
 import * as poseDetection from '@tensorflow-models/pose-detection'
 import '@tensorflow/tfjs-backend-webgl'
 import '@tensorflow/tfjs-backend-cpu'
+import '@tensorflow/tfjs-backend-wasm'
+import { setWasmPaths } from '@tensorflow/tfjs-backend-wasm'
 import * as tf from '@tensorflow/tfjs'
 
 let detector: poseDetection.PoseDetector | null = null
 let isInitializing = false
 let initError: string | null = null
+let initAttempts = 0
+const MAX_INIT_ATTEMPTS = 3
 
 // 检测是否是移动端
 const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -24,7 +28,12 @@ export interface PoseResult {
 // 初始化 MoveNet 检测器
 export async function initPoseDetector(): Promise<poseDetection.PoseDetector> {
   if (detector) return detector
-  if (initError) throw new Error(initError)
+  
+  // 允许重试，而不是永久失败
+  if (initError && initAttempts >= MAX_INIT_ATTEMPTS) {
+    throw new Error(initError)
+  }
+  
   if (isInitializing) {
     while (isInitializing) {
       await new Promise(resolve => setTimeout(resolve, 100))
@@ -34,30 +43,38 @@ export async function initPoseDetector(): Promise<poseDetection.PoseDetector> {
   }
 
   isInitializing = true
+  initAttempts++
+  initError = null // 重置错误状态
 
   try {
-    console.log('[AI] 初始化 TensorFlow.js...')
+    console.log('[AI] 初始化 TensorFlow.js... (尝试 #' + initAttempts + ')')
     console.log('[AI] 设备类型:', isMobile() ? '移动端' : '桌面端')
+    console.log('[AI] User Agent:', navigator.userAgent)
     
-    // 尝试设置后端，优先 WebGL，失败则用 CPU
+    // 设置 WASM 路径（使用 CDN）
+    setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/')
+    
+    // 后端优先级：移动端优先 WASM > WebGL > CPU，桌面端优先 WebGL > WASM > CPU
+    const backendPriority = isMobile() 
+      ? ['wasm', 'webgl', 'cpu'] 
+      : ['webgl', 'wasm', 'cpu']
+    
     let backendSet = false
-    try {
-      await tf.setBackend('webgl')
-      await tf.ready()
-      backendSet = true
-      console.log('[AI] 使用 WebGL 后端')
-    } catch (e) {
-      console.warn('[AI] WebGL 不可用，尝试 CPU 后端')
+    for (const backend of backendPriority) {
+      if (backendSet) break
+      try {
+        console.log('[AI] 尝试设置后端:', backend)
+        await tf.setBackend(backend)
+        await tf.ready()
+        backendSet = true
+        console.log('[AI] 成功使用后端:', backend)
+      } catch (e) {
+        console.warn('[AI]', backend, '后端不可用:', e)
+      }
     }
     
     if (!backendSet) {
-      try {
-        await tf.setBackend('cpu')
-        await tf.ready()
-        console.log('[AI] 使用 CPU 后端')
-      } catch (e) {
-        console.error('[AI] CPU 后端也不可用')
-      }
+      throw new Error('所有 TensorFlow 后端都不可用')
     }
     
     console.log('[AI] TensorFlow 后端:', tf.getBackend())
