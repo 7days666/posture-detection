@@ -35,25 +35,29 @@ export async function initPoseDetector(): Promise<Pose> {
   if (poseInstance) return poseInstance
   if (initPromise) return initPromise
 
+  const mobile = isMobile()
   console.log('[AI] 初始化 MediaPipe Pose...')
-  console.log('[AI] 设备类型:', isMobile() ? '移动端' : '桌面端')
+  console.log('[AI] 设备类型:', mobile ? '移动端' : '桌面端')
+  console.log('[AI] User Agent:', navigator.userAgent)
 
   initPromise = new Promise((resolve, reject) => {
     try {
       const pose = new Pose({
         locateFile: (file) => {
-          const url = `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          // 使用更稳定的 CDN
+          const url = `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/${file}`
           console.log('[AI] 加载文件:', url)
           return url
         }
       })
 
+      // 移动端使用更宽松的配置
       pose.setOptions({
-        modelComplexity: isMobile() ? 0 : 1, // 移动端用轻量模型
+        modelComplexity: mobile ? 0 : 1, // 移动端用轻量模型 (Lite)
         smoothLandmarks: false,
         enableSegmentation: false,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
+        minDetectionConfidence: mobile ? 0.3 : 0.5, // 移动端降低检测阈值
+        minTrackingConfidence: mobile ? 0.3 : 0.5   // 移动端降低跟踪阈值
       })
 
       pose.onResults(() => {
@@ -84,8 +88,10 @@ export async function initPoseDetector(): Promise<Pose> {
 export async function detectPoseFromImage(imageElement: HTMLImageElement): Promise<PoseResult | null> {
   try {
     const pose = await initPoseDetector()
+    const mobile = isMobile()
 
     console.log('[AI] 检测图片:', imageElement.naturalWidth, 'x', imageElement.naturalHeight)
+    console.log('[AI] 设备类型:', mobile ? '移动端' : '桌面端')
 
     // 确保图片加载完成
     if (!imageElement.complete || imageElement.naturalWidth === 0) {
@@ -97,70 +103,122 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
 
     // 创建 canvas 处理图片
     const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { 
+      willReadFrequently: true,
+      alpha: false  // 禁用 alpha 通道，提高性能
+    })
     if (!ctx) {
       console.error('[AI] 无法创建 canvas context')
       return null
     }
 
-    // 调整图片尺寸
-    const maxSize = isMobile() ? 480 : 640
+    // 移动端使用更小的尺寸以提高兼容性
+    // 同时确保尺寸是偶数（某些编码器要求）
+    const maxSize = mobile ? 384 : 640
     let width = imageElement.naturalWidth
     let height = imageElement.naturalHeight
 
-    if (width > maxSize || height > maxSize) {
-      const scale = maxSize / Math.max(width, height)
-      width = Math.round(width * scale)
-      height = Math.round(height * scale)
-    }
+    // 计算缩放比例
+    const scale = Math.min(maxSize / width, maxSize / height, 1)
+    width = Math.round(width * scale)
+    height = Math.round(height * scale)
+    
+    // 确保尺寸是偶数
+    width = width % 2 === 0 ? width : width + 1
+    height = height % 2 === 0 ? height : height + 1
 
     canvas.width = width
     canvas.height = height
+    
+    // 设置白色背景（避免透明度问题）
+    ctx.fillStyle = '#FFFFFF'
+    ctx.fillRect(0, 0, width, height)
+    
+    // 绘制图片
     ctx.drawImage(imageElement, 0, 0, width, height)
 
     console.log('[AI] Canvas 尺寸:', width, 'x', height)
 
-    // 使用 Promise 包装 MediaPipe 的回调式 API
-    return new Promise((resolve) => {
-      let resultLandmarks: Landmark[] | null = null
+    // 移动端多次尝试检测
+    const maxAttempts = mobile ? 3 : 1
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(`[AI] 检测尝试 ${attempt}/${maxAttempts}`)
+      
+      const result = await new Promise<PoseResult | null>((resolve) => {
+        let resultLandmarks: Landmark[] | null = null
+        let resolved = false
 
-      pose.onResults((results) => {
-        if (results.poseLandmarks && results.poseLandmarks.length > 0) {
-          console.log('[AI] 检测到姿态，关键点数:', results.poseLandmarks.length)
+        const handleResults = (results: { poseLandmarks?: Array<{ x: number; y: number; visibility?: number }> }) => {
+          if (resolved) return
           
-          resultLandmarks = results.poseLandmarks.map((lm, idx) => ({
-            x: lm.x,
-            y: lm.y,
-            score: lm.visibility,
-            name: KEYPOINT_NAMES[idx] || `point_${idx}`
-          }))
+          if (results.poseLandmarks && results.poseLandmarks.length > 0) {
+            console.log('[AI] 检测到姿态，关键点数:', results.poseLandmarks.length)
+            
+            resultLandmarks = results.poseLandmarks.map((lm, idx) => ({
+              x: lm.x,
+              y: lm.y,
+              score: lm.visibility ?? 0.5,
+              name: KEYPOINT_NAMES[idx] || `point_${idx}`
+            }))
 
-          // 统计有效关键点
-          const minScore = isMobile() ? 0.3 : 0.5
-          const validCount = resultLandmarks.filter(lm => lm.score && lm.score > minScore).length
-          console.log('[AI] 有效关键点:', validCount, '/', resultLandmarks.length)
+            // 移动端降低有效关键点的阈值
+            const minScore = mobile ? 0.2 : 0.5
+            const validCount = resultLandmarks.filter(lm => lm.score && lm.score > minScore).length
+            console.log('[AI] 有效关键点:', validCount, '/', resultLandmarks.length)
 
-          resolve({ landmarks: resultLandmarks })
-        } else {
-          console.warn('[AI] 未检测到姿态')
-          resolve(null)
+            // 至少需要检测到一定数量的关键点才算成功
+            const minValidPoints = mobile ? 8 : 12
+            if (validCount >= minValidPoints) {
+              resolved = true
+              resolve({ landmarks: resultLandmarks })
+            } else {
+              console.warn('[AI] 有效关键点不足:', validCount, '<', minValidPoints)
+              resolved = true
+              resolve(null)
+            }
+          } else {
+            console.warn('[AI] 未检测到姿态')
+            resolved = true
+            resolve(null)
+          }
         }
+
+        pose.onResults(handleResults)
+
+        // 发送图片进行检测
+        pose.send({ image: canvas }).catch((err) => {
+          console.error('[AI] 发送图片失败:', err)
+          if (!resolved) {
+            resolved = true
+            resolve(null)
+          }
+        })
+
+        // 移动端给更长的超时时间
+        const timeout = mobile ? 15000 : 10000
+        setTimeout(() => {
+          if (!resolved) {
+            console.warn('[AI] 检测超时')
+            resolved = true
+            resolve(null)
+          }
+        }, timeout)
       })
 
-      // 发送图片进行检测
-      pose.send({ image: canvas }).catch((err) => {
-        console.error('[AI] 发送图片失败:', err)
-        resolve(null)
-      })
+      if (result) {
+        return result
+      }
 
-      // 超时处理
-      setTimeout(() => {
-        if (!resultLandmarks) {
-          console.warn('[AI] 检测超时')
-          resolve(null)
-        }
-      }, 10000)
-    })
+      // 如果失败且还有重试机会，等待一下再重试
+      if (attempt < maxAttempts) {
+        console.log('[AI] 等待后重试...')
+        await new Promise(r => setTimeout(r, 500))
+      }
+    }
+
+    console.warn('[AI] 所有检测尝试均失败')
+    return null
   } catch (error) {
     console.error('[AI] 检测失败:', error)
     return null
@@ -221,6 +279,9 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
   const items: PostureAnalysis['items'] = []
   const suggestions: string[] = []
   let totalScore = 100
+  const mobile = isMobile()
+  // 移动端使用更低的置信度阈值
+  const minConfidence = mobile ? 0.2 : 0.3
 
   const rawData: PostureAnalysis['rawData'] = {
     shoulderTilt: 0, hipTilt: 0, headTilt: 0,
@@ -237,7 +298,7 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
 
   // 1. 高低肩检测
   if (leftShoulder?.score && rightShoulder?.score && 
-      leftShoulder.score > 0.3 && rightShoulder.score > 0.3) {
+      leftShoulder.score > minConfidence && rightShoulder.score > minConfidence) {
     const shoulderDiff = Math.abs(leftShoulder.y - rightShoulder.y) * 100
     rawData.shoulderTilt = shoulderDiff
 
@@ -261,7 +322,7 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
 
   // 2. 骨盆倾斜
   if (leftHip?.score && rightHip?.score && 
-      leftHip.score > 0.3 && rightHip.score > 0.3) {
+      leftHip.score > minConfidence && rightHip.score > minConfidence) {
     const hipDiff = Math.abs(leftHip.y - rightHip.y) * 100
     rawData.hipTilt = hipDiff
 
@@ -284,7 +345,7 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
 
   // 3. 头部倾斜
   if (leftEar?.score && rightEar?.score && 
-      leftEar.score > 0.3 && rightEar.score > 0.3) {
+      leftEar.score > minConfidence && rightEar.score > minConfidence) {
     const headDiff = Math.abs(leftEar.y - rightEar.y) * 100
     rawData.headTilt = headDiff
 
@@ -307,7 +368,7 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
 
   // 4. 身体中线
   if (nose?.score && leftShoulder?.score && rightShoulder?.score &&
-      nose.score > 0.3 && leftShoulder.score > 0.3 && rightShoulder.score > 0.3) {
+      nose.score > minConfidence && leftShoulder.score > minConfidence && rightShoulder.score > minConfidence) {
     const shoulderMidX = (leftShoulder.x + rightShoulder.x) / 2
     const offset = Math.abs(nose.x - shoulderMidX) * 100
     rawData.spineAngle = offset
@@ -339,6 +400,9 @@ export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
   const items: PostureAnalysis['items'] = []
   const suggestions: string[] = []
   let scoreDeduction = 0
+  const mobile = isMobile()
+  // 移动端使用更低的置信度阈值
+  const minConfidence = mobile ? 0.2 : 0.3
 
   const rawData = {
     shoulderTilt: 0, hipTilt: 0, headTilt: 0,
@@ -352,12 +416,12 @@ export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
   const leftHip = lm[KEYPOINTS.LEFT_HIP]
   const rightHip = lm[KEYPOINTS.RIGHT_HIP]
 
-  const ear = leftEar?.score && leftEar.score > 0.3 ? leftEar : rightEar
-  const shoulder = leftShoulder?.score && leftShoulder.score > 0.3 ? leftShoulder : rightShoulder
-  const hip = leftHip?.score && leftHip.score > 0.3 ? leftHip : rightHip
+  const ear = leftEar?.score && leftEar.score > minConfidence ? leftEar : rightEar
+  const shoulder = leftShoulder?.score && leftShoulder.score > minConfidence ? leftShoulder : rightShoulder
+  const hip = leftHip?.score && leftHip.score > minConfidence ? leftHip : rightHip
 
   // 1. 头部前倾
-  if (ear?.score && shoulder?.score && ear.score > 0.3 && shoulder.score > 0.3) {
+  if (ear?.score && shoulder?.score && ear.score > minConfidence && shoulder.score > minConfidence) {
     const forwardOffset = (ear.x - shoulder.x) * 100
     rawData.headForward = Math.abs(forwardOffset)
 
@@ -380,7 +444,7 @@ export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
   }
 
   // 2. 驼背/圆肩
-  if (shoulder?.score && hip?.score && shoulder.score > 0.3 && hip.score > 0.3) {
+  if (shoulder?.score && hip?.score && shoulder.score > minConfidence && hip.score > minConfidence) {
     const shoulderForward = (shoulder.x - hip.x) * 100
     rawData.shoulderRound = Math.abs(shoulderForward)
 
