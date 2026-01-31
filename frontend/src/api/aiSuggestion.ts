@@ -1,7 +1,9 @@
 import type { PostureAnalysis } from '../utils/poseDetection'
 
-const API_KEY = 'sk-zgkbubnglnexrytvtgnyaoitoebwflrflhytyhltnwdukuif'
-const API_URL = 'https://api.gptsapi.net/v1/chat/completions'
+// DeepSeek API 配置
+const API_KEY = 'sk-c8c22d2575634a88bf51916854f855a2'
+const API_URL = 'https://api.deepseek.com/v1/chat/completions'
+const MODEL = 'deepseek-chat'
 
 interface AIResponse {
   choices: {
@@ -46,7 +48,7 @@ export async function generateAISuggestion(
         'Authorization': `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: MODEL,
         messages: [
           {
             role: 'system',
@@ -168,7 +170,7 @@ export async function generateTrainingPlan(
         'Authorization': `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: MODEL,
         messages: [
           {
             role: 'system',
