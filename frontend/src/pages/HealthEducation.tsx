@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import TabBar from '../components/TabBar'
 import {
   ArticleIcon,
@@ -12,6 +12,7 @@ import {
   LessonCompleteIcon,
   LessonPendingIcon
 } from '../components/Icons'
+import { generateTrainingPlan, TrainingPlan, TrainingExercise } from '../api/aiSuggestion'
 import './HealthEducation.css'
 
 // 图标映射
@@ -464,16 +465,40 @@ export default function HealthEducation() {
   const [activeTab, setActiveTab] = useState<'recommend' | 'articles' | 'videos' | 'courses'>('recommend')
   const [selectedArticle, setSelectedArticle] = useState<typeof educationContents.articles[0] | null>(null)
   const [showTrainingTip, setShowTrainingTip] = useState(fromReport || false)
+  const [trainingPlan, setTrainingPlan] = useState<TrainingPlan | null>(null)
+  const [trainingLoading, setTrainingLoading] = useState(false)
+  const [selectedExercise, setSelectedExercise] = useState<TrainingExercise | null>(null)
 
   const recommendedContent = getRecommendedContent(problems)
   
-  // 如果是从报告页面跳转来的，3秒后隐藏提示
+  // 如果是从报告页面跳转来的，自动生成训练计划
+  useEffect(() => {
+    if (fromReport && problems && problems.length > 0 && !trainingPlan) {
+      loadTrainingPlan()
+    }
+  }, [fromReport, problems])
+  
+  // 如果是从报告页面跳转来的，5秒后隐藏提示
   useEffect(() => {
     if (showTrainingTip) {
       const timer = setTimeout(() => setShowTrainingTip(false), 5000)
       return () => clearTimeout(timer)
     }
   }, [showTrainingTip])
+
+  // 加载 AI 训练计划
+  const loadTrainingPlan = async () => {
+    if (trainingLoading) return
+    setTrainingLoading(true)
+    try {
+      const plan = await generateTrainingPlan(problems || [])
+      setTrainingPlan(plan)
+    } catch (error) {
+      console.error('加载训练计划失败:', error)
+    } finally {
+      setTrainingLoading(false)
+    }
+  }
 
   const renderContentCard = (item: any, type: string) => (
     <motion.div
@@ -500,6 +525,131 @@ export default function HealthEducation() {
       </div>
     </motion.div>
   )
+
+  // 渲染训练动作详情
+  const renderExerciseDetail = () => {
+    if (!selectedExercise) return null
+    
+    return (
+      <div className="health-education-page">
+        <header className="page-header">
+          <button className="back-btn" onClick={() => setSelectedExercise(null)}>
+            ← 返回
+          </button>
+          <h1>{selectedExercise.name}</h1>
+        </header>
+        <main className="exercise-detail-content">
+          <div className="exercise-meta">
+            <span className="exercise-duration">⏱ {selectedExercise.duration}</span>
+            <span className="exercise-target">🎯 {selectedExercise.targetArea}</span>
+          </div>
+          
+          <div className="exercise-description">
+            <p>{selectedExercise.description}</p>
+          </div>
+          
+          <div className="exercise-steps">
+            <h3>动作步骤</h3>
+            <ol>
+              {selectedExercise.steps.map((step, index) => (
+                <li key={index}>
+                  <span className="step-number">{index + 1}</span>
+                  <span className="step-text">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          
+          <div className="exercise-tips">
+            <h3>💡 动作要点</h3>
+            <p>{selectedExercise.tips}</p>
+          </div>
+        </main>
+        <TabBar />
+      </div>
+    )
+  }
+
+  // 渲染 AI 训练计划
+  const renderTrainingPlan = () => {
+    if (trainingLoading) {
+      return (
+        <div className="training-loading">
+          <div className="loading-animation">
+            <div className="loading-spinner"></div>
+          </div>
+          <p>AI 正在为您生成个性化训练计划...</p>
+        </div>
+      )
+    }
+    
+    if (!trainingPlan) {
+      return (
+        <div className="no-training-plan">
+          <p>暂无训练计划</p>
+          <button className="generate-btn" onClick={loadTrainingPlan}>
+            生成 AI 训练计划
+          </button>
+        </div>
+      )
+    }
+    
+    return (
+      <div className="training-plan">
+        <div className="plan-header">
+          <h3>{trainingPlan.title}</h3>
+          <p>{trainingPlan.summary}</p>
+        </div>
+        
+        <div className="plan-routine">
+          <span className="routine-icon">📅</span>
+          <span>{trainingPlan.dailyRoutine}</span>
+        </div>
+        
+        <div className="exercises-list">
+          <h4>训练动作 ({trainingPlan.exercises.length}个)</h4>
+          {trainingPlan.exercises.map((exercise, index) => (
+            <motion.div
+              key={index}
+              className="exercise-card"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedExercise(exercise)}
+            >
+              <div className="exercise-number">{index + 1}</div>
+              <div className="exercise-info">
+                <h5>{exercise.name}</h5>
+                <p>{exercise.description}</p>
+                <div className="exercise-meta-small">
+                  <span>⏱ {exercise.duration}</span>
+                  <span>🎯 {exercise.targetArea}</span>
+                </div>
+              </div>
+              <div className="exercise-arrow">→</div>
+            </motion.div>
+          ))}
+        </div>
+        
+        <div className="plan-precautions">
+          <h4>⚠️ 注意事项</h4>
+          <ul>
+            {trainingPlan.precautions.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        
+        <button className="regenerate-btn" onClick={loadTrainingPlan}>
+          🔄 重新生成训练计划
+        </button>
+      </div>
+    )
+  }
+
+  // 如果选中了训练动作，显示详情
+  if (selectedExercise) {
+    return renderExerciseDetail()
+  }
 
   if (selectedArticle) {
     return (
@@ -569,14 +719,27 @@ export default function HealthEducation() {
                 <div className="tip-content">
                   <strong>根据您的检测结果</strong>
                   <p>发现以下问题：{problems.map(p => problemLabels[p] || p).join('、')}</p>
-                  <p>以下是为您推荐的矫正训练课程</p>
+                  <p>AI 正在为您生成个性化矫正训练计划</p>
                 </div>
                 <button className="tip-close" onClick={() => setShowTrainingTip(false)}>×</button>
               </motion.div>
             )}
-            <div className="section-header">
-              <h2>{fromReport ? '矫正训练推荐' : '个性化推荐'}</h2>
-              <p>{fromReport ? '针对您的体态问题，推荐以下训练内容' : '根据你的体态检测结果，我们为你推荐以下内容'}</p>
+            
+            {/* 如果是从报告页面来的，显示 AI 训练计划 */}
+            {fromReport && (
+              <>
+                <div className="section-header">
+                  <h2>🤖 AI 个性化训练计划</h2>
+                  <p>根据您的体态检测结果，AI 为您定制的矫正训练</p>
+                </div>
+                {renderTrainingPlan()}
+              </>
+            )}
+            
+            {/* 推荐内容 */}
+            <div className="section-header" style={{ marginTop: fromReport ? 24 : 0 }}>
+              <h2>{fromReport ? '📚 相关学习资料' : '个性化推荐'}</h2>
+              <p>{fromReport ? '了解更多体态健康知识' : '根据你的体态检测结果，我们为你推荐以下内容'}</p>
             </div>
             <div className="content-list">
               {recommendedContent.map((item: any) => renderContentCard(item, item.videoUrl ? 'video' : 'article'))}
