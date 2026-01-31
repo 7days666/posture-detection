@@ -17,7 +17,7 @@ export default function TabBar() {
         {({ isActive }) => (
           <>
             <span className="tab-icon"><LearnIcon active={isActive} /></span>
-            <span className="tab-label">学堂</span>
+            <span className="tab-label">数字教练</span>
           </>
         )}
       </NavLink>
