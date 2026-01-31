@@ -418,3 +418,261 @@ function generateFallbackTrainingPlan(problems: string[]): TrainingPlan {
     ]
   }
 }
+
+
+// AI 健康趋势预测接口
+export interface PredictionData {
+  riskTrend: {
+    current: 'low' | 'medium' | 'high'
+    predicted: 'low' | 'medium' | 'high'
+    confidence: number
+    timeframe: string
+    factors: { name: string; impact: 'positive' | 'negative'; score: number }[]
+  }
+  behaviorImpact: {
+    behavior: string
+    impact: string
+    description: string
+    priority: 'high' | 'medium' | 'low'
+  }[]
+  futureForcast: { week: number; score: number; risk: 'low' | 'medium' | 'high' }[]
+  adjustments: {
+    type: 'increase' | 'add' | 'monitor'
+    suggestion: string
+    expectedImpact: string
+  }[]
+}
+
+// 生成 AI 健康趋势预测
+export async function generateHealthPrediction(
+  historyData: Array<{
+    overall_score: number
+    risk_level: string
+    created_at: string
+    head_forward_angle?: number | null
+    shoulder_level_diff?: number | null
+    spine_curvature?: number | null
+    pelvis_tilt?: number | null
+  }>
+): Promise<PredictionData> {
+  const prompt = buildPredictionPrompt(historyData)
+
+  try {
+    console.log('[AI预测] 正在生成健康趋势预测...')
+    
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          {
+            role: 'system',
+            content: `你是一位专业的儿童青少年体态健康分析师，擅长根据历史检测数据预测健康趋势。
+
+请根据用户的历史体态检测数据，分析趋势并预测未来变化。
+
+要求：
+1. 分析数据变化趋势（改善/恶化/稳定）
+2. 预测4周后的风险等级变化
+3. 识别影响最大的行为因素
+4. 给出具体可执行的调整建议
+
+请严格按照以下JSON格式返回（不要包含markdown代码块标记）：
+{
+  "riskTrend": {
+    "current": "low/medium/high",
+    "predicted": "low/medium/high",
+    "confidence": 0-100的数字,
+    "timeframe": "4周后",
+    "factors": [
+      {"name": "因素名称", "impact": "positive/negative", "score": 0-100}
+    ]
+  },
+  "behaviorImpact": [
+    {
+      "behavior": "行为名称",
+      "impact": "+X分",
+      "description": "影响描述",
+      "priority": "high/medium/low"
+    }
+  ],
+  "futureForcast": [
+    {"week": 1, "score": 预测分数, "risk": "low/medium/high"},
+    {"week": 2, "score": 预测分数, "risk": "low/medium/high"},
+    {"week": 3, "score": 预测分数, "risk": "low/medium/high"},
+    {"week": 4, "score": 预测分数, "risk": "low/medium/high"}
+  ],
+  "adjustments": [
+    {
+      "type": "increase/add/monitor",
+      "suggestion": "具体建议",
+      "expectedImpact": "预期效果"
+    }
+  ]
+}`
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`)
+    }
+
+    const data: AIResponse = await response.json()
+    const content = data.choices[0]?.message?.content || ''
+    
+    console.log('[AI预测] 生成成功')
+    
+    try {
+      const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      return JSON.parse(jsonStr)
+    } catch (parseError) {
+      console.error('[AI预测] JSON解析失败:', parseError)
+      return generateFallbackPrediction(historyData)
+    }
+  } catch (error) {
+    console.error('[AI预测] 生成失败:', error)
+    return generateFallbackPrediction(historyData)
+  }
+}
+
+function buildPredictionPrompt(historyData: Array<{
+  overall_score: number
+  risk_level: string
+  created_at: string
+  head_forward_angle?: number | null
+  shoulder_level_diff?: number | null
+  spine_curvature?: number | null
+  pelvis_tilt?: number | null
+}>): string {
+  if (historyData.length === 0) {
+    return `用户暂无历史检测数据，请基于一般青少年体态健康情况给出预测和建议。`
+  }
+
+  let prompt = `## 用户历史体态检测数据
+
+共有 ${historyData.length} 次检测记录：
+
+`
+
+  historyData.forEach((record, index) => {
+    const date = new Date(record.created_at).toLocaleDateString('zh-CN')
+    prompt += `### 第${index + 1}次检测 (${date})
+- 综合评分: ${record.overall_score}分
+- 风险等级: ${record.risk_level === 'low' ? '低风险' : record.risk_level === 'medium' ? '中风险' : '高风险'}
+`
+    if (record.head_forward_angle !== null && record.head_forward_angle !== undefined) {
+      prompt += `- 头部前倾角度: ${record.head_forward_angle.toFixed(1)}°\n`
+    }
+    if (record.shoulder_level_diff !== null && record.shoulder_level_diff !== undefined) {
+      prompt += `- 肩膀高低差: ${record.shoulder_level_diff.toFixed(1)}cm\n`
+    }
+    if (record.spine_curvature !== null && record.spine_curvature !== undefined) {
+      prompt += `- 脊柱弯曲度: ${record.spine_curvature.toFixed(1)}°\n`
+    }
+    if (record.pelvis_tilt !== null && record.pelvis_tilt !== undefined) {
+      prompt += `- 骨盆倾斜度: ${record.pelvis_tilt.toFixed(1)}°\n`
+    }
+    prompt += '\n'
+  })
+
+  prompt += `请分析以上数据的变化趋势，预测未来4周的健康变化，并给出调整建议。`
+
+  return prompt
+}
+
+function generateFallbackPrediction(historyData: Array<{
+  overall_score: number
+  risk_level: string
+}>): PredictionData {
+  const latestScore = historyData.length > 0 ? historyData[0].overall_score : 75
+  const latestRisk = historyData.length > 0 ? historyData[0].risk_level : 'medium'
+  
+  // 简单预测：假设每周改善2分
+  const predictedScores = [
+    Math.min(latestScore + 2, 100),
+    Math.min(latestScore + 4, 100),
+    Math.min(latestScore + 6, 100),
+    Math.min(latestScore + 8, 100)
+  ]
+
+  const getRisk = (score: number): 'low' | 'medium' | 'high' => {
+    if (score >= 80) return 'low'
+    if (score >= 60) return 'medium'
+    return 'high'
+  }
+
+  return {
+    riskTrend: {
+      current: latestRisk as 'low' | 'medium' | 'high',
+      predicted: getRisk(predictedScores[3]),
+      confidence: 75,
+      timeframe: '4周后',
+      factors: [
+        { name: '运动频率', impact: 'positive', score: 70 },
+        { name: '坐姿习惯', impact: 'negative', score: 55 },
+        { name: '训练依从性', impact: 'positive', score: 80 }
+      ]
+    },
+    behaviorImpact: [
+      {
+        behavior: '每日颈椎操',
+        impact: '+6分',
+        description: '对头部前倾改善效果显著',
+        priority: 'high'
+      },
+      {
+        behavior: '减少久坐时间',
+        impact: '+4分',
+        description: '建议每45分钟休息活动一次',
+        priority: 'high'
+      },
+      {
+        behavior: '核心肌群训练',
+        impact: '+3分',
+        description: '增强脊柱稳定性',
+        priority: 'medium'
+      },
+      {
+        behavior: '正确背书包',
+        impact: '+2分',
+        description: '预防肩膀不对称',
+        priority: 'low'
+      }
+    ],
+    futureForcast: [
+      { week: 1, score: predictedScores[0], risk: getRisk(predictedScores[0]) },
+      { week: 2, score: predictedScores[1], risk: getRisk(predictedScores[1]) },
+      { week: 3, score: predictedScores[2], risk: getRisk(predictedScores[2]) },
+      { week: 4, score: predictedScores[3], risk: getRisk(predictedScores[3]) }
+    ],
+    adjustments: [
+      {
+        type: 'increase',
+        suggestion: '增加颈椎放松操的频率，从每天1次增加到2次',
+        expectedImpact: '加速头部前倾改善'
+      },
+      {
+        type: 'add',
+        suggestion: '新增每周3次核心训练，每次15分钟',
+        expectedImpact: '增强脊柱稳定性'
+      },
+      {
+        type: 'monitor',
+        suggestion: '持续监测肩膀对称性变化',
+        expectedImpact: '及时发现异常并调整'
+      }
+    ]
+  }
+}
