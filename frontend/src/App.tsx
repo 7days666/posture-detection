@@ -76,6 +76,11 @@ function App() {
           <HealthReport />
         </RequireOnboarding>
       } />
+      <Route path="/health-report" element={
+        <RequireOnboarding>
+          <HealthReport />
+        </RequireOnboarding>
+      } />
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>

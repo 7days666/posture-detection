@@ -14,7 +14,7 @@ interface User {
 }
 
 const features = [
-  { icon: ReportIcon, label: '我的报告', color: '#4ecdc4', path: '/report' },
+  { icon: ReportIcon, label: '我的报告', color: '#4ecdc4', path: '/health-report' },
   { icon: AIIcon, label: 'AI体态检测', color: '#68d391', path: '/ai-detect' },
   { icon: SurveyIcon, label: '问卷调查', color: '#f687b3', path: '/survey' },
   { icon: ShopIcon, label: '商城', color: '#fbd38d', path: '/shop' },
@@ -61,7 +61,7 @@ export default function Home() {
   }
 
   const handleFeatureClick = (path: string) => {
-    if (path === '/ai-detect') {
+    if (path === '/ai-detect' || path === '/health-report') {
       navigate(path)
     } else {
       console.log('Navigate to:', path)
