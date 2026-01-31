@@ -471,3 +471,56 @@
   color: #92400e;
   border-left: 4px solid #f59e0b;
 }
+
+
+/* Training Tip */
+.training-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #93c5fd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.training-tip .tip-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.training-tip .tip-content {
+  flex: 1;
+}
+
+.training-tip .tip-content strong {
+  display: block;
+  color: #1e40af;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.training-tip .tip-content p {
+  color: #3b82f6;
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.training-tip .tip-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  color: #3b82f6;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

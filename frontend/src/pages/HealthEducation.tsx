@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
 import {
@@ -402,8 +403,45 @@ const educationContents = {
 }
 
 // 根据用户风险等级推荐内容
-const getRecommendedContent = () => {
-  // 这里可以根据用户的检测结果推荐个性化内容
+const getRecommendedContent = (problems?: string[]) => {
+  // 如果有具体问题，根据问题推荐
+  if (problems && problems.length > 0) {
+    const recommended: any[] = []
+    
+    if (problems.includes('neck')) {
+      // 颈部问题推荐
+      recommended.push(educationContents.videos[0]) // 颈椎放松操
+      recommended.push(educationContents.articles[0]) // 正确坐姿
+    }
+    if (problems.includes('shoulder')) {
+      // 肩部问题推荐
+      recommended.push(educationContents.videos[1]) // 办公室伸展
+      recommended.push(educationContents.articles[1]) // 站姿矫正
+    }
+    if (problems.includes('spine')) {
+      // 脊柱问题推荐
+      recommended.push(educationContents.videos[2]) // 脊柱矫正瑜伽
+      recommended.push(educationContents.articles[2]) // 预防脊柱侧弯
+    }
+    if (problems.includes('pelvis')) {
+      // 骨盆问题推荐
+      recommended.push(educationContents.videos[2]) // 脊柱矫正瑜伽
+      recommended.push(educationContents.articles[1]) // 站姿矫正
+    }
+    
+    // 去重
+    const uniqueRecommended = recommended.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    )
+    
+    return uniqueRecommended.length > 0 ? uniqueRecommended : [
+      educationContents.articles[0],
+      educationContents.articles[2],
+      educationContents.videos[0]
+    ]
+  }
+  
+  // 默认推荐
   return [
     educationContents.articles[0],
     educationContents.articles[2],
@@ -411,11 +449,31 @@ const getRecommendedContent = () => {
   ]
 }
 
+// 问题类型对应的中文描述
+const problemLabels: Record<string, string> = {
+  neck: '颈部前倾',
+  shoulder: '肩膀不平',
+  spine: '脊柱弯曲',
+  pelvis: '骨盆倾斜'
+}
+
 export default function HealthEducation() {
+  const location = useLocation()
+  const { problems, fromReport } = (location.state as { problems?: string[], fromReport?: boolean }) || {}
+  
   const [activeTab, setActiveTab] = useState<'recommend' | 'articles' | 'videos' | 'courses'>('recommend')
   const [selectedArticle, setSelectedArticle] = useState<typeof educationContents.articles[0] | null>(null)
+  const [showTrainingTip, setShowTrainingTip] = useState(fromReport || false)
 
-  const recommendedContent = getRecommendedContent()
+  const recommendedContent = getRecommendedContent(problems)
+  
+  // 如果是从报告页面跳转来的，3秒后隐藏提示
+  useEffect(() => {
+    if (showTrainingTip) {
+      const timer = setTimeout(() => setShowTrainingTip(false), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [showTrainingTip])
 
   const renderContentCard = (item: any, type: string) => (
     <motion.div
@@ -500,12 +558,28 @@ export default function HealthEducation() {
       <main className="education-content">
         {activeTab === 'recommend' && (
           <section className="content-section">
+            {showTrainingTip && problems && problems.length > 0 && (
+              <motion.div 
+                className="training-tip"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="tip-icon">💪</div>
+                <div className="tip-content">
+                  <strong>根据您的检测结果</strong>
+                  <p>发现以下问题：{problems.map(p => problemLabels[p] || p).join('、')}</p>
+                  <p>以下是为您推荐的矫正训练课程</p>
+                </div>
+                <button className="tip-close" onClick={() => setShowTrainingTip(false)}>×</button>
+              </motion.div>
+            )}
             <div className="section-header">
-              <h2>个性化推荐</h2>
-              <p>根据你的体态检测结果，我们为你推荐以下内容</p>
+              <h2>{fromReport ? '矫正训练推荐' : '个性化推荐'}</h2>
+              <p>{fromReport ? '针对您的体态问题，推荐以下训练内容' : '根据你的体态检测结果，我们为你推荐以下内容'}</p>
             </div>
             <div className="content-list">
-              {recommendedContent.map((item: any) => renderContentCard(item, 'article'))}
+              {recommendedContent.map((item: any) => renderContentCard(item, item.videoUrl ? 'video' : 'article'))}
             </div>
           </section>
         )}
