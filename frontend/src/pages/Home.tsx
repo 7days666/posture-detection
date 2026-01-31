@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import TabBar from '../components/TabBar'
 import { getProfile, Profile } from '../api/profile'
 import {
-  ReportIcon, ArchiveIcon,
-  AIIcon, FollowUpIcon, SurveyIcon, ShopIcon
+  ReportIcon, AIIcon, SurveyIcon, ShopIcon
 } from '../components/Icons'
 import './Home.css'
 
@@ -16,9 +15,7 @@ interface User {
 
 const features = [
   { icon: ReportIcon, label: '我的报告', color: '#4ecdc4', path: '/report' },
-  { icon: ArchiveIcon, label: '档案管理', color: '#f6ad55', path: '/archive' },
   { icon: AIIcon, label: 'AI体态检测', color: '#68d391', path: '/ai-detect' },
-  { icon: FollowUpIcon, label: '随访管理', color: '#b794f4', path: '/follow-up' },
   { icon: SurveyIcon, label: '问卷调查', color: '#f687b3', path: '/survey' },
   { icon: ShopIcon, label: '商城', color: '#fbd38d', path: '/shop' },
 ]
