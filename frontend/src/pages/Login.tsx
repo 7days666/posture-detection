@@ -123,6 +123,10 @@ export default function Login() {
             </div>
           </div>
 
+          <div className="forgot-password">
+            <span onClick={() => alert('请联系客服重置密码：400-888-8888')}>忘记密码？</span>
+          </div>
+
           <button type="submit" className={`submit-btn ${loading ? 'loading' : ''}`} disabled={loading}>
             {loading && <span className="btn-spinner"></span>}
             {loading ? '登录中' : '登 录'}
