@@ -12,9 +12,9 @@ interface User {
 }
 
 const menuItems = [
-  { label: '检测记录', icon: 'chart' },
-  { label: '消息通知', icon: 'bell' },
-  { label: '设置', icon: 'settings' },
+  { label: '检测记录', icon: 'chart', path: '/tracking' },
+  { label: '消息通知', icon: 'bell', path: '' },
+  { label: '设置', icon: 'settings', path: '' },
 ]
 
 const MenuIcon = ({ type }: { type: string }) => {
@@ -265,6 +265,7 @@ export default function Profile() {
               key={item.label} 
               className="menu-item"
               style={{ '--delay': `${index * 0.05}s` } as React.CSSProperties}
+              onClick={() => item.path && navigate(item.path)}
             >
               <span className="menu-icon">
                 <MenuIcon type={item.icon} />
