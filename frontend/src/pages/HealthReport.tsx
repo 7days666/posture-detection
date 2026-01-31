@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
 import AIPrediction from '../components/AIPrediction'
@@ -144,10 +145,12 @@ function transformAssessmentData(data: AssessmentData, historyData: AssessmentDa
 }
 
 export default function HealthReport() {
+  const navigate = useNavigate()
   const [showPrediction, setShowPrediction] = useState(false)
   const [loading, setLoading] = useState(true)
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showShareModal, setShowShareModal] = useState(false)
   
   useEffect(() => {
     fetchReportData()
@@ -229,6 +232,62 @@ export default function HealthReport() {
   }
   
   const risk = riskConfig[reportData.riskLevel]
+
+  // 开始矫正训练 - 跳转到数字运动教练页面
+  const handleStartTraining = () => {
+    // 根据检测结果确定推荐的训练类型
+    const problems: string[] = []
+    if (reportData.details.headForward && reportData.details.headForward.status !== 'good') {
+      problems.push('neck') // 颈部问题
+    }
+    if (reportData.details.shoulderLevel && reportData.details.shoulderLevel.status !== 'good') {
+      problems.push('shoulder') // 肩部问题
+    }
+    if (reportData.details.spineCurvature && reportData.details.spineCurvature.status !== 'good') {
+      problems.push('spine') // 脊柱问题
+    }
+    if (reportData.details.pelvisTilt && reportData.details.pelvisTilt.status !== 'good') {
+      problems.push('pelvis') // 骨盆问题
+    }
+    
+    // 跳转到数字运动教练页面，带上问题类型参数
+    navigate('/education', { state: { problems, fromReport: true } })
+  }
+
+  // 分享报告
+  const handleShareReport = async () => {
+    const shareData = {
+      title: '我的体态健康报告',
+      text: `我的体态评分：${reportData.overallScore}分，${risk.label}。快来检测你的体态健康吧！`,
+      url: window.location.href
+    }
+
+    // 检查是否支持原生分享
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        // 用户取消分享或分享失败，显示分享弹窗
+        if ((err as Error).name !== 'AbortError') {
+          setShowShareModal(true)
+        }
+      }
+    } else {
+      // 不支持原生分享，显示分享弹窗
+      setShowShareModal(true)
+    }
+  }
+
+  // 复制链接
+  const handleCopyLink = () => {
+    const text = `我的体态评分：${reportData.overallScore}分，${risk.label}。快来检测你的体态健康吧！ ${window.location.origin}/detect`
+    navigator.clipboard.writeText(text).then(() => {
+      alert('已复制到剪贴板')
+      setShowShareModal(false)
+    }).catch(() => {
+      alert('复制失败，请手动复制')
+    })
+  }
 
   return (
     <div className="health-report-page">
@@ -376,10 +435,41 @@ export default function HealthReport() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <button className="action-btn primary">开始矫正训练</button>
-          <button className="action-btn secondary">分享报告</button>
+          <button className="action-btn primary" onClick={handleStartTraining}>开始矫正训练</button>
+          <button className="action-btn secondary" onClick={handleShareReport}>分享报告</button>
         </motion.div>
       </main>
+
+      {/* 分享弹窗 */}
+      {showShareModal && (
+        <div className="share-modal-overlay" onClick={() => setShowShareModal(false)}>
+          <motion.div 
+            className="share-modal"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3>分享报告</h3>
+            <div className="share-content">
+              <div className="share-preview">
+                <div className="share-score" style={{ color: risk.color }}>{reportData.overallScore}分</div>
+                <div className="share-risk" style={{ background: risk.bg, color: risk.color }}>{risk.label}</div>
+              </div>
+              <p className="share-text">我的体态评分：{reportData.overallScore}分，{risk.label}。快来检测你的体态健康吧！</p>
+            </div>
+            <div className="share-actions">
+              <button className="share-btn copy" onClick={handleCopyLink}>
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+                  <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                复制链接
+              </button>
+            </div>
+            <button className="share-close" onClick={() => setShowShareModal(false)}>关闭</button>
+          </motion.div>
+        </div>
+      )}
 
       {/* AI 预测弹窗 */}
       {showPrediction && (
