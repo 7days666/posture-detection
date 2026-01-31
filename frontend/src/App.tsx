@@ -8,6 +8,8 @@ import AIDetect from './pages/AIDetect'
 import HealthEducation from './pages/HealthEducation'
 import DataTracking from './pages/DataTracking'
 import HealthReport from './pages/HealthReport'
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
 
 // 检查是否需要引导流程
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
@@ -81,6 +83,8 @@ function App() {
           <HealthReport />
         </RequireOnboarding>
       } />
+      <Route path="/admin" element={<AdminLogin />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
