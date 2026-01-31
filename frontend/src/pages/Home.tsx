@@ -13,9 +13,10 @@ interface User {
   phone: string
 }
 
-const features = [
+const mainFeature = { icon: AIIcon, label: 'AI体态检测', color: '#68d391', path: '/ai-detect' }
+
+const subFeatures = [
   { icon: ReportIcon, label: '我的报告', color: '#4ecdc4', path: '/health-report' },
-  { icon: AIIcon, label: 'AI体态检测', color: '#68d391', path: '/ai-detect' },
   { icon: SurveyIcon, label: '问卷调查', color: '#f687b3', path: '/survey' },
   { icon: ShopIcon, label: '商城', color: '#fbd38d', path: '/shop' },
 ]
@@ -201,9 +202,28 @@ export default function Home() {
           )}
         </div>
 
-        {/* 功能网格 */}
+        {/* AI体态检测 - 主功能 */}
+        <div 
+          className="main-feature"
+          onClick={() => handleFeatureClick(mainFeature.path)}
+        >
+          <div className="main-feature-icon" style={{ '--icon-color': mainFeature.color } as React.CSSProperties}>
+            <mainFeature.icon color={mainFeature.color} />
+          </div>
+          <div className="main-feature-content">
+            <span className="main-feature-label">{mainFeature.label}</span>
+            <span className="main-feature-desc">智能检测体态问题，守护脊柱健康</span>
+          </div>
+          <div className="main-feature-arrow">
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* 其他功能 */}
         <div className="feature-grid">
-          {features.map((item, index) => (
+          {subFeatures.map((item, index) => (
             <div
               key={item.label}
               className="feature-item"
