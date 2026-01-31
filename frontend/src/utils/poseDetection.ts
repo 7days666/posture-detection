@@ -1,10 +1,34 @@
-import * as poseModule from '@mediapipe/pose'
+// MediaPipe Pose 类型定义
+interface MediaPipePose {
+  setOptions(options: {
+    modelComplexity?: number
+    smoothLandmarks?: boolean
+    enableSegmentation?: boolean
+    minDetectionConfidence?: number
+    minTrackingConfidence?: number
+  }): void
+  onResults(callback: (results: MediaPipeResults) => void): void
+  initialize(): Promise<void>
+  send(input: { image: HTMLCanvasElement | HTMLImageElement | HTMLVideoElement }): Promise<void>
+}
 
-const Pose = poseModule.Pose
-type PoseType = InstanceType<typeof Pose>
+interface MediaPipeResults {
+  poseLandmarks?: Array<{ x: number; y: number; visibility?: number }>
+}
 
-let poseInstance: PoseType | null = null
-let initPromise: Promise<PoseType> | null = null
+interface MediaPipePoseConstructor {
+  new (config: { locateFile: (file: string) => string }): MediaPipePose
+}
+
+declare global {
+  interface Window {
+    Pose?: MediaPipePoseConstructor
+  }
+}
+
+let poseInstance: MediaPipePose | null = null
+let initPromise: Promise<MediaPipePose> | null = null
+let scriptLoaded = false
 
 // 检测是否是移动端
 const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -33,21 +57,65 @@ const KEYPOINT_NAMES = [
   'left_foot_index', 'right_foot_index'
 ]
 
+// 动态加载 MediaPipe 脚本
+function loadMediaPipeScript(): Promise<void> {
+  if (scriptLoaded && window.Pose) {
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve, reject) => {
+    // 检查是否已加载
+    if (window.Pose) {
+      scriptLoaded = true
+      resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose.js'
+    script.crossOrigin = 'anonymous'
+    
+    script.onload = () => {
+      console.log('[AI] MediaPipe 脚本加载成功')
+      scriptLoaded = true
+      // 等待一小段时间确保全局变量可用
+      setTimeout(() => {
+        if (window.Pose) {
+          resolve()
+        } else {
+          reject(new Error('MediaPipe Pose 未正确加载'))
+        }
+      }, 100)
+    }
+    
+    script.onerror = () => {
+      reject(new Error('MediaPipe 脚本加载失败'))
+    }
+
+    document.head.appendChild(script)
+  })
+}
+
 // 初始化 MediaPipe Pose
-export async function initPoseDetector(): Promise<PoseType> {
+export async function initPoseDetector(): Promise<MediaPipePose> {
   if (poseInstance) return poseInstance
   if (initPromise) return initPromise
 
   const mobile = isMobile()
   console.log('[AI] 初始化 MediaPipe Pose...')
   console.log('[AI] 设备类型:', mobile ? '移动端' : '桌面端')
-  console.log('[AI] User Agent:', navigator.userAgent)
 
-  initPromise = new Promise((resolve, reject) => {
+  initPromise = (async () => {
     try {
-      const pose = new Pose({
+      // 先加载脚本
+      await loadMediaPipeScript()
+      
+      if (!window.Pose) {
+        throw new Error('MediaPipe Pose 构造函数不可用')
+      }
+
+      const pose = new window.Pose({
         locateFile: (file) => {
-          // 使用更稳定的 CDN
           const url = `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/${file}`
           console.log('[AI] 加载文件:', url)
           return url
@@ -56,36 +124,31 @@ export async function initPoseDetector(): Promise<PoseType> {
 
       // 移动端使用更宽松的配置
       pose.setOptions({
-        modelComplexity: mobile ? 0 : 1, // 移动端用轻量模型 (Lite)
+        modelComplexity: mobile ? 0 : 1,
         smoothLandmarks: false,
         enableSegmentation: false,
-        minDetectionConfidence: mobile ? 0.3 : 0.5, // 移动端降低检测阈值
-        minTrackingConfidence: mobile ? 0.3 : 0.5   // 移动端降低跟踪阈值
+        minDetectionConfidence: mobile ? 0.3 : 0.5,
+        minTrackingConfidence: mobile ? 0.3 : 0.5
       })
 
       pose.onResults(() => {
-        // 初始化回调，不做任何事
+        // 初始化回调
       })
 
-      // 初始化模型
-      pose.initialize().then(() => {
-        console.log('[AI] MediaPipe Pose 初始化成功')
-        poseInstance = pose
-        resolve(pose)
-      }).catch((err) => {
-        console.error('[AI] MediaPipe 初始化失败:', err)
-        initPromise = null // 允许重试
-        reject(err)
-      })
+      await pose.initialize()
+      console.log('[AI] MediaPipe Pose 初始化成功')
+      poseInstance = pose
+      return pose
     } catch (error) {
-      console.error('[AI] MediaPipe 创建失败:', error)
-      initPromise = null // 允许重试
-      reject(error)
+      console.error('[AI] MediaPipe 初始化失败:', error)
+      initPromise = null
+      throw error
     }
-  })
+  })()
 
   return initPromise
 }
+
 
 // 从图片检测姿态
 export async function detectPoseFromImage(imageElement: HTMLImageElement): Promise<PoseResult | null> {
@@ -94,7 +157,6 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
     const mobile = isMobile()
 
     console.log('[AI] 检测图片:', imageElement.naturalWidth, 'x', imageElement.naturalHeight)
-    console.log('[AI] 设备类型:', mobile ? '移动端' : '桌面端')
 
     // 确保图片加载完成
     if (!imageElement.complete || imageElement.naturalWidth === 0) {
@@ -108,73 +170,62 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d', { 
       willReadFrequently: true,
-      alpha: false  // 禁用 alpha 通道，提高性能
+      alpha: false
     })
     if (!ctx) {
       console.error('[AI] 无法创建 canvas context')
       return null
     }
 
-    // 移动端使用更小的尺寸以提高兼容性
-    // 同时确保尺寸是偶数（某些编码器要求）
     const maxSize = mobile ? 384 : 640
     let width = imageElement.naturalWidth
     let height = imageElement.naturalHeight
 
-    // 计算缩放比例
     const scale = Math.min(maxSize / width, maxSize / height, 1)
     width = Math.round(width * scale)
     height = Math.round(height * scale)
     
-    // 确保尺寸是偶数
     width = width % 2 === 0 ? width : width + 1
     height = height % 2 === 0 ? height : height + 1
 
     canvas.width = width
     canvas.height = height
     
-    // 设置白色背景（避免透明度问题）
     ctx.fillStyle = '#FFFFFF'
     ctx.fillRect(0, 0, width, height)
-    
-    // 绘制图片
     ctx.drawImage(imageElement, 0, 0, width, height)
 
     console.log('[AI] Canvas 尺寸:', width, 'x', height)
 
-    // 移动端多次尝试检测
     const maxAttempts = mobile ? 3 : 1
     
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       console.log(`[AI] 检测尝试 ${attempt}/${maxAttempts}`)
       
       const result = await new Promise<PoseResult | null>((resolve) => {
-        let resultLandmarks: Landmark[] | null = null
         let resolved = false
 
-        const handleResults = (results: { poseLandmarks?: Array<{ x: number; y: number; visibility?: number }> }) => {
+        const handleResults = (results: MediaPipeResults) => {
           if (resolved) return
           
           if (results.poseLandmarks && results.poseLandmarks.length > 0) {
             console.log('[AI] 检测到姿态，关键点数:', results.poseLandmarks.length)
             
-            resultLandmarks = results.poseLandmarks.map((lm, idx) => ({
+            const landmarks = results.poseLandmarks.map((lm, idx) => ({
               x: lm.x,
               y: lm.y,
               score: lm.visibility ?? 0.5,
               name: KEYPOINT_NAMES[idx] || `point_${idx}`
             }))
 
-            // 移动端降低有效关键点的阈值
             const minScore = mobile ? 0.2 : 0.5
-            const validCount = resultLandmarks.filter(lm => lm.score && lm.score > minScore).length
-            console.log('[AI] 有效关键点:', validCount, '/', resultLandmarks.length)
+            const validCount = landmarks.filter(lm => lm.score && lm.score > minScore).length
+            console.log('[AI] 有效关键点:', validCount, '/', landmarks.length)
 
-            // 至少需要检测到一定数量的关键点才算成功
             const minValidPoints = mobile ? 8 : 12
             if (validCount >= minValidPoints) {
               resolved = true
-              resolve({ landmarks: resultLandmarks })
+              resolve({ landmarks })
             } else {
               console.warn('[AI] 有效关键点不足:', validCount, '<', minValidPoints)
               resolved = true
@@ -189,7 +240,6 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
 
         pose.onResults(handleResults)
 
-        // 发送图片进行检测
         pose.send({ image: canvas }).catch((err) => {
           console.error('[AI] 发送图片失败:', err)
           if (!resolved) {
@@ -198,7 +248,6 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
           }
         })
 
-        // 移动端给更长的超时时间
         const timeout = mobile ? 15000 : 10000
         setTimeout(() => {
           if (!resolved) {
@@ -213,7 +262,6 @@ export async function detectPoseFromImage(imageElement: HTMLImageElement): Promi
         return result
       }
 
-      // 如果失败且还有重试机会，等待一下再重试
       if (attempt < maxAttempts) {
         console.log('[AI] 等待后重试...')
         await new Promise(r => setTimeout(r, 500))
@@ -270,11 +318,6 @@ export interface PostureAnalysis {
   }
 }
 
-// 计算角度（备用）
-// function calcAngle(p1: Landmark, p2: Landmark): number {
-//   return Math.abs(Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI)
-// }
-
 
 // 分析正面姿态
 export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
@@ -283,7 +326,6 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
   const suggestions: string[] = []
   let totalScore = 100
   const mobile = isMobile()
-  // 移动端使用更低的置信度阈值
   const minConfidence = mobile ? 0.2 : 0.3
 
   const rawData: PostureAnalysis['rawData'] = {
@@ -396,7 +438,6 @@ export function analyzeFrontPose(result: PoseResult): PostureAnalysis {
   return { score: Math.max(totalScore, 0), status, items, suggestions, rawData }
 }
 
-
 // 分析侧面姿态
 export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
   const lm = result.landmarks
@@ -404,7 +445,6 @@ export function analyzeSidePose(result: PoseResult): Partial<PostureAnalysis> {
   const suggestions: string[] = []
   let scoreDeduction = 0
   const mobile = isMobile()
-  // 移动端使用更低的置信度阈值
   const minConfidence = mobile ? 0.2 : 0.3
 
   const rawData = {
