@@ -1,7 +1,10 @@
-import { Pose } from '@mediapipe/pose'
+import * as poseModule from '@mediapipe/pose'
 
-let poseInstance: Pose | null = null
-let initPromise: Promise<Pose> | null = null
+const Pose = poseModule.Pose
+type PoseType = InstanceType<typeof Pose>
+
+let poseInstance: PoseType | null = null
+let initPromise: Promise<PoseType> | null = null
 
 // 检测是否是移动端
 const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -31,7 +34,7 @@ const KEYPOINT_NAMES = [
 ]
 
 // 初始化 MediaPipe Pose
-export async function initPoseDetector(): Promise<Pose> {
+export async function initPoseDetector(): Promise<PoseType> {
   if (poseInstance) return poseInstance
   if (initPromise) return initPromise
 
