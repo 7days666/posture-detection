@@ -339,3 +339,62 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+
+/* Loading State */
+.prediction-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.prediction-loading .loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.prediction-loading p {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+/* Error State */
+.prediction-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.prediction-error p {
+  font-size: 15px;
+  color: #ef4444;
+  margin-bottom: 16px;
+}
+
+.prediction-error button {
+  padding: 10px 24px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.prediction-error button:hover {
+  background: #e5e7eb;
+}
