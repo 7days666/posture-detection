@@ -13,7 +13,6 @@ interface User {
 
 const menuItems = [
   { label: '检测记录', icon: 'chart' },
-  { label: '我的预约', icon: 'calendar' },
   { label: '消息通知', icon: 'bell' },
   { label: '设置', icon: 'settings' },
 ]
