@@ -50,8 +50,10 @@ export default function AIDetect() {
   const handleImageUpload = (type: 'front' | 'side' | 'back') => {
     const input = document.createElement('input')
     input.type = 'file'
-    input.accept = 'image/*'
-    // 不设置 capture 属性，让用户可以选择拍照或从相册上传
+    // 明确指定接受的图片格式，避免某些浏览器默认只打开相机
+    input.accept = 'image/jpeg,image/png,image/gif,image/webp,image/*'
+    // 确保不设置 capture 属性，这样用户可以选择拍照或从相册上传
+    input.removeAttribute('capture')
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (file) {
@@ -69,7 +71,14 @@ export default function AIDetect() {
         reader.readAsDataURL(file)
       }
     }
+    // 添加到 DOM 中再触发点击（某些浏览器需要）
+    input.style.display = 'none'
+    document.body.appendChild(input)
     input.click()
+    // 清理
+    setTimeout(() => {
+      document.body.removeChild(input)
+    }, 1000)
   }
 
   const handleNext = () => {
