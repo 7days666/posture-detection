@@ -10,7 +10,18 @@ import {
   VideoIcon,
   CourseIcon,
   LessonCompleteIcon,
-  LessonPendingIcon
+  LessonPendingIcon,
+  CalendarIcon,
+  DumbbellIcon,
+  TargetIcon,
+  WarningIcon,
+  RefreshIcon,
+  ClockIcon,
+  BodyIcon,
+  LightbulbIcon,
+  BookIcon,
+  SparkleIcon,
+  RobotIcon
 } from '../components/Icons'
 import { generateTrainingPlan, TrainingPlan, TrainingExercise } from '../api/aiSuggestion'
 import './HealthEducation.css'
@@ -540,8 +551,8 @@ export default function HealthEducation() {
         </header>
         <main className="exercise-detail-content">
           <div className="exercise-meta">
-            <span className="exercise-duration">⏱ {selectedExercise.duration}</span>
-            <span className="exercise-target">🎯 {selectedExercise.targetArea}</span>
+            <span className="exercise-duration"><ClockIcon color="#374151" /> {selectedExercise.duration}</span>
+            <span className="exercise-target"><TargetIcon color="#374151" /> {selectedExercise.targetArea}</span>
           </div>
           
           <div className="exercise-description">
@@ -549,7 +560,7 @@ export default function HealthEducation() {
           </div>
           
           <div className="exercise-steps">
-            <h3>动作步骤</h3>
+            <h3><BodyIcon color="#4ecdc4" /> 动作步骤</h3>
             <ol>
               {selectedExercise.steps.map((step, index) => (
                 <li key={index}>
@@ -561,7 +572,7 @@ export default function HealthEducation() {
           </div>
           
           <div className="exercise-tips">
-            <h3>💡 动作要点</h3>
+            <h3><LightbulbIcon color="#f59e0b" /> 动作要点</h3>
             <p>{selectedExercise.tips}</p>
           </div>
         </main>
@@ -586,9 +597,10 @@ export default function HealthEducation() {
     if (!trainingPlan) {
       return (
         <div className="no-training-plan">
+          <DumbbellIcon color="#9ca3af" />
           <p>暂无训练计划</p>
           <button className="generate-btn" onClick={loadTrainingPlan}>
-            生成 AI 训练计划
+            <SparkleIcon color="#ffffff" /> 生成 AI 训练计划
           </button>
         </div>
       )
@@ -602,12 +614,12 @@ export default function HealthEducation() {
         </div>
         
         <div className="plan-routine">
-          <span className="routine-icon">📅</span>
+          <span className="routine-icon"><CalendarIcon color="#1e40af" /></span>
           <span>{trainingPlan.dailyRoutine}</span>
         </div>
         
         <div className="exercises-list">
-          <h4>训练动作 ({trainingPlan.exercises.length}个)</h4>
+          <h4><DumbbellIcon color="#374151" /> 训练动作 ({trainingPlan.exercises.length}个)</h4>
           {trainingPlan.exercises.map((exercise, index) => (
             <motion.div
               key={index}
@@ -621,8 +633,8 @@ export default function HealthEducation() {
                 <h5>{exercise.name}</h5>
                 <p>{exercise.description}</p>
                 <div className="exercise-meta-small">
-                  <span>⏱ {exercise.duration}</span>
-                  <span>🎯 {exercise.targetArea}</span>
+                  <span><ClockIcon color="#9ca3af" /> {exercise.duration}</span>
+                  <span><TargetIcon color="#9ca3af" /> {exercise.targetArea}</span>
                 </div>
               </div>
               <div className="exercise-arrow">→</div>
@@ -631,7 +643,7 @@ export default function HealthEducation() {
         </div>
         
         <div className="plan-precautions">
-          <h4>⚠️ 注意事项</h4>
+          <h4><WarningIcon color="#f59e0b" /> 注意事项</h4>
           <ul>
             {trainingPlan.precautions.map((item, index) => (
               <li key={index}>{item}</li>
@@ -640,7 +652,7 @@ export default function HealthEducation() {
         </div>
         
         <button className="regenerate-btn" onClick={loadTrainingPlan}>
-          🔄 重新生成训练计划
+          <RefreshIcon color="#6b7280" /> 重新生成训练计划
         </button>
       </div>
     )
@@ -729,7 +741,7 @@ export default function HealthEducation() {
             {fromReport && (
               <>
                 <div className="section-header">
-                  <h2>🤖 AI 个性化训练计划</h2>
+                  <h2><RobotIcon color="#8b5cf6" /> AI 个性化训练计划</h2>
                   <p>根据您的体态检测结果，AI 为您定制的矫正训练</p>
                 </div>
                 {renderTrainingPlan()}
@@ -738,7 +750,7 @@ export default function HealthEducation() {
             
             {/* 推荐内容 */}
             <div className="section-header" style={{ marginTop: fromReport ? 24 : 0 }}>
-              <h2>{fromReport ? '📚 相关学习资料' : '个性化推荐'}</h2>
+              <h2>{fromReport ? <><BookIcon color="#3b82f6" /> 相关学习资料</> : '个性化推荐'}</h2>
               <p>{fromReport ? '了解更多体态健康知识' : '根据你的体态检测结果，我们为你推荐以下内容'}</p>
             </div>
             <div className="content-list">
