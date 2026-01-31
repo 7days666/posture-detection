@@ -466,7 +466,7 @@ export default function HealthEducation() {
   return (
     <div className="health-education-page">
       <header className="page-header">
-        <h1>健康学堂</h1>
+        <h1>数字运动教练</h1>
         <p className="subtitle">学习体态健康知识，守护脊柱健康</p>
       </header>
 
