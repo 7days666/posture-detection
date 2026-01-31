@@ -385,3 +385,93 @@ export const LessonPendingIcon = ({ color = "#d1d5db" }: { color?: string }) => 
     <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2"/>
   </svg>
 )
+
+
+// 训练计划相关图标
+export const CalendarIcon = ({ color = "#3b82f6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <rect x="3" y="4" width="18" height="18" rx="2" stroke={color} strokeWidth="2"/>
+    <path d="M3 10H21" stroke={color} strokeWidth="2"/>
+    <path d="M8 2V6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M16 2V6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <rect x="7" y="14" width="4" height="4" rx="1" fill={color}/>
+  </svg>
+)
+
+export const DumbbellIcon = ({ color = "#10b981" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <rect x="2" y="9" width="4" height="6" rx="1" stroke={color} strokeWidth="2"/>
+    <rect x="18" y="9" width="4" height="6" rx="1" stroke={color} strokeWidth="2"/>
+    <path d="M6 12H18" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <rect x="5" y="10" width="2" height="4" fill={color}/>
+    <rect x="17" y="10" width="2" height="4" fill={color}/>
+  </svg>
+)
+
+export const TargetIcon = ({ color = "#f59e0b" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <circle cx="12" cy="12" r="6" stroke={color} strokeWidth="2"/>
+    <circle cx="12" cy="12" r="2" fill={color}/>
+  </svg>
+)
+
+export const WarningIcon = ({ color = "#f59e0b" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M12 2L2 22H22L12 2Z" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
+    <path d="M12 9V14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <circle cx="12" cy="18" r="1" fill={color}/>
+  </svg>
+)
+
+export const RefreshIcon = ({ color = "#6b7280" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M4 12C4 7.58172 7.58172 4 12 4C15.0736 4 17.7554 5.64664 19.2 8.1" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M20 12C20 16.4183 16.4183 20 12 20C8.92643 20 6.24461 18.3534 4.8 15.9" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M15 8H20V3" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M9 16H4V21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const ClockIcon = ({ color = "#6b7280" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <path d="M12 6V12L16 14" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const BodyIcon = ({ color = "#8b5cf6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <circle cx="12" cy="4" r="2.5" stroke={color} strokeWidth="2"/>
+    <path d="M12 7V14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 10H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M12 14L9 22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M12 14L15 22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const LightbulbIcon = ({ color = "#f59e0b" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M9 21H15" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M12 3C8.13401 3 5 6.13401 5 10C5 12.3869 6.23053 14.4699 8.09091 15.6364C8.65151 16.0152 9 16.6364 9 17.3182V18H15V17.3182C15 16.6364 15.3485 16.0152 15.9091 15.6364C17.7695 14.4699 19 12.3869 19 10C19 6.13401 15.866 3 12 3Z" stroke={color} strokeWidth="2"/>
+    <path d="M12 7V11" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M10 9L12 11L14 9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+export const BookIcon = ({ color = "#3b82f6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M4 19.5C4 18.1193 5.11929 17 6.5 17H20" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6.5 2H20V22H6.5C5.11929 22 4 20.8807 4 19.5V4.5C4 3.11929 5.11929 2 6.5 2Z" stroke={color} strokeWidth="2"/>
+    <path d="M8 7H16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <path d="M8 11H14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+)
+
+export const SparkleIcon = ({ color = "#8b5cf6" }: { color?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
+    <circle cx="19" cy="5" r="2" fill={color}/>
+    <circle cx="5" cy="19" r="2" fill={color}/>
+  </svg>
+)

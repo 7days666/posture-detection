@@ -71,10 +71,18 @@
 }
 
 .section-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 18px;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
+}
+
+.section-header h2 svg {
+  width: 24px;
+  height: 24px;
 }
 
 .section-header p {
@@ -562,12 +570,21 @@
   margin-bottom: 20px;
 }
 
+.no-training-plan svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
 .no-training-plan p {
   color: #9ca3af;
   margin-bottom: 16px;
 }
 
 .generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 24px;
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
   color: white;
@@ -576,6 +593,11 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.generate-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .training-plan {
@@ -613,7 +635,13 @@
 }
 
 .plan-routine .routine-icon {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.plan-routine .routine-icon svg {
+  width: 22px;
+  height: 22px;
 }
 
 .plan-routine span:last-child {
@@ -622,10 +650,18 @@
 }
 
 .exercises-list h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 15px;
   font-weight: 600;
   color: #374151;
   margin: 0 0 12px 0;
+}
+
+.exercises-list h4 svg {
+  width: 20px;
+  height: 20px;
 }
 
 .exercise-card {
@@ -682,6 +718,17 @@
   color: #9ca3af;
 }
 
+.exercise-meta-small span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.exercise-meta-small svg {
+  width: 14px;
+  height: 14px;
+}
+
 .exercise-arrow {
   color: #9ca3af;
   font-size: 18px;
@@ -694,10 +741,18 @@
 }
 
 .plan-precautions h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 15px;
   font-weight: 600;
   color: #374151;
   margin: 0 0 12px 0;
+}
+
+.plan-precautions h4 svg {
+  width: 20px;
+  height: 20px;
 }
 
 .plan-precautions ul {
@@ -714,6 +769,10 @@
 
 .regenerate-btn {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 12px;
   margin-top: 16px;
   background: #f3f4f6;
@@ -722,6 +781,11 @@
   font-size: 14px;
   color: #6b7280;
   cursor: pointer;
+}
+
+.regenerate-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .regenerate-btn:hover {
@@ -740,11 +804,19 @@
 }
 
 .exercise-detail-content .exercise-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 16px;
   background: #f3f4f6;
   border-radius: 20px;
   font-size: 14px;
   color: #374151;
+}
+
+.exercise-detail-content .exercise-meta span svg {
+  width: 18px;
+  height: 18px;
 }
 
 .exercise-detail-content .exercise-description {
@@ -769,10 +841,18 @@
 }
 
 .exercise-detail-content .exercise-steps h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 16px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 16px 0;
+}
+
+.exercise-detail-content .exercise-steps h3 svg {
+  width: 22px;
+  height: 22px;
 }
 
 .exercise-detail-content .exercise-steps ol {
@@ -821,10 +901,18 @@
 }
 
 .exercise-detail-content .exercise-tips h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 15px;
   font-weight: 600;
   color: #92400e;
   margin: 0 0 8px 0;
+}
+
+.exercise-detail-content .exercise-tips h3 svg {
+  width: 20px;
+  height: 20px;
 }
 
 .exercise-detail-content .exercise-tips p {
