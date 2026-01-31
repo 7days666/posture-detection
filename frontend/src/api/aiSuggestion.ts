@@ -1,7 +1,7 @@
 import type { PostureAnalysis } from '../utils/poseDetection'
 
 // DeepSeek API 配置
-const API_KEY = 'sk-c8c22d2575634a88bf51916854f855a2'
+const API_KEY = 'sk-281fd0d816a448da8f6eacc303ceae32'
 const API_URL = 'https://api.deepseek.com/v1/chat/completions'
 const MODEL = 'deepseek-chat'
 
