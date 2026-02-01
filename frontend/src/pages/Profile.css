@@ -420,10 +420,10 @@
   margin-top: 24px;
   margin-bottom: 60px;
   padding: 16px;
-  background: white;
-  border: 2px solid #fed7d7;
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  border: none;
   border-radius: 16px;
-  color: #e53e3e;
+  color: white;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -433,13 +433,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
 }
 
 .logout-btn:hover {
-  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-  border-color: #fc8181;
+  background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(229, 62, 62, 0.15);
+  box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
 }
 
 .logout-btn:active {
