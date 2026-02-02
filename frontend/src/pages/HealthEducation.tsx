@@ -263,25 +263,28 @@ const educationContents = {
       category: 'exercise',
       thumbnail: null,
       duration: 5,
-      videoUrl: '/颈椎保健操.mp4'
+      videoUrl: 'https://www.bilibili.com/video/BV1ps4y1w7i7/',
+      isExternal: true
     },
     {
       id: 'video-2',
-      title: '办公室伸展运动',
-      description: '适合久坐后的简单拉伸',
+      title: '脊柱矫正运动',
+      description: '适合久坐后的脊柱拉伸',
       category: 'exercise',
       thumbnail: null,
       duration: 8,
-      videoUrl: '#'
+      videoUrl: 'https://www.bilibili.com/video/BV1X14y1i7a1/',
+      isExternal: true
     },
     {
       id: 'video-3',
-      title: '脊柱矫正瑜伽',
+      title: '儿童体态矫正亲子瑜伽',
       description: '温和的瑜伽动作改善体态',
       category: 'exercise',
       thumbnail: null,
       duration: 15,
-      videoUrl: '#'  // 视频文件过大，暂时禁用
+      videoUrl: 'https://www.bilibili.com/video/BV1Vb1ZYuE9h/',
+      isExternal: true
     }
   ],
   courses: [
@@ -441,7 +444,11 @@ export default function HealthEducation() {
         if (type === 'article') {
           setSelectedArticle(item)
         } else if (type === 'video' && item.videoUrl && item.videoUrl !== '#') {
-          setSelectedVideo(item)
+          if (item.isExternal) {
+            window.open(item.videoUrl, '_blank')
+          } else {
+            setSelectedVideo(item)
+          }
         }
       }}
     >
