@@ -352,7 +352,8 @@
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  padding: 0 10px;
 }
 
 .action-btn {
