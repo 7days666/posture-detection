@@ -21,9 +21,11 @@ import {
   LightbulbIcon,
   BookIcon,
   SparkleIcon,
-  RobotIcon
+  RobotIcon,
+  CheckCircleIcon
 } from '../components/Icons'
 import { generateTrainingPlan, TrainingPlan, TrainingExercise } from '../api/aiSuggestion'
+import { exerciseAPI } from '../api/healthApi'
 import './HealthEducation.css'
 
 // 图标映射
@@ -479,6 +481,8 @@ export default function HealthEducation() {
   const [trainingPlan, setTrainingPlan] = useState<TrainingPlan | null>(null)
   const [trainingLoading, setTrainingLoading] = useState(false)
   const [selectedExercise, setSelectedExercise] = useState<TrainingExercise | null>(null)
+  const [completingExercise, setCompletingExercise] = useState(false)
+  const [exerciseCompleted, setExerciseCompleted] = useState(false)
 
   const recommendedContent = getRecommendedContent(problems)
   
@@ -540,6 +544,37 @@ export default function HealthEducation() {
   // 渲染训练动作详情
   const renderExerciseDetail = () => {
     if (!selectedExercise) return null
+
+    // 解析时长（如 "3分钟" -> 3）
+    const parseDuration = (duration: string): number => {
+      const match = duration.match(/(\d+)/)
+      return match ? parseInt(match[1]) : 5
+    }
+
+    // 完成训练
+    const handleCompleteExercise = async () => {
+      setCompletingExercise(true)
+      try {
+        await exerciseAPI.save({
+          exercise_type: 'posture_correction',
+          exercise_name: selectedExercise.name,
+          duration_minutes: parseDuration(selectedExercise.duration),
+          completion_rate: 100,
+          difficulty_level: 'medium',
+          notes: `目标部位: ${selectedExercise.targetArea}`
+        })
+        setExerciseCompleted(true)
+        setTimeout(() => {
+          setExerciseCompleted(false)
+          setSelectedExercise(null)
+        }, 2000)
+      } catch (error) {
+        console.error('保存运动记录失败:', error)
+        alert('保存失败，请重试')
+      } finally {
+        setCompletingExercise(false)
+      }
+    }
     
     return (
       <div className="health-education-page">
@@ -574,6 +609,38 @@ export default function HealthEducation() {
           <div className="exercise-tips">
             <h3><LightbulbIcon color="#f59e0b" /> 动作要点</h3>
             <p>{selectedExercise.tips}</p>
+          </div>
+
+          {/* 完成训练按钮 */}
+          <div className="exercise-complete-section">
+            {exerciseCompleted ? (
+              <motion.div 
+                className="complete-success"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+              >
+                <CheckCircleIcon color="#10b981" />
+                <span>训练已完成！</span>
+              </motion.div>
+            ) : (
+              <button 
+                className="complete-exercise-btn"
+                onClick={handleCompleteExercise}
+                disabled={completingExercise}
+              >
+                {completingExercise ? (
+                  <>
+                    <span className="btn-spinner"></span>
+                    保存中...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircleIcon color="#ffffff" />
+                    完成训练
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </main>
         <TabBar />
