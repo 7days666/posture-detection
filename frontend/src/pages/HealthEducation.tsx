@@ -94,7 +94,7 @@ const educationContents = {
       duration: 4,
       content: `
         <div class="article-hero-image">
-          <img src="/椅子坐姿.jpg" alt="正确坐姿示范" class="article-main-image" />
+          <img src="/站姿矫正那里.jpg" alt="站姿矫正示范" class="article-main-image" />
         </div>
         <h3>正确站姿的关键</h3>
         <div class="tip-box tip-important">
@@ -446,12 +446,11 @@ export default function HealthEducation() {
       <div className="card-content">
         <h3 className="card-title">{item.title}</h3>
         <p className="card-description">{item.description}</p>
-        <div className="card-meta">
-          <span className="duration">{item.duration}分钟</span>
-          {type === 'course' && (
+        {type === 'course' && (
+          <div className="card-meta">
             <span className="lessons">{item.lessons?.length}节课</span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </motion.div>
   )
