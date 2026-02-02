@@ -126,36 +126,55 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [usersRes, statsRes, assessmentsRes, productsRes, ordersRes, makeupRes, pointsStatsRes] = await Promise.all([
-        getUsers(), 
-        getStats(),
-        getAssessments(),
-        getAdminProducts(),
-        getAdminOrders(),
-        getMakeupRequests(),
-        getPointsStats()
-      ])
-      if (usersRes.data.success) {
-        setUsers(usersRes.data.users)
-      }
-      if (statsRes.data.success) {
-        setStats(statsRes.data.stats)
-      }
-      if (assessmentsRes.data.success) {
-        setAssessments(assessmentsRes.data.assessments)
-      }
-      if (productsRes.data.success) {
-        setProducts(productsRes.data.products)
-      }
-      if (ordersRes.data.success) {
-        setOrders(ordersRes.data.orders)
-      }
-      if (makeupRes.data.success) {
-        setMakeupRequests(makeupRes.data.requests)
-      }
-      if (pointsStatsRes.data.success) {
-        setPointsStats(pointsStatsRes.data.stats)
-      }
+      // 分别加载数据，避免一个失败导致全部失败
+      try {
+        const usersRes = await getUsers()
+        if (usersRes.data.success) {
+          setUsers(usersRes.data.users)
+        }
+      } catch (e) { console.error('加载用户失败:', e) }
+
+      try {
+        const statsRes = await getStats()
+        if (statsRes.data.success) {
+          setStats(statsRes.data.stats)
+        }
+      } catch (e) { console.error('加载统计失败:', e) }
+
+      try {
+        const assessmentsRes = await getAssessments()
+        if (assessmentsRes.data.success) {
+          setAssessments(assessmentsRes.data.assessments)
+        }
+      } catch (e) { console.error('加载检测数据失败:', e) }
+
+      try {
+        const productsRes = await getAdminProducts()
+        if (productsRes.data.success) {
+          setProducts(productsRes.data.products)
+        }
+      } catch (e) { console.error('加载商品失败:', e) }
+
+      try {
+        const ordersRes = await getAdminOrders()
+        if (ordersRes.data.success) {
+          setOrders(ordersRes.data.orders)
+        }
+      } catch (e) { console.error('加载订单失败:', e) }
+
+      try {
+        const makeupRes = await getMakeupRequests()
+        if (makeupRes.data.success) {
+          setMakeupRequests(makeupRes.data.requests)
+        }
+      } catch (e) { console.error('加载补测申请失败:', e) }
+
+      try {
+        const pointsStatsRes = await getPointsStats()
+        if (pointsStatsRes.data.success) {
+          setPointsStats(pointsStatsRes.data.stats)
+        }
+      } catch (e) { console.error('加载积分统计失败:', e) }
     } catch (error) {
       console.error('加载数据失败:', error)
     } finally {
