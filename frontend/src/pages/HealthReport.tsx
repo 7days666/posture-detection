@@ -125,14 +125,33 @@ function transformAssessmentData(data: AssessmentData, historyData: AssessmentDa
   }
   
   // 解析 AI 建议
-  const suggestions = data.ai_suggestions 
-    ? data.ai_suggestions.split('\n').filter(s => s.trim()).slice(0, 4)
-    : [
-        '完成首次AI体态检测后，这里会显示个性化建议',
-        '建议定期进行体态检测，跟踪健康变化',
-        '保持良好的坐姿和站姿习惯',
-        '每天进行适量的伸展运动'
-      ]
+  let suggestions: string[] = []
+  if (data.ai_suggestions) {
+    // 尝试按数字编号分割（如 1. 2. 3. 或 1、2、3、）
+    const numbered = data.ai_suggestions.split(/(?=\d+[.、])/g).filter(s => s.trim())
+    if (numbered.length >= 3) {
+      suggestions = numbered.slice(0, 6)
+    } else {
+      // 按换行符分割
+      const lines = data.ai_suggestions.split('\n').filter(s => s.trim())
+      if (lines.length >= 3) {
+        suggestions = lines.slice(0, 6)
+      } else {
+        // 按句号分割
+        const sentences = data.ai_suggestions.split(/[。！]/).filter(s => s.trim())
+        suggestions = sentences.slice(0, 6).map(s => s + (s.endsWith('。') ? '' : '。'))
+      }
+    }
+  }
+  
+  if (suggestions.length === 0) {
+    suggestions = [
+      '完成首次AI体态检测后，这里会显示个性化建议',
+      '建议定期进行体态检测，跟踪健康变化',
+      '保持良好的坐姿和站姿习惯',
+      '每天进行适量的伸展运动'
+    ]
+  }
   
   return {
     date: new Date(data.created_at).toLocaleDateString('zh-CN'),
