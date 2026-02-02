@@ -357,9 +357,9 @@
 
 .action-btn {
   flex: 1;
-  padding: 20px 28px;
-  border-radius: 18px;
-  font-size: 20px;
+  padding: 22px 32px;
+  border-radius: 20px;
+  font-size: 22px;
   font-weight: 600;
   cursor: pointer;
   border: none;
