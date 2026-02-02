@@ -127,21 +127,12 @@ function transformAssessmentData(data: AssessmentData, historyData: AssessmentDa
   // 解析 AI 建议
   let suggestions: string[] = []
   if (data.ai_suggestions) {
-    // 尝试按数字编号分割（如 1. 2. 3. 或 1、2、3、）
-    const numbered = data.ai_suggestions.split(/(?=\d+[.、])/g).filter(s => s.trim())
-    if (numbered.length >= 3) {
-      suggestions = numbered.slice(0, 6)
-    } else {
-      // 按换行符分割
-      const lines = data.ai_suggestions.split('\n').filter(s => s.trim())
-      if (lines.length >= 3) {
-        suggestions = lines.slice(0, 6)
-      } else {
-        // 按句号分割
-        const sentences = data.ai_suggestions.split(/[。！]/).filter(s => s.trim())
-        suggestions = sentences.slice(0, 6).map(s => s + (s.endsWith('。') ? '' : '。'))
-      }
-    }
+    // 按换行符分割
+    const lines = data.ai_suggestions.split('\n').filter(s => s.trim())
+    suggestions = lines.slice(0, 6).map(s => {
+      // 去掉开头的数字编号（如 1. 2. 1、2、等）
+      return s.replace(/^\d+[.、\s]+/, '').trim()
+    }).filter(s => s.length > 0)
   }
   
   if (suggestions.length === 0) {
@@ -420,7 +411,6 @@ export default function HealthReport() {
           <div className="suggestions-list">
             {reportData.suggestions.map((suggestion, index) => (
               <div key={index} className="suggestion-item">
-                <span className="suggestion-number">{index + 1}</span>
                 <span className="suggestion-text">{suggestion}</span>
               </div>
             ))}
