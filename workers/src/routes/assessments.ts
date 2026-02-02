@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { verifyJWT } from '../utils/jwt'
+import { addPointsForDetection } from '../services/pointsService'
 
 type Bindings = {
   DB: D1Database
@@ -40,7 +41,8 @@ assessmentRoutes.post('/', async (c) => {
       ai_suggestions
     } = body
 
-    await c.env.DB.prepare(`
+    // 保存检测结果
+    const insertResult = await c.env.DB.prepare(`
       INSERT INTO posture_assessments (
         user_id, overall_score, head_forward_angle, shoulder_level_diff,
         spine_curvature, pelvis_tilt, risk_level, keypoints_data, ai_suggestions
@@ -57,7 +59,32 @@ assessmentRoutes.post('/', async (c) => {
       ai_suggestions || null
     ).run()
 
-    return c.json({ success: true, message: '检测结果已保存' })
+    // 获取刚插入的检测记录ID
+    const assessmentRow = await c.env.DB.prepare(`
+      SELECT id FROM posture_assessments WHERE user_id = ? ORDER BY id DESC LIMIT 1
+    `).bind(userId).first<{ id: number }>()
+
+    // 添加积分奖励
+    let pointsResult = null
+    if (assessmentRow) {
+      try {
+        pointsResult = await addPointsForDetection(c.env.DB, userId, assessmentRow.id)
+      } catch (pointsError) {
+        console.error('添加积分失败:', pointsError)
+        // 积分添加失败不影响检测结果保存
+      }
+    }
+
+    return c.json({
+      success: true,
+      message: '检测结果已保存',
+      points: pointsResult ? {
+        earned: pointsResult.pointsEarned,
+        alreadyDetectedThisMonth: pointsResult.alreadyDetectedThisMonth,
+        newBalance: pointsResult.userPoints.balance,
+        consecutiveMonths: pointsResult.userPoints.consecutiveMonths
+      } : null
+    })
   } catch (error) {
     console.error('保存检测结果错误:', error)
     return c.json({ success: false, message: '服务器错误' }, 500)
