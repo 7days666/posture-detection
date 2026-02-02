@@ -298,7 +298,7 @@ const educationContents = {
       lessons: [
         { title: '认识你的脊柱', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1SzEgz3EaE/' },
         { title: '常见体态问题', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1Yy4y1G7Bf/' },
-        { title: '日常姿势纠正', completed: false },
+        { title: '不良日常姿势的危害', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1fr4y1i7n7/' },
         { title: '运动与体态', completed: false },
         { title: '建立健康习惯', completed: false }
       ]
