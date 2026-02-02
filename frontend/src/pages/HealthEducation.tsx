@@ -215,7 +215,7 @@ const educationContents = {
       duration: 3,
       content: `
         <div class="article-hero-image">
-          <img src="/屏幕/书本高度和距离示范.jpg" alt="书本高度和距离示范" class="article-main-image" />
+          <img src="/书包正确背法.png" alt="书包正确背法" class="article-main-image" />
         </div>
         <h3>书包与脊柱健康</h3>
         <p>书包过重或背法不当是导致青少年脊柱问题的重要原因之一。</p>
