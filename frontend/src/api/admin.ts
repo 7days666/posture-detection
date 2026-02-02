@@ -45,3 +45,25 @@ export const deleteUser = (userId: number) => {
 export const getStats = () => {
   return adminApi.get('/admin/stats')
 }
+
+// ========== 数据库管理 ==========
+
+// 获取所有检测记录
+export const getAssessments = () => {
+  return adminApi.get('/admin/assessments')
+}
+
+// 删除单条检测记录
+export const deleteAssessment = (assessmentId: number) => {
+  return adminApi.delete(`/admin/assessments/${assessmentId}`)
+}
+
+// 清理异常数据
+export const cleanupBadData = () => {
+  return adminApi.post('/admin/assessments/cleanup')
+}
+
+// 清理用户的所有检测记录
+export const clearUserAssessments = (userId: number) => {
+  return adminApi.delete(`/admin/users/${userId}/assessments`)
+}

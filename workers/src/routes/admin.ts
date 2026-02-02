@@ -155,3 +155,105 @@ adminRoutes.get('/stats', adminAuth, async (c) => {
     return c.json({ success: false, message: '服务器错误' }, 500)
   }
 })
+
+// ========== 数据库管理功能 ==========
+
+// 获取所有检测记录
+adminRoutes.get('/assessments', adminAuth, async (c) => {
+  try {
+    const assessments = await c.env.DB.prepare(`
+      SELECT 
+        a.id, a.user_id, a.overall_score, a.risk_level,
+        a.head_forward_angle, a.shoulder_level_diff, 
+        a.spine_curvature, a.pelvis_tilt,
+        a.created_at,
+        u.phone, u.name
+      FROM posture_assessments a
+      LEFT JOIN users u ON a.user_id = u.id
+      ORDER BY a.created_at DESC
+      LIMIT 100
+    `).all()
+    
+    return c.json({ success: true, assessments: assessments.results })
+  } catch (error) {
+    console.error('获取检测记录错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 删除单条检测记录
+adminRoutes.delete('/assessments/:id', adminAuth, async (c) => {
+  try {
+    const assessmentId = c.req.param('id')
+    
+    await c.env.DB.prepare(
+      'DELETE FROM posture_assessments WHERE id = ?'
+    ).bind(assessmentId).run()
+    
+    return c.json({ success: true, message: '检测记录已删除' })
+  } catch (error) {
+    console.error('删除检测记录错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 清理异常数据（评分100但指标异常的数据）
+adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
+  try {
+    // 找出评分>=95但有异常指标的记录（这些是错误数据）
+    const badRecords = await c.env.DB.prepare(`
+      SELECT id FROM posture_assessments 
+      WHERE overall_score >= 95 
+      AND (
+        head_forward_angle > 15 OR 
+        shoulder_level_diff > 3 OR 
+        spine_curvature > 15 OR 
+        pelvis_tilt > 10
+      )
+    `).all()
+    
+    const count = badRecords.results?.length || 0
+    
+    if (count > 0) {
+      // 删除这些异常记录
+      await c.env.DB.prepare(`
+        DELETE FROM posture_assessments 
+        WHERE overall_score >= 95 
+        AND (
+          head_forward_angle > 15 OR 
+          shoulder_level_diff > 3 OR 
+          spine_curvature > 15 OR 
+          pelvis_tilt > 10
+        )
+      `).run()
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: `已清理 ${count} 条异常数据`,
+      deletedCount: count
+    })
+  } catch (error) {
+    console.error('清理数据错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 清理指定用户的所有检测记录
+adminRoutes.delete('/users/:id/assessments', adminAuth, async (c) => {
+  try {
+    const userId = c.req.param('id')
+    
+    const result = await c.env.DB.prepare(
+      'DELETE FROM posture_assessments WHERE user_id = ?'
+    ).bind(userId).run()
+    
+    return c.json({ 
+      success: true, 
+      message: `已清理该用户的检测记录`
+    })
+  } catch (error) {
+    console.error('清理用户检测记录错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})

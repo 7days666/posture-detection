@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUsers, getStats, resetUserPassword, deleteUser } from '../api/admin'
+import { getUsers, getStats, resetUserPassword, deleteUser, getAssessments, deleteAssessment, cleanupBadData, clearUserAssessments } from '../api/admin'
 import './AdminDashboard.css'
 
 interface User {
@@ -16,6 +16,20 @@ interface User {
   weight?: string
 }
 
+interface Assessment {
+  id: number
+  user_id: number
+  overall_score: number
+  risk_level: string
+  head_forward_angle?: number
+  shoulder_level_diff?: number
+  spine_curvature?: number
+  pelvis_tilt?: number
+  created_at: string
+  phone?: string
+  name?: string
+}
+
 interface Stats {
   totalUsers: number
   totalAssessments: number
@@ -24,7 +38,9 @@ interface Stats {
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<'users' | 'assessments'>('users')
   const [users, setUsers] = useState<User[]>([])
+  const [assessments, setAssessments] = useState<Assessment[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -45,12 +61,19 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [usersRes, statsRes] = await Promise.all([getUsers(), getStats()])
+      const [usersRes, statsRes, assessmentsRes] = await Promise.all([
+        getUsers(), 
+        getStats(),
+        getAssessments()
+      ])
       if (usersRes.data.success) {
         setUsers(usersRes.data.users)
       }
       if (statsRes.data.success) {
         setStats(statsRes.data.stats)
+      }
+      if (assessmentsRes.data.success) {
+        setAssessments(assessmentsRes.data.assessments)
       }
     } catch (error) {
       console.error('加载数据失败:', error)
@@ -97,6 +120,54 @@ export default function AdminDashboard() {
       setMessage('删除失败')
     } finally {
       setActionLoading(false)
+    }
+  }
+
+  // 删除单条检测记录
+  const handleDeleteAssessment = async (id: number) => {
+    if (!confirm('确定删除这条检测记录吗？')) return
+    
+    try {
+      const res = await deleteAssessment(id)
+      if (res.data.success) {
+        setMessage('检测记录已删除')
+        loadData()
+      }
+    } catch (error) {
+      setMessage('删除失败')
+    }
+  }
+
+  // 清理异常数据
+  const handleCleanupBadData = async () => {
+    if (!confirm('确定清理所有异常数据吗？（评分>=95但指标异常的记录）')) return
+    
+    setActionLoading(true)
+    try {
+      const res = await cleanupBadData()
+      if (res.data.success) {
+        setMessage(res.data.message)
+        loadData()
+      }
+    } catch (error) {
+      setMessage('清理失败')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // 清理用户的所有检测记录
+  const handleClearUserAssessments = async (userId: number, phone: string) => {
+    if (!confirm(`确定清理用户 ${phone} 的所有检测记录吗？`)) return
+    
+    try {
+      const res = await clearUserAssessments(userId)
+      if (res.data.success) {
+        setMessage('已清理该用户的检测记录')
+        loadData()
+      }
+    } catch (error) {
+      setMessage('清理失败')
     }
   }
 
@@ -158,6 +229,24 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* 标签页切换 */}
+      <div className="admin-tabs">
+        <button 
+          className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+          用户管理
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'assessments' ? 'active' : ''}`}
+          onClick={() => setActiveTab('assessments')}
+        >
+          检测数据
+        </button>
+      </div>
+
+      {/* 用户列表 */}
+      {activeTab === 'users' && (
       <div className="users-section">
         <h2>用户列表 ({users.length})</h2>
         <div className="users-table-wrapper">
@@ -211,6 +300,12 @@ export default function AdminDashboard() {
                     >
                       删除
                     </button>
+                    <button 
+                      className="action-btn clear-btn"
+                      onClick={() => handleClearUserAssessments(user.id, user.phone)}
+                    >
+                      清检测
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -218,6 +313,77 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+      )}
+
+      {/* 检测数据管理 */}
+      {activeTab === 'assessments' && (
+      <div className="assessments-section">
+        <div className="section-header">
+          <h2>检测记录 ({assessments.length})</h2>
+          <button 
+            className="cleanup-btn"
+            onClick={handleCleanupBadData}
+            disabled={actionLoading}
+          >
+            {actionLoading ? '处理中...' : '清理异常数据'}
+          </button>
+        </div>
+        <div className="users-table-wrapper">
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>用户</th>
+                <th>评分</th>
+                <th>风险</th>
+                <th>头部前倾</th>
+                <th>肩膀高低差</th>
+                <th>脊柱弯曲</th>
+                <th>骨盆倾斜</th>
+                <th>检测时间</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {assessments.map(a => {
+                // 判断是否是异常数据
+                const isBad = a.overall_score >= 95 && (
+                  (a.head_forward_angle && a.head_forward_angle > 15) ||
+                  (a.shoulder_level_diff && a.shoulder_level_diff > 3) ||
+                  (a.spine_curvature && a.spine_curvature > 15) ||
+                  (a.pelvis_tilt && a.pelvis_tilt > 10)
+                )
+                return (
+                <tr key={a.id} className={isBad ? 'bad-row' : ''}>
+                  <td>{a.id}</td>
+                  <td>{a.phone || a.user_id}</td>
+                  <td className={a.overall_score >= 80 ? 'score-good' : a.overall_score >= 60 ? 'score-warn' : 'score-bad'}>
+                    {a.overall_score}
+                  </td>
+                  <td>{a.risk_level === 'low' ? '低' : a.risk_level === 'medium' ? '中' : '高'}</td>
+                  <td>{a.head_forward_angle?.toFixed(1) || '-'}°</td>
+                  <td>{a.shoulder_level_diff?.toFixed(1) || '-'}cm</td>
+                  <td>{a.spine_curvature?.toFixed(1) || '-'}°</td>
+                  <td>{a.pelvis_tilt?.toFixed(1) || '-'}°</td>
+                  <td>{formatDate(a.created_at)}</td>
+                  <td>{isBad ? <span className="bad-tag">异常</span> : <span className="ok-tag">正常</span>}</td>
+                  <td>
+                    <button 
+                      className="action-btn delete-btn"
+                      onClick={() => handleDeleteAssessment(a.id)}
+                    >
+                      删除
+                    </button>
+                  </td>
+                </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      )}
 
       {/* 重置密码弹窗 */}
       {showResetModal && selectedUser && (

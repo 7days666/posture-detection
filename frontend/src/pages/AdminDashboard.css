@@ -329,3 +329,123 @@
     font-size: 11px;
   }
 }
+
+
+/* 标签页 */
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+}
+
+.tab-btn:hover:not(.active) {
+  background: #cbd5e0;
+}
+
+/* 检测数据区域 */
+.assessments-section {
+  padding: 0 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  color: #2d3748;
+}
+
+.cleanup-btn {
+  padding: 8px 16px;
+  background: #f56565;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cleanup-btn:hover {
+  background: #e53e3e;
+}
+
+.cleanup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 分数颜色 */
+.score-good {
+  color: #38a169;
+  font-weight: 600;
+}
+
+.score-warn {
+  color: #d69e2e;
+  font-weight: 600;
+}
+
+.score-bad {
+  color: #e53e3e;
+  font-weight: 600;
+}
+
+/* 异常行 */
+.bad-row {
+  background: #fff5f5 !important;
+}
+
+.bad-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fed7d7;
+  color: #c53030;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.ok-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #c6f6d5;
+  color: #276749;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.clear-btn {
+  background: #fbd38d;
+  color: #744210;
+}
+
+.clear-btn:hover {
+  background: #f6ad55;
+}
