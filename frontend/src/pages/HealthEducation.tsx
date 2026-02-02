@@ -281,7 +281,7 @@ const educationContents = {
       category: 'exercise',
       thumbnail: null,
       duration: 15,
-      videoUrl: '#'
+      videoUrl: '/儿童体态矫正亲子瑜伽.mp4'
     }
   ],
   courses: [
