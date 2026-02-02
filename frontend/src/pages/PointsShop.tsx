@@ -286,7 +286,15 @@ export default function PointsShop() {
                   {product.imageUrl ? (
                     <img src={product.imageUrl} alt={product.name} />
                   ) : (
-                    <div className="placeholder-image">🎁</div>
+                    <div className="placeholder-image">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/>
+                        <path d="M12 12V3"/>
+                        <path d="M12 3l4 4"/>
+                        <path d="M12 3L8 7"/>
+                        <rect x="2" y="12" width="20" height="4" rx="1"/>
+                      </svg>
+                    </div>
                   )}
                 </div>
                 <div className="product-info">
