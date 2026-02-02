@@ -231,13 +231,13 @@ adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
     }
     
     // 2. 清理指标全为空/0的无效数据（检测失败的记录）
-    // 检查 NULL、0、空字符串等情况
+    // 使用 COALESCE 处理各种空值情况
     const emptyRecords = await c.env.DB.prepare(`
       SELECT id FROM posture_assessments 
-      WHERE (head_forward_angle IS NULL OR head_forward_angle = 0 OR head_forward_angle = '')
-      AND (shoulder_level_diff IS NULL OR shoulder_level_diff = 0 OR shoulder_level_diff = '')
-      AND (spine_curvature IS NULL OR spine_curvature = 0 OR spine_curvature = '')
-      AND (pelvis_tilt IS NULL OR pelvis_tilt = 0 OR pelvis_tilt = '')
+      WHERE COALESCE(head_forward_angle, 0) = 0
+      AND COALESCE(shoulder_level_diff, 0) = 0
+      AND COALESCE(spine_curvature, 0) = 0
+      AND COALESCE(pelvis_tilt, 0) = 0
     `).all()
     
     const emptyCount = emptyRecords.results?.length || 0
@@ -245,10 +245,10 @@ adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
     if (emptyCount > 0) {
       await c.env.DB.prepare(`
         DELETE FROM posture_assessments 
-        WHERE (head_forward_angle IS NULL OR head_forward_angle = 0 OR head_forward_angle = '')
-        AND (shoulder_level_diff IS NULL OR shoulder_level_diff = 0 OR shoulder_level_diff = '')
-        AND (spine_curvature IS NULL OR spine_curvature = 0 OR spine_curvature = '')
-        AND (pelvis_tilt IS NULL OR pelvis_tilt = 0 OR pelvis_tilt = '')
+        WHERE COALESCE(head_forward_angle, 0) = 0
+        AND COALESCE(shoulder_level_diff, 0) = 0
+        AND COALESCE(spine_curvature, 0) = 0
+        AND COALESCE(pelvis_tilt, 0) = 0
       `).run()
       totalDeleted += emptyCount
     }
