@@ -7,6 +7,7 @@ import { exerciseRoutes } from './routes/exercises'
 import { educationRoutes } from './routes/education'
 import { predictionRoutes } from './routes/predictions'
 import { adminRoutes } from './routes/admin'
+import { pointsRoutes } from './routes/points'
 
 export type Env = {
   DB: D1Database
@@ -29,6 +30,7 @@ app.route('/api/exercises', exerciseRoutes)
 app.route('/api/education', educationRoutes)
 app.route('/api/predictions', predictionRoutes)
 app.route('/api/admin', adminRoutes)
+app.route('/api/points', pointsRoutes)
 
 // 健康检查
 app.get('/api/health', (c) => {

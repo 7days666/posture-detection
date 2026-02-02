@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUsers, getStats, resetUserPassword, deleteUser, getAssessments, deleteAssessment, cleanupBadData, clearUserAssessments } from '../api/admin'
+import { getUsers, getStats, resetUserPassword, deleteUser, getAssessments, deleteAssessment, cleanupBadData, clearUserAssessments, getAdminProducts, createProduct, updateProduct, deleteProduct, getAdminOrders, updateOrderStatus, getMakeupRequests, reviewMakeupRequest, getPointsStats } from '../api/admin'
 import './AdminDashboard.css'
 
 interface User {
@@ -36,9 +36,52 @@ interface Stats {
   todayNewUsers: number
 }
 
+interface Product {
+  id: number
+  name: string
+  description: string | null
+  imageUrl: string | null
+  pointsRequired: number
+  minConsecutiveMonths: number
+  stock: number
+  category: string | null
+  isActive: boolean
+  sortOrder: number
+}
+
+interface Order {
+  id: number
+  userId: number
+  productName: string
+  pointsSpent: number
+  quantity: number
+  status: string
+  shippingInfo: any
+  userPhone: string
+  userName: string
+  createdAt: string
+}
+
+interface MakeupRequest {
+  id: number
+  userId: number
+  targetMonth: string
+  status: string
+  userPhone: string
+  userName: string
+  createdAt: string
+}
+
+interface PointsStats {
+  totalPointsInCirculation: number
+  totalPointsRedeemed: number
+  pendingOrders: number
+  pendingMakeupRequests: number
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'users' | 'assessments'>('users')
+  const [activeTab, setActiveTab] = useState<'users' | 'assessments' | 'products' | 'orders' | 'makeup'>('users')
   const [users, setUsers] = useState<User[]>([])
   const [assessments, setAssessments] = useState<Assessment[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
@@ -49,6 +92,28 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [message, setMessage] = useState('')
+  
+  // 商品管理状态
+  const [products, setProducts] = useState<Product[]>([])
+  const [showProductModal, setShowProductModal] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [productForm, setProductForm] = useState({
+    name: '',
+    description: '',
+    imageUrl: '',
+    pointsRequired: 30,
+    minConsecutiveMonths: 3,
+    stock: 10,
+    category: '',
+    sortOrder: 0
+  })
+  
+  // 订单管理状态
+  const [orders, setOrders] = useState<Order[]>([])
+  const [pointsStats, setPointsStats] = useState<PointsStats | null>(null)
+  
+  // 补测申请状态
+  const [makeupRequests, setMakeupRequests] = useState<MakeupRequest[]>([])
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken')
@@ -61,10 +126,14 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [usersRes, statsRes, assessmentsRes] = await Promise.all([
+      const [usersRes, statsRes, assessmentsRes, productsRes, ordersRes, makeupRes, pointsStatsRes] = await Promise.all([
         getUsers(), 
         getStats(),
-        getAssessments()
+        getAssessments(),
+        getAdminProducts(),
+        getAdminOrders(),
+        getMakeupRequests(),
+        getPointsStats()
       ])
       if (usersRes.data.success) {
         setUsers(usersRes.data.users)
@@ -74,6 +143,18 @@ export default function AdminDashboard() {
       }
       if (assessmentsRes.data.success) {
         setAssessments(assessmentsRes.data.assessments)
+      }
+      if (productsRes.data.success) {
+        setProducts(productsRes.data.products)
+      }
+      if (ordersRes.data.success) {
+        setOrders(ordersRes.data.orders)
+      }
+      if (makeupRes.data.success) {
+        setMakeupRequests(makeupRes.data.requests)
+      }
+      if (pointsStatsRes.data.success) {
+        setPointsStats(pointsStatsRes.data.stats)
       }
     } catch (error) {
       console.error('加载数据失败:', error)
@@ -171,6 +252,116 @@ export default function AdminDashboard() {
     }
   }
 
+  // ========== 商品管理 ==========
+  const handleSaveProduct = async () => {
+    if (!productForm.name || !productForm.pointsRequired) {
+      setMessage('商品名称和所需积分必填')
+      return
+    }
+    
+    setActionLoading(true)
+    try {
+      if (editingProduct) {
+        const res = await updateProduct(editingProduct.id, productForm)
+        if (res.data.success) {
+          setMessage('商品更新成功')
+        }
+      } else {
+        const res = await createProduct(productForm)
+        if (res.data.success) {
+          setMessage('商品创建成功')
+        }
+      }
+      setShowProductModal(false)
+      setEditingProduct(null)
+      setProductForm({
+        name: '',
+        description: '',
+        imageUrl: '',
+        pointsRequired: 30,
+        minConsecutiveMonths: 3,
+        stock: 10,
+        category: '',
+        sortOrder: 0
+      })
+      loadData()
+    } catch (error) {
+      setMessage('操作失败')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product)
+    setProductForm({
+      name: product.name,
+      description: product.description || '',
+      imageUrl: product.imageUrl || '',
+      pointsRequired: product.pointsRequired,
+      minConsecutiveMonths: product.minConsecutiveMonths,
+      stock: product.stock,
+      category: product.category || '',
+      sortOrder: product.sortOrder
+    })
+    setShowProductModal(true)
+  }
+
+  const handleDeleteProduct = async (productId: number) => {
+    if (!confirm('确定删除此商品吗？')) return
+    
+    try {
+      const res = await deleteProduct(productId)
+      if (res.data.success) {
+        setMessage('商品已删除')
+        loadData()
+      }
+    } catch (error) {
+      setMessage('删除失败')
+    }
+  }
+
+  const handleToggleProductActive = async (product: Product) => {
+    try {
+      const res = await updateProduct(product.id, { isActive: !product.isActive })
+      if (res.data.success) {
+        setMessage(product.isActive ? '商品已下架' : '商品已上架')
+        loadData()
+      }
+    } catch (error) {
+      setMessage('操作失败')
+    }
+  }
+
+  // ========== 订单管理 ==========
+  const handleUpdateOrderStatus = async (orderId: number, status: string) => {
+    try {
+      const res = await updateOrderStatus(orderId, status)
+      if (res.data.success) {
+        setMessage('订单状态已更新')
+        loadData()
+      }
+    } catch (error) {
+      setMessage('更新失败')
+    }
+  }
+
+  // ========== 补测申请管理 ==========
+  const handleReviewMakeup = async (requestId: number, approved: boolean) => {
+    const reason = approved ? undefined : prompt('请输入拒绝原因') || undefined
+    if (!approved && !reason) return
+    
+    try {
+      const res = await reviewMakeupRequest(requestId, approved, reason)
+      if (res.data.success) {
+        setMessage(approved ? '已批准补测申请' : '已拒绝补测申请')
+        loadData()
+      }
+    } catch (error) {
+      setMessage('操作失败')
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken')
     navigate('/admin')
@@ -190,6 +381,26 @@ export default function AdminDashboard() {
     if (ageGroup === 'child') return '儿童'
     if (ageGroup === 'teen') return '青少年'
     return '-'
+  }
+
+  const getOrderStatusText = (status: string) => {
+    const map: Record<string, string> = {
+      pending: '待处理',
+      processing: '处理中',
+      shipped: '已发货',
+      completed: '已完成',
+      cancelled: '已取消'
+    }
+    return map[status] || status
+  }
+
+  const getMakeupStatusText = (status: string) => {
+    const map: Record<string, string> = {
+      pending: '待审核',
+      approved: '已批准',
+      rejected: '已拒绝'
+    }
+    return map[status] || status
   }
 
   if (loading) {
@@ -227,6 +438,18 @@ export default function AdminDashboard() {
           <div className="stat-value">{stats?.todayNewUsers || 0}</div>
           <div className="stat-label">今日新增</div>
         </div>
+        <div className="stat-card">
+          <div className="stat-value">{pointsStats?.totalPointsInCirculation || 0}</div>
+          <div className="stat-label">流通积分</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{pointsStats?.pendingOrders || 0}</div>
+          <div className="stat-label">待处理订单</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{pointsStats?.pendingMakeupRequests || 0}</div>
+          <div className="stat-label">待审补测</div>
+        </div>
       </div>
 
       {/* 标签页切换 */}
@@ -242,6 +465,24 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab('assessments')}
         >
           检测数据
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
+          onClick={() => setActiveTab('products')}
+        >
+          商品管理
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
+          onClick={() => setActiveTab('orders')}
+        >
+          兑换订单
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'makeup' ? 'active' : ''}`}
+          onClick={() => setActiveTab('makeup')}
+        >
+          补测申请
         </button>
       </div>
 
@@ -430,6 +671,289 @@ export default function AdminDashboard() {
                 disabled={actionLoading}
               >
                 {actionLoading ? '处理中...' : '确认删除'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 商品管理 */}
+      {activeTab === 'products' && (
+        <div className="products-section">
+          <div className="section-header">
+            <h2>商品管理 ({products.length})</h2>
+            <button 
+              className="add-btn"
+              onClick={() => {
+                setEditingProduct(null)
+                setProductForm({
+                  name: '',
+                  description: '',
+                  imageUrl: '',
+                  pointsRequired: 30,
+                  minConsecutiveMonths: 3,
+                  stock: 10,
+                  category: '',
+                  sortOrder: 0
+                })
+                setShowProductModal(true)
+              }}
+            >
+              添加商品
+            </button>
+          </div>
+          <div className="users-table-wrapper">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>图片</th>
+                  <th>名称</th>
+                  <th>所需积分</th>
+                  <th>最低月数</th>
+                  <th>库存</th>
+                  <th>分类</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(product => (
+                  <tr key={product.id}>
+                    <td>{product.id}</td>
+                    <td>
+                      {product.imageUrl ? (
+                        <img src={product.imageUrl} alt={product.name} className="product-thumb" />
+                      ) : (
+                        <span className="no-image">无图</span>
+                      )}
+                    </td>
+                    <td>{product.name}</td>
+                    <td>{product.pointsRequired}</td>
+                    <td>{product.minConsecutiveMonths}个月</td>
+                    <td>{product.stock}</td>
+                    <td>{product.category || '-'}</td>
+                    <td>
+                      <span className={product.isActive ? 'ok-tag' : 'bad-tag'}>
+                        {product.isActive ? '上架' : '下架'}
+                      </span>
+                    </td>
+                    <td className="action-cell">
+                      <button className="action-btn reset-btn" onClick={() => handleEditProduct(product)}>
+                        编辑
+                      </button>
+                      <button className="action-btn clear-btn" onClick={() => handleToggleProductActive(product)}>
+                        {product.isActive ? '下架' : '上架'}
+                      </button>
+                      <button className="action-btn delete-btn" onClick={() => handleDeleteProduct(product.id)}>
+                        删除
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 兑换订单管理 */}
+      {activeTab === 'orders' && (
+        <div className="orders-section">
+          <div className="section-header">
+            <h2>兑换订单 ({orders.length})</h2>
+          </div>
+          <div className="users-table-wrapper">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>订单ID</th>
+                  <th>用户</th>
+                  <th>商品</th>
+                  <th>积分</th>
+                  <th>数量</th>
+                  <th>收货信息</th>
+                  <th>状态</th>
+                  <th>时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(order => (
+                  <tr key={order.id}>
+                    <td>{order.id}</td>
+                    <td>{order.userPhone}</td>
+                    <td>{order.productName}</td>
+                    <td>{order.pointsSpent}</td>
+                    <td>{order.quantity}</td>
+                    <td className="shipping-cell">
+                      {order.shippingInfo ? (
+                        <span title={`${order.shippingInfo.name} ${order.shippingInfo.phone} ${order.shippingInfo.address}`}>
+                          {order.shippingInfo.name} - {order.shippingInfo.address?.substring(0, 20)}...
+                        </span>
+                      ) : '-'}
+                    </td>
+                    <td>
+                      <span className={`status-tag status-${order.status}`}>
+                        {getOrderStatusText(order.status)}
+                      </span>
+                    </td>
+                    <td>{formatDate(order.createdAt)}</td>
+                    <td className="action-cell">
+                      {order.status === 'pending' && (
+                        <button className="action-btn reset-btn" onClick={() => handleUpdateOrderStatus(order.id, 'processing')}>
+                          处理
+                        </button>
+                      )}
+                      {order.status === 'processing' && (
+                        <button className="action-btn reset-btn" onClick={() => handleUpdateOrderStatus(order.id, 'shipped')}>
+                          发货
+                        </button>
+                      )}
+                      {order.status === 'shipped' && (
+                        <button className="action-btn reset-btn" onClick={() => handleUpdateOrderStatus(order.id, 'completed')}>
+                          完成
+                        </button>
+                      )}
+                      {['pending', 'processing'].includes(order.status) && (
+                        <button className="action-btn delete-btn" onClick={() => handleUpdateOrderStatus(order.id, 'cancelled')}>
+                          取消
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 补测申请管理 */}
+      {activeTab === 'makeup' && (
+        <div className="makeup-section">
+          <div className="section-header">
+            <h2>补测申请 ({makeupRequests.length})</h2>
+          </div>
+          <div className="users-table-wrapper">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>用户</th>
+                  <th>补测月份</th>
+                  <th>状态</th>
+                  <th>申请时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {makeupRequests.map(request => (
+                  <tr key={request.id}>
+                    <td>{request.id}</td>
+                    <td>{request.userPhone}</td>
+                    <td>{request.targetMonth}</td>
+                    <td>
+                      <span className={`status-tag status-${request.status}`}>
+                        {getMakeupStatusText(request.status)}
+                      </span>
+                    </td>
+                    <td>{formatDate(request.createdAt)}</td>
+                    <td className="action-cell">
+                      {request.status === 'pending' && (
+                        <>
+                          <button className="action-btn reset-btn" onClick={() => handleReviewMakeup(request.id, true)}>
+                            批准
+                          </button>
+                          <button className="action-btn delete-btn" onClick={() => handleReviewMakeup(request.id, false)}>
+                            拒绝
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 商品编辑弹窗 */}
+      {showProductModal && (
+        <div className="modal-overlay" onClick={() => setShowProductModal(false)}>
+          <div className="modal-content product-modal" onClick={e => e.stopPropagation()}>
+            <h3>{editingProduct ? '编辑商品' : '添加商品'}</h3>
+            <div className="product-form">
+              <input
+                type="text"
+                placeholder="商品名称 *"
+                value={productForm.name}
+                onChange={e => setProductForm({...productForm, name: e.target.value})}
+                className="modal-input"
+              />
+              <textarea
+                placeholder="商品描述"
+                value={productForm.description}
+                onChange={e => setProductForm({...productForm, description: e.target.value})}
+                className="modal-input"
+              />
+              <input
+                type="text"
+                placeholder="图片URL"
+                value={productForm.imageUrl}
+                onChange={e => setProductForm({...productForm, imageUrl: e.target.value})}
+                className="modal-input"
+              />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>所需积分 *</label>
+                  <input
+                    type="number"
+                    value={productForm.pointsRequired}
+                    onChange={e => setProductForm({...productForm, pointsRequired: parseInt(e.target.value) || 0})}
+                    className="modal-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>最低连续月数</label>
+                  <input
+                    type="number"
+                    value={productForm.minConsecutiveMonths}
+                    onChange={e => setProductForm({...productForm, minConsecutiveMonths: parseInt(e.target.value) || 3})}
+                    className="modal-input"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>库存</label>
+                  <input
+                    type="number"
+                    value={productForm.stock}
+                    onChange={e => setProductForm({...productForm, stock: parseInt(e.target.value) || 0})}
+                    className="modal-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>分类</label>
+                  <input
+                    type="text"
+                    value={productForm.category}
+                    onChange={e => setProductForm({...productForm, category: e.target.value})}
+                    className="modal-input"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={() => setShowProductModal(false)}>取消</button>
+              <button 
+                className="confirm-btn" 
+                onClick={handleSaveProduct}
+                disabled={actionLoading}
+              >
+                {actionLoading ? '处理中...' : '保存'}
               </button>
             </div>
           </div>

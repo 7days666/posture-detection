@@ -72,3 +72,76 @@ export const clearUserAssessments = (userId: number) => {
 export const debugAssessments = () => {
   return adminApi.get('/admin/assessments/debug')
 }
+
+
+// ========== 积分商品管理 ==========
+
+// 获取所有商品
+export const getAdminProducts = () => {
+  return adminApi.get('/admin/products')
+}
+
+// 创建商品
+export const createProduct = (data: {
+  name: string
+  description?: string
+  imageUrl?: string
+  pointsRequired: number
+  minConsecutiveMonths?: number
+  stock?: number
+  category?: string
+  sortOrder?: number
+}) => {
+  return adminApi.post('/admin/products', data)
+}
+
+// 更新商品
+export const updateProduct = (productId: number, data: {
+  name?: string
+  description?: string
+  imageUrl?: string
+  pointsRequired?: number
+  minConsecutiveMonths?: number
+  stock?: number
+  category?: string
+  isActive?: boolean
+  sortOrder?: number
+}) => {
+  return adminApi.put(`/admin/products/${productId}`, data)
+}
+
+// 删除商品
+export const deleteProduct = (productId: number) => {
+  return adminApi.delete(`/admin/products/${productId}`)
+}
+
+// ========== 兑换订单管理 ==========
+
+// 获取所有订单
+export const getAdminOrders = (status?: string) => {
+  return adminApi.get('/admin/orders', { params: status ? { status } : {} })
+}
+
+// 更新订单状态
+export const updateOrderStatus = (orderId: number, status: string, adminNotes?: string) => {
+  return adminApi.put(`/admin/orders/${orderId}/status`, { status, adminNotes })
+}
+
+// ========== 补测申请管理 ==========
+
+// 获取所有补测申请
+export const getMakeupRequests = (status?: string) => {
+  return adminApi.get('/admin/makeup-requests', { params: status ? { status } : {} })
+}
+
+// 审核补测申请
+export const reviewMakeupRequest = (requestId: number, approved: boolean, rejectReason?: string) => {
+  return adminApi.put(`/admin/makeup-requests/${requestId}/review`, { approved, rejectReason })
+}
+
+// ========== 积分统计 ==========
+
+// 获取积分统计
+export const getPointsStats = () => {
+  return adminApi.get('/admin/points-stats')
+}

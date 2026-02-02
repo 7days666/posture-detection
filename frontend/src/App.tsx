@@ -10,6 +10,7 @@ import DataTracking from './pages/DataTracking'
 import HealthReport from './pages/HealthReport'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import PointsShop from './pages/PointsShop'
 
 // 检查是否需要引导流程
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
@@ -81,6 +82,11 @@ function App() {
       <Route path="/health-report" element={
         <RequireOnboarding>
           <HealthReport />
+        </RequireOnboarding>
+      } />
+      <Route path="/points" element={
+        <RequireOnboarding>
+          <PointsShop />
         </RequireOnboarding>
       } />
       <Route path="/admin" element={<AdminLogin />} />

@@ -449,3 +449,135 @@
 .clear-btn:hover {
   background: #f6ad55;
 }
+
+
+/* 统计卡片扩展 */
+@media (min-width: 769px) {
+  .stats-cards {
+    grid-template-columns: repeat(6, 1fr);
+    max-width: 1200px;
+  }
+}
+
+/* 商品管理 */
+.products-section,
+.orders-section,
+.makeup-section {
+  padding: 0 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.add-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+}
+
+.product-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.no-image {
+  color: #999;
+  font-size: 12px;
+}
+
+.shipping-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 状态标签 */
+.status-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-processing {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-shipped {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-cancelled {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.status-approved {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-rejected {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+/* 商品编辑弹窗 */
+.product-modal {
+  max-width: 500px;
+}
+
+.product-form {
+  margin-bottom: 16px;
+}
+
+.product-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.form-group .modal-input {
+  margin-bottom: 8px;
+}

@@ -1,5 +1,13 @@
 import { Hono } from 'hono'
 import { hashPassword } from '../utils/password'
+import {
+  ProductRow,
+  RedemptionOrderRow,
+  MakeupRequestRow,
+  toProduct,
+  toRedemptionOrder,
+  toMakeupRequest,
+} from '../types/points'
 
 type Bindings = {
   DB: D1Database
@@ -314,6 +322,280 @@ adminRoutes.delete('/users/:id/assessments', adminAuth, async (c) => {
     })
   } catch (error) {
     console.error('清理用户检测记录错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// ========== 积分商品管理 ==========
+
+// 获取所有商品（管理端）
+adminRoutes.get('/products', adminAuth, async (c) => {
+  try {
+    const results = await c.env.DB.prepare(`
+      SELECT * FROM products ORDER BY sort_order ASC, id DESC
+    `).all<ProductRow>()
+    
+    const products = results.results.map(toProduct)
+    return c.json({ success: true, products })
+  } catch (error) {
+    console.error('获取商品列表错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 创建商品
+adminRoutes.post('/products', adminAuth, async (c) => {
+  try {
+    const { name, description, imageUrl, pointsRequired, minConsecutiveMonths = 3, stock = 0, category, sortOrder = 0 } = await c.req.json()
+    
+    if (!name || !pointsRequired) {
+      return c.json({ success: false, message: '商品名称和所需积分必填' }, 400)
+    }
+    
+    await c.env.DB.prepare(`
+      INSERT INTO products (name, description, image_url, points_required, min_consecutive_months, stock, category, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(name, description || null, imageUrl || null, pointsRequired, minConsecutiveMonths, stock, category || null, sortOrder).run()
+    
+    return c.json({ success: true, message: '商品创建成功' })
+  } catch (error) {
+    console.error('创建商品错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 更新商品
+adminRoutes.put('/products/:id', adminAuth, async (c) => {
+  try {
+    const productId = c.req.param('id')
+    const { name, description, imageUrl, pointsRequired, minConsecutiveMonths, stock, category, isActive, sortOrder } = await c.req.json()
+    
+    await c.env.DB.prepare(`
+      UPDATE products SET
+        name = COALESCE(?, name),
+        description = COALESCE(?, description),
+        image_url = COALESCE(?, image_url),
+        points_required = COALESCE(?, points_required),
+        min_consecutive_months = COALESCE(?, min_consecutive_months),
+        stock = COALESCE(?, stock),
+        category = COALESCE(?, category),
+        is_active = COALESCE(?, is_active),
+        sort_order = COALESCE(?, sort_order),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      name ?? null, 
+      description ?? null, 
+      imageUrl ?? null, 
+      pointsRequired ?? null, 
+      minConsecutiveMonths ?? null, 
+      stock ?? null, 
+      category ?? null, 
+      isActive !== undefined ? (isActive ? 1 : 0) : null,
+      sortOrder ?? null,
+      productId
+    ).run()
+    
+    return c.json({ success: true, message: '商品更新成功' })
+  } catch (error) {
+    console.error('更新商品错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 删除商品
+adminRoutes.delete('/products/:id', adminAuth, async (c) => {
+  try {
+    const productId = c.req.param('id')
+    
+    await c.env.DB.prepare('DELETE FROM products WHERE id = ?').bind(productId).run()
+    
+    return c.json({ success: true, message: '商品已删除' })
+  } catch (error) {
+    console.error('删除商品错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// ========== 兑换订单管理 ==========
+
+// 获取所有兑换订单
+adminRoutes.get('/orders', adminAuth, async (c) => {
+  try {
+    const status = c.req.query('status')
+    
+    let query = `
+      SELECT o.*, u.phone, u.name as user_name
+      FROM redemption_orders o
+      LEFT JOIN users u ON o.user_id = u.id
+    `
+    const params: any[] = []
+    
+    if (status) {
+      query += ' WHERE o.status = ?'
+      params.push(status)
+    }
+    
+    query += ' ORDER BY o.created_at DESC'
+    
+    const stmt = params.length > 0 
+      ? c.env.DB.prepare(query).bind(...params)
+      : c.env.DB.prepare(query)
+    
+    const results = await stmt.all()
+    
+    // 手动处理结果，因为有额外字段
+    const orders = results.results.map((row: any) => ({
+      id: row.id,
+      userId: row.user_id,
+      productId: row.product_id,
+      productName: row.product_name,
+      pointsSpent: row.points_spent,
+      quantity: row.quantity,
+      status: row.status,
+      shippingInfo: row.shipping_info ? JSON.parse(row.shipping_info) : null,
+      adminNotes: row.admin_notes,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      userPhone: row.phone,
+      userName: row.user_name,
+    }))
+    
+    return c.json({ success: true, orders })
+  } catch (error) {
+    console.error('获取订单列表错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 更新订单状态
+adminRoutes.put('/orders/:id/status', adminAuth, async (c) => {
+  try {
+    const orderId = c.req.param('id')
+    const { status, adminNotes } = await c.req.json()
+    
+    if (!['pending', 'processing', 'shipped', 'completed', 'cancelled'].includes(status)) {
+      return c.json({ success: false, message: '无效的订单状态' }, 400)
+    }
+    
+    await c.env.DB.prepare(`
+      UPDATE redemption_orders SET
+        status = ?,
+        admin_notes = COALESCE(?, admin_notes),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(status, adminNotes || null, orderId).run()
+    
+    return c.json({ success: true, message: '订单状态已更新' })
+  } catch (error) {
+    console.error('更新订单状态错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// ========== 补测申请管理 ==========
+
+// 获取所有补测申请
+adminRoutes.get('/makeup-requests', adminAuth, async (c) => {
+  try {
+    const status = c.req.query('status')
+    
+    let query = `
+      SELECT m.*, u.phone, u.name as user_name
+      FROM makeup_requests m
+      LEFT JOIN users u ON m.user_id = u.id
+    `
+    const params: any[] = []
+    
+    if (status) {
+      query += ' WHERE m.status = ?'
+      params.push(status)
+    }
+    
+    query += ' ORDER BY m.created_at DESC'
+    
+    const stmt = params.length > 0 
+      ? c.env.DB.prepare(query).bind(...params)
+      : c.env.DB.prepare(query)
+    
+    const results = await stmt.all()
+    
+    const requests = results.results.map((row: any) => ({
+      id: row.id,
+      userId: row.user_id,
+      targetMonth: row.target_month,
+      status: row.status,
+      assessmentId: row.assessment_id,
+      reviewedBy: row.reviewed_by,
+      reviewedAt: row.reviewed_at,
+      rejectReason: row.reject_reason,
+      createdAt: row.created_at,
+      userPhone: row.phone,
+      userName: row.user_name,
+    }))
+    
+    return c.json({ success: true, requests })
+  } catch (error) {
+    console.error('获取补测申请错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 审核补测申请
+adminRoutes.put('/makeup-requests/:id/review', adminAuth, async (c) => {
+  try {
+    const requestId = c.req.param('id')
+    const { approved, rejectReason } = await c.req.json()
+    
+    const status = approved ? 'approved' : 'rejected'
+    
+    await c.env.DB.prepare(`
+      UPDATE makeup_requests SET
+        status = ?,
+        reject_reason = ?,
+        reviewed_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(status, approved ? null : rejectReason, requestId).run()
+    
+    return c.json({ success: true, message: approved ? '已批准补测申请' : '已拒绝补测申请' })
+  } catch (error) {
+    console.error('审核补测申请错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// ========== 积分统计 ==========
+
+// 获取积分相关统计
+adminRoutes.get('/points-stats', adminAuth, async (c) => {
+  try {
+    const totalPoints = await c.env.DB.prepare(
+      'SELECT SUM(balance) as total FROM user_points'
+    ).first<{ total: number }>()
+    
+    const totalRedeemed = await c.env.DB.prepare(
+      'SELECT SUM(points_spent) as total FROM redemption_orders WHERE status != "cancelled"'
+    ).first<{ total: number }>()
+    
+    const pendingOrders = await c.env.DB.prepare(
+      'SELECT COUNT(*) as count FROM redemption_orders WHERE status = "pending"'
+    ).first<{ count: number }>()
+    
+    const pendingMakeup = await c.env.DB.prepare(
+      'SELECT COUNT(*) as count FROM makeup_requests WHERE status = "pending"'
+    ).first<{ count: number }>()
+    
+    return c.json({
+      success: true,
+      stats: {
+        totalPointsInCirculation: totalPoints?.total || 0,
+        totalPointsRedeemed: totalRedeemed?.total || 0,
+        pendingOrders: pendingOrders?.count || 0,
+        pendingMakeupRequests: pendingMakeup?.count || 0,
+      }
+    })
+  } catch (error) {
+    console.error('获取积分统计错误:', error)
     return c.json({ success: false, message: '服务器错误' }, 500)
   }
 })
