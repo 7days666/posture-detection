@@ -402,7 +402,7 @@ export default function AIDetect() {
                 <ellipse cx="70" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
                 <ellipse cx="130" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
                 {/* 提示文字 */}
-                <text x="100" y="335" textAnchor="middle" fill="#4ecdc4" fontSize="10">双脚并拢站在此位置</text>
+                <text x="100" y="290" textAnchor="middle" fill="#4ecdc4" fontSize="10">双脚并拢站在此位置</text>
               </svg>
             </div>
             <div className="capture-hint">
@@ -460,7 +460,7 @@ export default function AIDetect() {
                 {/* 脚部 */}
                 <ellipse cx="100" cy="310" rx="20" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
                 {/* 提示文字 */}
-                <text x="100" y="335" textAnchor="middle" fill="#4ecdc4" fontSize="10">侧身站立，双脚并拢</text>
+                <text x="100" y="290" textAnchor="middle" fill="#4ecdc4" fontSize="10">侧身站立，双脚并拢</text>
               </svg>
             </div>
             <div className="capture-hint">
@@ -527,7 +527,7 @@ export default function AIDetect() {
                 <ellipse cx="70" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
                 <ellipse cx="130" cy="310" rx="15" ry="8" stroke="#4ecdc4" strokeWidth="1.5" strokeDasharray="4 2" fill="rgba(78, 205, 196, 0.1)"/>
                 {/* 提示文字 */}
-                <text x="100" y="335" textAnchor="middle" fill="#4ecdc4" fontSize="10">背对镜头，双脚并拢</text>
+                <text x="100" y="290" textAnchor="middle" fill="#4ecdc4" fontSize="10">背对镜头，双脚并拢</text>
               </svg>
             </div>
             <div className="capture-hint">
