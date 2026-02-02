@@ -352,18 +352,18 @@
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 8px;
-  padding: 0 10px;
+  gap: 12px;
 }
 
 .action-btn {
   flex: 1;
-  padding: 22px 32px;
-  border-radius: 20px;
-  font-size: 22px;
-  font-weight: 600;
+  padding: 20px 0;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 700;
   cursor: pointer;
   border: none;
+  min-height: 60px;
 }
 
 .action-btn.primary {
