@@ -297,8 +297,13 @@ export default function AIDetect() {
         </div>
         <div className="pose-info">
           <h4 className="pose-title">正面检测</h4>
-          <p className="pose-desc">双脚合拢自然站立，光脚站立镜头对准胸部下部的位置，水平拍摄全身</p>
-          <p className="pose-tip">提示:不可俯身拍摄或者仰视拍摄，脚跟应水平位置</p>
+          <p className="pose-desc">请参照示例图拍摄【全身照】，需包含头顶到脚底完整身体，双脚并拢自然站立</p>
+          <p className="pose-tip">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14" className="tip-icon">
+              <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            注意：必须拍全身，不可只拍半身！
+          </p>
         </div>
       </div>
       <div className="pose-card">
@@ -307,8 +312,13 @@ export default function AIDetect() {
         </div>
         <div className="pose-info">
           <h4 className="pose-title">侧面检测</h4>
-          <p className="pose-desc">镜头对准腰部位置，水平进行拍摄或者对准骨盆的位置</p>
-          <p className="pose-tip">提示:双脚合拢拍摄，两脚跟应水平位置</p>
+          <p className="pose-desc">请参照示例图拍摄【全身照】，侧身站立，需包含头顶到脚底完整身体</p>
+          <p className="pose-tip">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14" className="tip-icon">
+              <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            注意：必须拍全身，不可只拍半身！
+          </p>
         </div>
       </div>
       <div className="pose-card">
@@ -317,8 +327,13 @@ export default function AIDetect() {
         </div>
         <div className="pose-info">
           <h4 className="pose-title">背面检测</h4>
-          <p className="pose-desc">镜头对准腰底的位置进行拍摄或者水平对准骨盆的位置</p>
-          <p className="pose-tip">提示:不可俯身拍摄或者仰视拍摄，脚跟应水平位置</p>
+          <p className="pose-desc">请参照示例图拍摄【全身照】，背对镜头站立，需包含头顶到脚底完整身体</p>
+          <p className="pose-tip">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14" className="tip-icon">
+              <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            注意：必须拍全身，不可只拍半身！
+          </p>
         </div>
       </div>
       {modelLoading && (

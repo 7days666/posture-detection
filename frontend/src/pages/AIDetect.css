@@ -165,8 +165,20 @@
 
 .pose-tip {
   font-size: 13px;
-  color: #999;
+  color: #e53e3e;
   line-height: 1.5;
+  font-weight: 500;
+  background: #fff5f5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pose-tip .tip-icon {
+  flex-shrink: 0;
 }
 
 
