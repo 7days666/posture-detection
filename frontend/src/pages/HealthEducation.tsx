@@ -501,13 +501,41 @@ export default function HealthEducation() {
     }
   }, [showTrainingTip])
 
-  // 加载 AI 训练计划
+  // 加载 AI 训练计划 - 带缓存，同样的问题不重复生成
   const loadTrainingPlan = async () => {
     if (trainingLoading) return
     setTrainingLoading(true)
     try {
+      // 生成缓存 key：基于问题类型排序后的字符串
+      const cacheKey = `training_plan_${(problems || []).sort().join('_') || 'general'}`
+      
+      // 检查本地缓存
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached)
+          // 检查缓存是否在7天内
+          if (cachedData.timestamp && Date.now() - cachedData.timestamp < 7 * 24 * 60 * 60 * 1000) {
+            console.log('[训练计划] 使用缓存数据')
+            setTrainingPlan(cachedData.plan)
+            setTrainingLoading(false)
+            return
+          }
+        } catch (e) {
+          // 缓存解析失败，继续生成新的
+        }
+      }
+      
+      // 调用 AI 生成训练计划
+      console.log('[训练计划] 调用 AI 生成新计划')
       const plan = await generateTrainingPlan(problems || [])
       setTrainingPlan(plan)
+      
+      // 保存到本地缓存
+      localStorage.setItem(cacheKey, JSON.stringify({
+        plan,
+        timestamp: Date.now()
+      }))
     } catch (error) {
       console.error('加载训练计划失败:', error)
     } finally {

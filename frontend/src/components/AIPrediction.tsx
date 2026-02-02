@@ -35,10 +35,35 @@ export default function AIPrediction({ onClose }: AIPredictionProps) {
     setError(null)
     
     try {
+      // 检查本地缓存（同一天内不重复请求）
+      const cacheKey = 'health_prediction'
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached)
+          const today = new Date().toDateString()
+          // 同一天内使用缓存
+          if (cachedData.date === today && cachedData.data) {
+            console.log('[AI预测] 使用今日缓存数据')
+            setPredictionData(cachedData.data as PredictionData)
+            setLoading(false)
+            return
+          }
+        } catch (e) {
+          // 缓存解析失败，继续请求
+        }
+      }
+      
       // 调用后端预测接口，基于真实数据计算预测
+      console.log('[AI预测] 请求后端数据')
       const response = await predictionAPI.analyze()
       if (response.success && response.data) {
         setPredictionData(response.data as PredictionData)
+        // 保存到缓存
+        localStorage.setItem(cacheKey, JSON.stringify({
+          data: response.data,
+          date: new Date().toDateString()
+        }))
       } else {
         setError('暂无足够数据进行预测，请先完成体态检测')
       }
