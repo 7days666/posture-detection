@@ -236,16 +236,6 @@ const educationContents = {
 
         <p><strong>3. 调整肩带</strong></p>
         <p>肩带长度适中，书包底部不要低于腰部。</p>
-        <div class="inline-illustration">
-          <svg viewBox="0 0 120 100" fill="none">
-            <circle cx="60" cy="20" r="10" stroke="#10b981" stroke-width="2"/>
-            <line x1="60" y1="30" x2="60" y2="70" stroke="#10b981" stroke-width="2"/>
-            <rect x="45" y="35" width="30" height="30" rx="3" stroke="#f59e0b" stroke-width="2" fill="#fef3c7"/>
-            <line x1="20" y1="65" x2="100" y2="65" stroke="#ef4444" stroke-width="1" stroke-dasharray="4"/>
-            <text x="105" y="68" fill="#ef4444" font-size="8">腰线</text>
-            <text x="60" y="95" text-anchor="middle" fill="#059669" font-size="8">书包底部不低于腰部</text>
-          </svg>
-        </div>
 
         <p><strong>4. 合理装包</strong></p>
         <p>重物放在靠近背部的位置，物品均匀分布。</p>
