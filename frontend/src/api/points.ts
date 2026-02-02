@@ -13,14 +13,14 @@ const getAuthHeader = () => {
 
 // 获取积分概览
 export const getPointsSummary = () => {
-  return axios.get(`${API_BASE}/api/points/summary`, {
+  return axios.get(`${API_BASE}/points/summary`, {
     headers: getAuthHeader()
   })
 }
 
 // 获取积分历史
 export const getPointsHistory = (limit = 20, offset = 0) => {
-  return axios.get(`${API_BASE}/api/points/history`, {
+  return axios.get(`${API_BASE}/points/history`, {
     headers: getAuthHeader(),
     params: { limit, offset }
   })
@@ -28,7 +28,7 @@ export const getPointsHistory = (limit = 20, offset = 0) => {
 
 // 获取商品列表
 export const getProducts = (category?: string) => {
-  return axios.get(`${API_BASE}/api/points/products`, {
+  return axios.get(`${API_BASE}/points/products`, {
     headers: getAuthHeader(),
     params: category ? { category } : {}
   })
@@ -42,7 +42,7 @@ export const redeemProduct = (productId: number, quantity: number, shippingInfo:
   postalCode?: string
   notes?: string
 }) => {
-  return axios.post(`${API_BASE}/api/points/redeem`, {
+  return axios.post(`${API_BASE}/points/redeem`, {
     productId,
     quantity,
     shippingInfo
@@ -53,28 +53,28 @@ export const redeemProduct = (productId: number, quantity: number, shippingInfo:
 
 // 获取兑换订单
 export const getOrders = () => {
-  return axios.get(`${API_BASE}/api/points/orders`, {
+  return axios.get(`${API_BASE}/points/orders`, {
     headers: getAuthHeader()
   })
 }
 
 // 检查补测资格
 export const checkMakeupEligibility = () => {
-  return axios.get(`${API_BASE}/api/points/makeup/check`, {
+  return axios.get(`${API_BASE}/points/makeup/check`, {
     headers: getAuthHeader()
   })
 }
 
 // 申请补测
 export const applyMakeup = () => {
-  return axios.post(`${API_BASE}/api/points/makeup/apply`, {}, {
+  return axios.post(`${API_BASE}/points/makeup/apply`, {}, {
     headers: getAuthHeader()
   })
 }
 
 // 获取补测申请记录
 export const getMakeupRequests = () => {
-  return axios.get(`${API_BASE}/api/points/makeup/requests`, {
+  return axios.get(`${API_BASE}/points/makeup/requests`, {
     headers: getAuthHeader()
   })
 }
