@@ -223,7 +223,7 @@ export default function PointsShop() {
       {/* 积分概览卡片 */}
       <div className="points-summary-card">
         <div className="points-balance">
-          <span className="label">当前积分</span>
+          <span className="label">我的积分</span>
           <span className="value">{summary?.balance || 0}</span>
         </div>
         <div className="points-info">
@@ -278,7 +278,7 @@ export default function PointsShop() {
       {activeTab === 'shop' && (
         <div className="products-grid">
           {products.length === 0 ? (
-            <div className="empty-state">暂无商品</div>
+            <div className="empty-state">暂无可兑换商品</div>
           ) : (
             products.map(product => (
               <div key={product.id} className="product-card">
