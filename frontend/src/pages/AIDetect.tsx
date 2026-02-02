@@ -253,17 +253,17 @@ export default function AIDetect() {
       // 从检测结果中提取详细数据
       const headItem = result.items.find(item => item.name.includes('头') || item.name.includes('颈'))
       const shoulderItem = result.items.find(item => item.name.includes('肩'))
-      const spineItem = result.items.find(item => item.name.includes('脊') || item.name.includes('背'))
+      const spineItem = result.items.find(item => item.name.includes('脊') || item.name.includes('背') || item.name.includes('驼'))
       const pelvisItem = result.items.find(item => item.name.includes('骨盆') || item.name.includes('髋'))
 
       const riskLevel = result.score >= 80 ? 'low' : result.score >= 60 ? 'medium' : 'high'
 
       await assessmentAPI.save({
         overall_score: result.score,
-        head_forward_angle: headItem ? (100 - headItem.value) * 0.3 : undefined,
-        shoulder_level_diff: shoulderItem ? (100 - shoulderItem.value) * 0.1 : undefined,
-        spine_curvature: spineItem ? (100 - spineItem.value) * 0.15 : undefined,
-        pelvis_tilt: pelvisItem ? (100 - pelvisItem.value) * 0.1 : undefined,
+        head_forward_angle: headItem ? headItem.value * 0.3 : undefined,
+        shoulder_level_diff: shoulderItem ? shoulderItem.value * 0.1 : undefined,
+        spine_curvature: spineItem ? spineItem.value * 0.15 : undefined,
+        pelvis_tilt: pelvisItem ? pelvisItem.value * 0.1 : undefined,
         risk_level: riskLevel,
         keypoints_data: result.items,
         ai_suggestions: aiSuggestion
