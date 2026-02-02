@@ -353,8 +353,8 @@ adminRoutes.post('/products', adminAuth, async (c) => {
     }
     
     await c.env.DB.prepare(`
-      INSERT INTO products (name, description, image_url, points_required, min_consecutive_months, stock, category, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO products (name, description, image_url, points_required, min_consecutive_months, stock, category, sort_order, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).bind(name, description || null, imageUrl || null, pointsRequired, minConsecutiveMonths, stock, category || null, sortOrder).run()
     
     return c.json({ success: true, message: '商品创建成功' })
