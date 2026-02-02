@@ -274,7 +274,7 @@ export default function AIDetect() {
     }
   }
 
-  // 人体正面轮廓 SVG
+  // 人体正面轮廓 SVG (用于分析动画)
   const FrontBodySvg = () => (
     <svg viewBox="0 0 60 120" fill="none" className="body-svg">
       <ellipse cx="30" cy="12" rx="8" ry="10" stroke="#4ecdc4" strokeWidth="1.2"/>
@@ -288,39 +288,13 @@ export default function AIDetect() {
     </svg>
   )
 
-  // 人体侧面轮廓 SVG
-  const SideBodySvg = () => (
-    <svg viewBox="0 0 50 120" fill="none" className="body-svg">
-      <ellipse cx="28" cy="12" rx="7" ry="10" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <path d="M28 22 Q32 35 30 55" stroke="#4ecdc4" strokeWidth="1.2" fill="none"/>
-      <line x1="28" y1="28" x2="18" y2="42" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="30" y1="55" x2="25" y2="95" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="30" y1="55" x2="35" y2="95" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="25" y1="95" x2="22" y2="115" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="35" y1="95" x2="38" y2="115" stroke="#4ecdc4" strokeWidth="1.2"/>
-    </svg>
-  )
-
-  // 人体背面轮廓 SVG
-  const BackBodySvg = () => (
-    <svg viewBox="0 0 60 120" fill="none" className="body-svg">
-      <ellipse cx="30" cy="12" rx="8" ry="10" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="30" y1="22" x2="30" y2="55" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="30" y1="28" x2="12" y2="45" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="30" y1="28" x2="48" y2="45" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <path d="M25 35 L30 50 L35 35" stroke="#4ecdc4" strokeWidth="0.8" fill="none"/>
-      <line x1="30" y1="55" x2="18" y2="95" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="30" y1="55" x2="42" y2="95" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="18" y1="95" x2="15" y2="115" stroke="#4ecdc4" strokeWidth="1.2"/>
-      <line x1="42" y1="95" x2="45" y2="115" stroke="#4ecdc4" strokeWidth="1.2"/>
-    </svg>
-  )
-
   // 介绍页面
   const renderIntro = () => (
     <motion.div className="detect-content intro-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="pose-card">
-        <div className="pose-figure"><FrontBodySvg /></div>
+        <div className="pose-figure">
+          <img src="/正面.jpg" alt="正面检测示范" className="pose-demo-img" />
+        </div>
         <div className="pose-info">
           <h4 className="pose-title">正面检测</h4>
           <p className="pose-desc">双脚合拢自然站立，光脚站立镜头对准胸部下部的位置，水平拍摄全身</p>
@@ -328,7 +302,9 @@ export default function AIDetect() {
         </div>
       </div>
       <div className="pose-card">
-        <div className="pose-figure"><SideBodySvg /></div>
+        <div className="pose-figure">
+          <img src="/侧面.png" alt="侧面检测示范" className="pose-demo-img" />
+        </div>
         <div className="pose-info">
           <h4 className="pose-title">侧面检测</h4>
           <p className="pose-desc">镜头对准腰部位置，水平进行拍摄或者对准骨盆的位置</p>
@@ -336,7 +312,9 @@ export default function AIDetect() {
         </div>
       </div>
       <div className="pose-card">
-        <div className="pose-figure"><BackBodySvg /></div>
+        <div className="pose-figure">
+          <img src="/背面.png" alt="背面检测示范" className="pose-demo-img" />
+        </div>
         <div className="pose-info">
           <h4 className="pose-title">背面检测</h4>
           <p className="pose-desc">镜头对准腰底的位置进行拍摄或者水平对准骨盆的位置</p>
