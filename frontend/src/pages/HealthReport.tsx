@@ -127,12 +127,33 @@ function transformAssessmentData(data: AssessmentData, historyData: AssessmentDa
   // 解析 AI 建议
   let suggestions: string[] = []
   if (data.ai_suggestions) {
-    // 按换行符分割
-    const lines = data.ai_suggestions.split('\n').filter(s => s.trim())
-    suggestions = lines.slice(0, 6).map(s => {
-      // 去掉开头的数字编号（如 1. 2. 1、2、等）
-      return s.replace(/^\d+[.、\s]+/, '').trim()
-    }).filter(s => s.length > 0)
+    // 先按换行符分割
+    let lines = data.ai_suggestions.split('\n').filter(s => s.trim())
+    
+    // 处理每一行，如果包含多个 - 开头的项目，拆分开
+    const processedLines: string[] = []
+    lines.forEach(line => {
+      // 检查是否有多个 - 开头的项目连在一起
+      if (line.includes('。 -') || line.includes('。-')) {
+        // 按 。- 或 。 - 分割
+        const parts = line.split(/。\s*-/).filter(s => s.trim())
+        parts.forEach((part, idx) => {
+          if (idx === 0) {
+            processedLines.push(part + '。')
+          } else {
+            processedLines.push('-' + part + (part.endsWith('。') ? '' : '。'))
+          }
+        })
+      } else if (line.includes('\*\*') && line.split('\*\*').length > 3) {
+        // 如果一行有多个 **标题**，拆分
+        const parts = line.split(/(?=\*\*[^*]+\*\*:)/).filter(s => s.trim())
+        processedLines.push(...parts)
+      } else {
+        processedLines.push(line)
+      }
+    })
+    
+    suggestions = processedLines.slice(0, 8).map(s => s.trim()).filter(s => s.length > 0)
   }
   
   if (suggestions.length === 0) {
