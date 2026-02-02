@@ -197,6 +197,37 @@ adminRoutes.delete('/assessments/:id', adminAuth, async (c) => {
   }
 })
 
+// 调试：查看数据库中的实际值
+adminRoutes.get('/assessments/debug', adminAuth, async (c) => {
+  try {
+    const records = await c.env.DB.prepare(`
+      SELECT 
+        id, 
+        overall_score,
+        head_forward_angle,
+        shoulder_level_diff,
+        spine_curvature,
+        pelvis_tilt,
+        typeof(head_forward_angle) as head_type,
+        typeof(shoulder_level_diff) as shoulder_type,
+        typeof(spine_curvature) as spine_type,
+        typeof(pelvis_tilt) as pelvis_type
+      FROM posture_assessments 
+      ORDER BY id DESC
+      LIMIT 20
+    `).all()
+    
+    return c.json({ 
+      success: true, 
+      records: records.results,
+      message: '调试数据'
+    })
+  } catch (error) {
+    console.error('调试错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
 // 清理异常数据（评分100但指标异常的数据，以及指标全为空的无效数据）
 adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
   try {
@@ -230,14 +261,14 @@ adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
       totalDeleted += badCount
     }
     
-    // 2. 清理指标全为空/0的无效数据（检测失败的记录）
-    // 使用 COALESCE 处理各种空值情况
+    // 2. 清理指标全为空/0/空字符串的无效数据（检测失败的记录）
+    // 处理 NULL, 0, '', 以及任何非正数的情况
     const emptyRecords = await c.env.DB.prepare(`
       SELECT id FROM posture_assessments 
-      WHERE COALESCE(head_forward_angle, 0) = 0
-      AND COALESCE(shoulder_level_diff, 0) = 0
-      AND COALESCE(spine_curvature, 0) = 0
-      AND COALESCE(pelvis_tilt, 0) = 0
+      WHERE (head_forward_angle IS NULL OR head_forward_angle = 0 OR head_forward_angle = '' OR CAST(head_forward_angle AS REAL) <= 0)
+      AND (shoulder_level_diff IS NULL OR shoulder_level_diff = 0 OR shoulder_level_diff = '' OR CAST(shoulder_level_diff AS REAL) <= 0)
+      AND (spine_curvature IS NULL OR spine_curvature = 0 OR spine_curvature = '' OR CAST(spine_curvature AS REAL) <= 0)
+      AND (pelvis_tilt IS NULL OR pelvis_tilt = 0 OR pelvis_tilt = '' OR CAST(pelvis_tilt AS REAL) <= 0)
     `).all()
     
     const emptyCount = emptyRecords.results?.length || 0
@@ -245,10 +276,10 @@ adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
     if (emptyCount > 0) {
       await c.env.DB.prepare(`
         DELETE FROM posture_assessments 
-        WHERE COALESCE(head_forward_angle, 0) = 0
-        AND COALESCE(shoulder_level_diff, 0) = 0
-        AND COALESCE(spine_curvature, 0) = 0
-        AND COALESCE(pelvis_tilt, 0) = 0
+        WHERE (head_forward_angle IS NULL OR head_forward_angle = 0 OR head_forward_angle = '' OR CAST(head_forward_angle AS REAL) <= 0)
+        AND (shoulder_level_diff IS NULL OR shoulder_level_diff = 0 OR shoulder_level_diff = '' OR CAST(shoulder_level_diff AS REAL) <= 0)
+        AND (spine_curvature IS NULL OR spine_curvature = 0 OR spine_curvature = '' OR CAST(spine_curvature AS REAL) <= 0)
+        AND (pelvis_tilt IS NULL OR pelvis_tilt = 0 OR pelvis_tilt = '' OR CAST(pelvis_tilt AS REAL) <= 0)
       `).run()
       totalDeleted += emptyCount
     }

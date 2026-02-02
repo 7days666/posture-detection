@@ -52,31 +52,7 @@ const educationContents = {
       duration: 5,
       content: `
         <div class="article-hero-image">
-          <div class="illustration-placeholder">
-            <svg viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
-              <!-- 背景 -->
-              <rect width="400" height="280" fill="#f0fdf4"/>
-              <!-- 椅子 -->
-              <rect x="160" y="150" width="80" height="100" rx="5" stroke="#4ecdc4" stroke-width="3" fill="#fff"/>
-              <rect x="150" y="130" width="100" height="25" rx="3" stroke="#4ecdc4" stroke-width="2" fill="#d1fae5"/>
-              <!-- 人物正确坐姿 -->
-              <circle cx="200" cy="90" r="20" stroke="#10b981" stroke-width="3" fill="#d1fae5"/>
-              <line x1="200" y1="110" x2="200" y2="170" stroke="#10b981" stroke-width="3"/>
-              <!-- 手臂 -->
-              <line x1="200" y1="125" x2="170" y2="150" stroke="#10b981" stroke-width="3"/>
-              <line x1="200" y1="125" x2="230" y2="150" stroke="#10b981" stroke-width="3"/>
-              <!-- 腿部 -->
-              <line x1="180" y1="250" x2="180" y2="200" stroke="#10b981" stroke-width="3"/>
-              <line x1="220" y1="250" x2="220" y2="200" stroke="#10b981" stroke-width="3"/>
-              <!-- 脚部 -->
-              <ellipse cx="180" cy="260" rx="18" ry="8" fill="#10b981"/>
-              <ellipse cx="220" cy="260" rx="18" ry="8" fill="#10b981"/>
-              <!-- 正确标记 -->
-              <circle cx="330" cy="50" r="30" fill="#10b981"/>
-              <path d="M315 50 L325 60 L345 40" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <text x="200" y="275" text-anchor="middle" fill="#059669" font-size="16" font-weight="600">✓ 正确坐姿示范</text>
-            </svg>
-          </div>
+          <img src="/education-posture.jpg" alt="正确坐姿示范" class="article-main-image" />
         </div>
         <h3>正确坐姿的要点</h3>
         <div class="tip-box tip-important">
@@ -88,28 +64,12 @@ const educationContents = {
         </div>
         <p><strong>1. 背部支撑</strong></p>
         <p>保持背部挺直，腰部紧贴椅背。可以使用腰垫提供额外支撑。</p>
-        <div class="inline-illustration">
-          <svg viewBox="0 0 100 80" fill="none">
-            <path d="M50 10 L50 50" stroke="#10b981" stroke-width="3"/>
-            <circle cx="50" cy="10" r="8" stroke="#10b981" stroke-width="2" fill="#d1fae5"/>
-            <path d="M30 70 L50 50 L70 70" stroke="#10b981" stroke-width="2"/>
-            <text x="50" y="78" text-anchor="middle" fill="#059669" font-size="8">背部挺直</text>
-          </svg>
-        </div>
 
         <p><strong>2. 双脚平放</strong></p>
         <p>双脚应平放在地面上，膝盖弯曲约90度。如果椅子太高，可以使用脚踏。</p>
 
         <p><strong>3. 屏幕高度</strong></p>
         <p>电脑屏幕顶端应与眼睛平齐或略低，避免低头或仰头。</p>
-        <div class="inline-illustration">
-          <svg viewBox="0 0 120 80" fill="none">
-            <rect x="40" y="10" width="40" height="30" rx="2" stroke="#3b82f6" stroke-width="2" fill="#eff6ff"/>
-            <circle cx="60" cy="55" r="10" stroke="#10b981" stroke-width="2" fill="#d1fae5"/>
-            <line x1="60" y1="25" x2="60" y2="45" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4"/>
-            <text x="60" y="78" text-anchor="middle" fill="#059669" font-size="8">屏幕与眼睛平齐</text>
-          </svg>
-        </div>
 
         <p><strong>4. 肩膀放松</strong></p>
         <p>肩膀自然下垂，不要耸肩。手肘弯曲约90度放在桌面上。</p>
@@ -226,14 +186,8 @@ const educationContents = {
       thumbnail: null,
       duration: 8,
       content: `
-        <div class="article-illustration">
-          <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <text x="50" y="20" fill="#ef4444" font-size="10">异常</text>
-            <path d="M50 30 Q45 60 55 90 Q45 120 50 140" stroke="#ef4444" stroke-width="3" fill="none"/>
-            <text x="150" y="20" fill="#10b981" font-size="10">正常</text>
-            <line x1="150" y1="30" x2="150" y2="140" stroke="#10b981" stroke-width="3"/>
-            <text x="100" y="148" text-anchor="middle" fill="#6b7280" font-size="9">脊柱侧弯 vs 正常脊柱</text>
-          </svg>
+        <div class="article-hero-image">
+          <img src="/education-spine.jpg" alt="脊柱侧弯对比" class="article-main-image" />
         </div>
         <h3>什么是脊柱侧弯？</h3>
         <p>脊柱侧弯是指脊柱向左或向右弯曲超过10度的情况。青少年发育期是高发期。</p>
@@ -251,53 +205,6 @@ const educationContents = {
 
         <p><strong>2. 均衡使用双侧</strong></p>
         <p>背书包时使用双肩背，避免单肩负重。写字时不要歪着身子。</p>
-        <div class="visual-comparison">
-          <div class="compare-box">
-            <div class="compare-item wrong">
-              <svg viewBox="0 0 120 180" fill="none">
-                <rect width="120" height="180" fill="#fff5f5" rx="8"/>
-                <circle cx="60" cy="30" r="16" stroke="#ef4444" stroke-width="3" fill="#fed7d7"/>
-                <path d="M60 46 L70 110" stroke="#ef4444" stroke-width="3"/>
-                <rect x="75" y="55" width="30" height="40" rx="4" stroke="#ef4444" stroke-width="2.5" fill="#fef2f2"/>
-                <line x1="48" y1="180" x2="48" y2="140" stroke="#ef4444" stroke-width="3"/>
-                <line x1="72" y1="180" x2="72" y2="140" stroke="#ef4444" stroke-width="3"/>
-                <text x="60" y="165" text-anchor="middle" fill="#c53030" font-size="12" font-weight="600">倾斜</text>
-              </svg>
-              <span class="compare-label wrong">
-                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
-                  <circle cx="8" cy="8" r="7" stroke="#dc2626" stroke-width="2"/>
-                  <path d="M5 5l6 6M11 5l-6 6" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                单肩背包
-              </span>
-            </div>
-            <div class="compare-item correct">
-              <svg viewBox="0 0 120 180" fill="none">
-                <rect width="120" height="180" fill="#f0fdf4" rx="8"/>
-                <circle cx="60" cy="30" r="16" stroke="#10b981" stroke-width="3" fill="#d1fae5"/>
-                <line x1="60" y1="46" x2="60" y2="110" stroke="#10b981" stroke-width="3"/>
-                <rect x="40" y="55" width="40" height="45" rx="4" stroke="#10b981" stroke-width="2.5" fill="#f0fdf4"/>
-                <line x1="45" y1="180" x2="45" y2="140" stroke="#10b981" stroke-width="3"/>
-                <line x1="75" y1="180" x2="75" y2="140" stroke="#10b981" stroke-width="3"/>
-                <text x="60" y="165" text-anchor="middle" fill="#059669" font-size="12" font-weight="600">平衡</text>
-              </svg>
-              <span class="compare-label correct">
-                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
-                  <circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="2"/>
-                  <path d="M5 8l2 2 4-4" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                双肩背包
-              </span>
-            </div>
-          </div>
-          <div class="photo-example-placeholder">
-            <svg class="placeholder-icon" viewBox="0 0 48 48" fill="none" width="48" height="48">
-              <rect x="6" y="10" width="36" height="28" rx="3" stroke="#a855f7" stroke-width="2"/>
-              <circle cx="24" cy="24" r="6" stroke="#a855f7" stroke-width="2"/>
-              <path d="M32 16h.01" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <p>建议：可在此处添加真实儿童背包示范照片</p>
-          </div>
         </div>
 
         <p><strong>3. 加强核心锻炼</strong></p>

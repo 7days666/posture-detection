@@ -67,3 +67,8 @@ export const cleanupBadData = () => {
 export const clearUserAssessments = (userId: number) => {
   return adminApi.delete(`/admin/users/${userId}/assessments`)
 }
+
+// 调试：查看数据库实际值
+export const debugAssessments = () => {
+  return adminApi.get('/admin/assessments/debug')
+}
