@@ -52,7 +52,7 @@ const educationContents = {
       duration: 5,
       content: `
         <div class="article-hero-image">
-          <img src="/education-posture.jpg" alt="正确坐姿示范" class="article-main-image" />
+          <img src="/正确坐姿.jpg" alt="正确坐姿示范" class="article-main-image" />
         </div>
         <h3>正确坐姿的要点</h3>
         <div class="tip-box tip-important">
@@ -93,19 +93,8 @@ const educationContents = {
       thumbnail: null,
       duration: 4,
       content: `
-        <div class="article-illustration">
-          <svg viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line x1="100" y1="10" x2="100" y2="170" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4"/>
-            <circle cx="100" cy="25" r="12" stroke="#10b981" stroke-width="2" fill="#d1fae5"/>
-            <line x1="100" y1="37" x2="100" y2="90" stroke="#10b981" stroke-width="2"/>
-            <line x1="100" y1="50" x2="75" y2="70" stroke="#10b981" stroke-width="2"/>
-            <line x1="100" y1="50" x2="125" y2="70" stroke="#10b981" stroke-width="2"/>
-            <line x1="100" y1="90" x2="85" y2="140" stroke="#10b981" stroke-width="2"/>
-            <line x1="100" y1="90" x2="115" y2="140" stroke="#10b981" stroke-width="2"/>
-            <line x1="85" y1="140" x2="80" y2="165" stroke="#10b981" stroke-width="2"/>
-            <line x1="115" y1="140" x2="120" y2="165" stroke="#10b981" stroke-width="2"/>
-            <text x="100" y="178" text-anchor="middle" fill="#059669" font-size="10">正确站姿：身体成一条直线</text>
-          </svg>
+        <div class="article-hero-image">
+          <img src="/椅子坐姿.jpg" alt="正确坐姿示范" class="article-main-image" />
         </div>
         <h3>正确站姿的关键</h3>
         <div class="tip-box tip-important">
@@ -187,7 +176,7 @@ const educationContents = {
       duration: 8,
       content: `
         <div class="article-hero-image">
-          <img src="/education-spine.jpg" alt="脊柱侧弯对比" class="article-main-image" />
+          <img src="/正常脊柱.jpg" alt="脊柱侧弯对比" class="article-main-image" />
         </div>
         <h3>什么是脊柱侧弯？</h3>
         <p>脊柱侧弯是指脊柱向左或向右弯曲超过10度的情况。青少年发育期是高发期。</p>
@@ -225,17 +214,8 @@ const educationContents = {
       thumbnail: null,
       duration: 3,
       content: `
-        <div class="article-illustration">
-          <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="30" r="15" stroke="#10b981" stroke-width="2" fill="#d1fae5"/>
-            <line x1="100" y1="45" x2="100" y2="100" stroke="#10b981" stroke-width="2"/>
-            <rect x="80" y="50" width="40" height="45" rx="5" stroke="#f59e0b" stroke-width="2" fill="#fef3c7"/>
-            <line x1="85" y1="50" x2="85" y2="45" stroke="#f59e0b" stroke-width="2"/>
-            <line x1="115" y1="50" x2="115" y2="45" stroke="#f59e0b" stroke-width="2"/>
-            <line x1="100" y1="100" x2="85" y2="140" stroke="#10b981" stroke-width="2"/>
-            <line x1="100" y1="100" x2="115" y2="140" stroke="#10b981" stroke-width="2"/>
-            <text x="100" y="148" text-anchor="middle" fill="#059669" font-size="10">书包贴近背部，双肩均匀受力</text>
-          </svg>
+        <div class="article-hero-image">
+          <img src="/屏幕/书本高度和距离示范.jpg" alt="书本高度和距离示范" class="article-main-image" />
         </div>
         <h3>书包与脊柱健康</h3>
         <p>书包过重或背法不当是导致青少年脊柱问题的重要原因之一。</p>
