@@ -82,6 +82,7 @@ export default function DataTracking() {
     <div className="bar-chart">
       {records.slice().reverse().map((record, index) => (
         <div key={record.id || index} className="bar-container">
+          <span className="bar-score">{record.overall_score}</span>
           <div
             className="bar"
             style={{ height: `${record.overall_score}%` }}
