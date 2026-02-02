@@ -7,8 +7,8 @@ import {
   MonitorIcon,
   CloseIcon
 } from './Icons'
-import { generateHealthPrediction, PredictionData } from '../api/aiSuggestion'
-import { assessmentAPI } from '../api/healthApi'
+import { PredictionData } from '../api/aiSuggestion'
+import { predictionAPI } from '../api/healthApi'
 import './AIPrediction.css'
 
 interface AIPredictionProps {
@@ -35,13 +35,13 @@ export default function AIPrediction({ onClose }: AIPredictionProps) {
     setError(null)
     
     try {
-      // 获取历史检测数据
-      const historyResponse = await assessmentAPI.getHistory(10, 0)
-      const historyData = historyResponse.success ? historyResponse.data : []
-      
-      // 调用 AI 生成预测
-      const prediction = await generateHealthPrediction(historyData)
-      setPredictionData(prediction)
+      // 调用后端预测接口，基于真实数据计算预测
+      const response = await predictionAPI.analyze()
+      if (response.success && response.data) {
+        setPredictionData(response.data as PredictionData)
+      } else {
+        setError('暂无足够数据进行预测，请先完成体态检测')
+      }
     } catch (err) {
       console.error('加载预测失败:', err)
       setError('加载预测失败，请稍后重试')
