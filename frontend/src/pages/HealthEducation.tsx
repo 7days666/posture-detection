@@ -290,7 +290,7 @@ const educationContents = {
   courses: [
     {
       id: 'course-1',
-      title: '青少年体态健康课程',
+      title: '体态健康课程',
       description: '系统学习体态健康知识',
       category: 'course',
       thumbnail: null,
