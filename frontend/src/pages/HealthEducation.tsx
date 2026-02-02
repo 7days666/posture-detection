@@ -108,54 +108,6 @@ const educationContents = {
 
         <p><strong>2. 肩膀打开</strong></p>
         <p>肩膀向后微收，胸部自然挺起，但不要过度挺胸。</p>
-        <div class="visual-comparison">
-          <div class="compare-box">
-            <div class="compare-item wrong">
-              <svg viewBox="0 0 120 160" fill="none">
-                <rect width="120" height="160" fill="#fff5f5" rx="8"/>
-                <circle cx="60" cy="30" r="16" stroke="#ef4444" stroke-width="3" fill="#fed7d7"/>
-                <path d="M60 46 Q50 80 60 110" stroke="#ef4444" stroke-width="3" fill="none"/>
-                <path d="M35 70 L60 55 L85 70" stroke="#ef4444" stroke-width="2.5" fill="none"/>
-                <line x1="45" y1="160" x2="45" y2="130" stroke="#ef4444" stroke-width="3"/>
-                <line x1="75" y1="160" x2="75" y2="130" stroke="#ef4444" stroke-width="3"/>
-                <text x="60" y="150" text-anchor="middle" fill="#c53030" font-size="12" font-weight="600">驼背</text>
-              </svg>
-              <span class="compare-label wrong">
-                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
-                  <circle cx="8" cy="8" r="7" stroke="#dc2626" stroke-width="2"/>
-                  <path d="M5 5l6 6M11 5l-6 6" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                含胸驼背
-              </span>
-            </div>
-            <div class="compare-item correct">
-              <svg viewBox="0 0 120 160" fill="none">
-                <rect width="120" height="160" fill="#f0fdf4" rx="8"/>
-                <circle cx="60" cy="30" r="16" stroke="#10b981" stroke-width="3" fill="#d1fae5"/>
-                <line x1="60" y1="46" x2="60" y2="110" stroke="#10b981" stroke-width="3"/>
-                <path d="M35 75 L60 60 L85 75" stroke="#10b981" stroke-width="2.5" fill="none"/>
-                <line x1="45" y1="160" x2="45" y2="130" stroke="#10b981" stroke-width="3"/>
-                <line x1="75" y1="160" x2="75" y2="130" stroke="#10b981" stroke-width="3"/>
-                <text x="60" y="150" text-anchor="middle" fill="#059669" font-size="12" font-weight="600">挺拔</text>
-              </svg>
-              <span class="compare-label correct">
-                <svg viewBox="0 0 16 16" fill="none" width="14" height="14" style="display:inline-block;vertical-align:middle;margin-right:4px">
-                  <circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="2"/>
-                  <path d="M5 8l2 2 4-4" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                肩膀打开
-              </span>
-            </div>
-          </div>
-          <div class="tip-box tip-practice">
-            <svg class="tip-icon" viewBox="0 0 24 24" fill="none" width="20" height="20">
-              <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-              <path d="M17 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span>对着镜子练习，确保肩膀在耳朵正下方</span>
-          </div>
-        </div>
 
         <p><strong>3. 收紧核心</strong></p>
         <p>腹部微微收紧，保持核心稳定，避免腰部过度前凸。</p>
