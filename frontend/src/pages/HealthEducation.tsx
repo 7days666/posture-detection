@@ -297,7 +297,7 @@ const educationContents = {
       duration: 60,
       lessons: [
         { title: '认识你的脊柱', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1SzEgz3EaE/' },
-        { title: '常见体态问题', completed: false },
+        { title: '常见体态问题', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1Yy4y1G7Bf/' },
         { title: '日常姿势纠正', completed: false },
         { title: '运动与体态', completed: false },
         { title: '建立健康习惯', completed: false }
