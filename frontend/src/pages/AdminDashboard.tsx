@@ -140,7 +140,7 @@ export default function AdminDashboard() {
 
   // 清理异常数据
   const handleCleanupBadData = async () => {
-    if (!confirm('确定清理所有异常数据吗？（评分>=95但指标异常的记录）')) return
+    if (!confirm('确定清理所有异常数据吗？\n\n将清理以下数据：\n1. 评分>=95但指标异常的记录\n2. 指标全为空的无效记录（检测失败的数据）')) return
     
     setActionLoading(true)
     try {
@@ -348,12 +348,15 @@ export default function AdminDashboard() {
             <tbody>
               {assessments.map(a => {
                 // 判断是否是异常数据
-                const isBad = a.overall_score >= 95 && (
+                const isBadScore = a.overall_score >= 95 && (
                   (a.head_forward_angle && a.head_forward_angle > 15) ||
                   (a.shoulder_level_diff && a.shoulder_level_diff > 3) ||
                   (a.spine_curvature && a.spine_curvature > 15) ||
                   (a.pelvis_tilt && a.pelvis_tilt > 10)
                 )
+                // 判断是否是指标全为空的无效数据
+                const isEmpty = !a.head_forward_angle && !a.shoulder_level_diff && !a.spine_curvature && !a.pelvis_tilt
+                const isBad = isBadScore || isEmpty
                 return (
                 <tr key={a.id} className={isBad ? 'bad-row' : ''}>
                   <td>{a.id}</td>
@@ -367,7 +370,7 @@ export default function AdminDashboard() {
                   <td>{a.spine_curvature?.toFixed(1) || '-'}°</td>
                   <td>{a.pelvis_tilt?.toFixed(1) || '-'}°</td>
                   <td>{formatDate(a.created_at)}</td>
-                  <td>{isBad ? <span className="bad-tag">异常</span> : <span className="ok-tag">正常</span>}</td>
+                  <td>{isBad ? <span className="bad-tag">{isEmpty ? '无效' : '异常'}</span> : <span className="ok-tag">正常</span>}</td>
                   <td>
                     <button 
                       className="action-btn delete-btn"
