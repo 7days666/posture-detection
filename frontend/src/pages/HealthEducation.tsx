@@ -296,7 +296,7 @@ const educationContents = {
       thumbnail: null,
       duration: 60,
       lessons: [
-        { title: '认识你的脊柱', completed: false },
+        { title: '认识你的脊柱', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1SzEgz3EaE/' },
         { title: '常见体态问题', completed: false },
         { title: '日常姿势纠正', completed: false },
         { title: '运动与体态', completed: false },
@@ -826,12 +826,20 @@ export default function HealthEducation() {
                     </div>
                   </div>
                   <div className="course-lessons">
-                    {item.lessons?.map((lesson, index) => (
-                      <div key={index} className="lesson-item">
+                    {item.lessons?.map((lesson: any, index: number) => (
+                      <div 
+                        key={index} 
+                        className={`lesson-item ${lesson.videoUrl ? 'clickable' : ''}`}
+                        onClick={() => lesson.videoUrl && window.open(lesson.videoUrl, '_blank')}
+                      >
                         <span className="lesson-number">{index + 1}</span>
                         <span className="lesson-title">{lesson.title}</span>
                         <span className={`lesson-status ${lesson.completed ? 'completed' : ''}`}>
-                          {lesson.completed ? <LessonCompleteIcon /> : <LessonPendingIcon />}
+                          {lesson.videoUrl ? (
+                            <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                              <polygon points="5,3 19,12 5,21" fill="#3b82f6"/>
+                            </svg>
+                          ) : lesson.completed ? <LessonCompleteIcon /> : <LessonPendingIcon />}
                         </span>
                       </div>
                     ))}
