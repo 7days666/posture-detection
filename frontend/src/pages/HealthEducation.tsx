@@ -241,7 +241,6 @@ const educationContents = {
         { title: '认识你的脊柱', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1SzEgz3EaE/' },
         { title: '常见体态问题', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1Yy4y1G7Bf/' },
         { title: '不良日常姿势的危害', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1fr4y1i7n7/' },
-        { title: '不良生活习惯对体态的影响', completed: false, videoUrl: 'https://www.bilibili.com/video/BV16K411B7B6/' },
         { title: '运动对体态的积极影响', completed: false, videoUrl: 'https://www.bilibili.com/video/BV1Jc411V7pp/' }
       ]
     }
