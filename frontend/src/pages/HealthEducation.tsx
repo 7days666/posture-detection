@@ -784,7 +784,6 @@ export default function HealthEducation() {
                       </div>
                     ))}
                   </div>
-                  <button className="start-course-btn">开始学习</button>
                 </motion.div>
               ))}
             </div>
