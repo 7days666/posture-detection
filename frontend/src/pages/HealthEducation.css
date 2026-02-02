@@ -434,14 +434,15 @@
 .article-hero-image {
   margin: -20px -20px 20px -20px;
   overflow: hidden;
+  background: #f8fafc;
 }
 
 .article-main-image {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: cover;
-  max-height: 280px;
+  object-fit: contain;
+  max-height: none;
 }
 
 .illustration-placeholder {
