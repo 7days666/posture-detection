@@ -995,3 +995,46 @@
   width: 24px;
   height: 24px;
 }
+
+
+/* 视频播放页面 */
+.video-content {
+  padding: 0;
+}
+
+.video-player {
+  background: #000;
+  width: 100%;
+}
+
+.video-player video {
+  display: block;
+  width: 100%;
+}
+
+.video-info {
+  padding: 20px;
+  background: white;
+}
+
+.video-info h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.video-info p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+}
+
+.video-duration {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #6b7280;
+}

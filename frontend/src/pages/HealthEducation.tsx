@@ -263,7 +263,7 @@ const educationContents = {
       category: 'exercise',
       thumbnail: null,
       duration: 5,
-      videoUrl: '#'
+      videoUrl: '/颈椎保健操.mp4'
     },
     {
       id: 'video-2',
@@ -364,6 +364,7 @@ export default function HealthEducation() {
   
   const [activeTab, setActiveTab] = useState<'recommend' | 'articles' | 'videos' | 'courses'>('recommend')
   const [selectedArticle, setSelectedArticle] = useState<typeof educationContents.articles[0] | null>(null)
+  const [selectedVideo, setSelectedVideo] = useState<typeof educationContents.videos[0] | null>(null)
   const [showTrainingTip, setShowTrainingTip] = useState(fromReport || false)
   const [trainingPlan, setTrainingPlan] = useState<TrainingPlan | null>(null)
   const [trainingLoading, setTrainingLoading] = useState(false)
@@ -439,6 +440,8 @@ export default function HealthEducation() {
       onClick={() => {
         if (type === 'article') {
           setSelectedArticle(item)
+        } else if (type === 'video' && item.videoUrl && item.videoUrl !== '#') {
+          setSelectedVideo(item)
         }
       }}
     >
@@ -659,6 +662,38 @@ export default function HealthEducation() {
             className="article-body"
             dangerouslySetInnerHTML={{ __html: selectedArticle.content || '' }}
           />
+        </main>
+        <TabBar />
+      </div>
+    )
+  }
+
+  if (selectedVideo) {
+    return (
+      <div className="health-education-page">
+        <header className="page-header">
+          <button className="back-btn" onClick={() => setSelectedVideo(null)}>
+            ← 返回
+          </button>
+          <h1>{selectedVideo.title}</h1>
+        </header>
+        <main className="video-content">
+          <div className="video-player">
+            <video 
+              controls 
+              autoPlay
+              playsInline
+              style={{ width: '100%', maxHeight: '70vh', background: '#000' }}
+            >
+              <source src={selectedVideo.videoUrl} type="video/mp4" />
+              您的浏览器不支持视频播放
+            </video>
+          </div>
+          <div className="video-info">
+            <h2>{selectedVideo.title}</h2>
+            <p>{selectedVideo.description}</p>
+            <span className="video-duration">{selectedVideo.duration}分钟</span>
+          </div>
         </main>
         <TabBar />
       </div>
