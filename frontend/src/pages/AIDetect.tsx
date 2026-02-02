@@ -238,8 +238,20 @@ export default function AIDetect() {
       const suggestion = await generateAISuggestion(result)
       setAiSuggestion(suggestion)
 
-      // 保存检测结果到数据库
-      await saveAssessmentToDatabase(result, suggestion)
+      // 只有检测成功（有有效的检测项）才保存到数据库
+      const hasValidItems = result.items.some(item => 
+        item.name.includes('肩') || 
+        item.name.includes('头') || 
+        item.name.includes('骨盆') || 
+        item.name.includes('脊') ||
+        item.name.includes('驼')
+      )
+      
+      if (hasValidItems) {
+        await saveAssessmentToDatabase(result, suggestion)
+      } else {
+        console.log('[AIDetect] 检测结果无效，不保存到数据库')
+      }
     } catch (error) {
       console.error('[AIDetect] AI建议获取失败:', error)
     } finally {

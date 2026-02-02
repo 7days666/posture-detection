@@ -197,10 +197,12 @@ adminRoutes.delete('/assessments/:id', adminAuth, async (c) => {
   }
 })
 
-// 清理异常数据（评分100但指标异常的数据）
+// 清理异常数据（评分100但指标异常的数据，以及指标全为空的无效数据）
 adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
   try {
-    // 找出评分>=95但有异常指标的记录（这些是错误数据）
+    let totalDeleted = 0
+    
+    // 1. 清理评分>=95但有异常指标的记录（这些是错误数据）
     const badRecords = await c.env.DB.prepare(`
       SELECT id FROM posture_assessments 
       WHERE overall_score >= 95 
@@ -212,10 +214,9 @@ adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
       )
     `).all()
     
-    const count = badRecords.results?.length || 0
+    const badCount = badRecords.results?.length || 0
     
-    if (count > 0) {
-      // 删除这些异常记录
+    if (badCount > 0) {
       await c.env.DB.prepare(`
         DELETE FROM posture_assessments 
         WHERE overall_score >= 95 
@@ -226,12 +227,39 @@ adminRoutes.post('/assessments/cleanup', adminAuth, async (c) => {
           pelvis_tilt > 10
         )
       `).run()
+      totalDeleted += badCount
+    }
+    
+    // 2. 清理指标全为空的无效数据（检测失败的记录）
+    const emptyRecords = await c.env.DB.prepare(`
+      SELECT id FROM posture_assessments 
+      WHERE head_forward_angle IS NULL 
+      AND shoulder_level_diff IS NULL 
+      AND spine_curvature IS NULL 
+      AND pelvis_tilt IS NULL
+    `).all()
+    
+    const emptyCount = emptyRecords.results?.length || 0
+    
+    if (emptyCount > 0) {
+      await c.env.DB.prepare(`
+        DELETE FROM posture_assessments 
+        WHERE head_forward_angle IS NULL 
+        AND shoulder_level_diff IS NULL 
+        AND spine_curvature IS NULL 
+        AND pelvis_tilt IS NULL
+      `).run()
+      totalDeleted += emptyCount
     }
     
     return c.json({ 
       success: true, 
-      message: `已清理 ${count} 条异常数据`,
-      deletedCount: count
+      message: `已清理 ${totalDeleted} 条异常数据（${badCount} 条指标异常，${emptyCount} 条指标为空）`,
+      deletedCount: totalDeleted,
+      details: {
+        badScoreCount: badCount,
+        emptyDataCount: emptyCount
+      }
     })
   } catch (error) {
     console.error('清理数据错误:', error)
