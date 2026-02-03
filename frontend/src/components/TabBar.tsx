@@ -26,7 +26,7 @@ export default function TabBar() {
         {({ isActive }) => (
           <>
             <span className="tab-icon"><LearnIcon active={isActive} /></span>
-            <span className="tab-label">教练</span>
+            <span className="tab-label">数字教练</span>
           </>
         )}
       </NavLink>
@@ -34,7 +34,7 @@ export default function TabBar() {
         {({ isActive }) => (
           <>
             <span className="tab-icon"><PointsIcon active={isActive} /></span>
-            <span className="tab-label">积分</span>
+            <span className="tab-label">积分&商店</span>
           </>
         )}
       </NavLink>
