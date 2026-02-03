@@ -18,7 +18,7 @@ const mainFeature = { icon: AIIcon, label: 'AI体态检测', color: '#68d391', p
 const subFeatures = [
   { icon: ReportIcon, label: '我的报告', color: '#4ecdc4', path: '/health-report' },
   { icon: SurveyIcon, label: '问卷调查', color: '#f687b3', path: '/survey' },
-  { icon: ShopIcon, label: '商城', color: '#fbd38d', path: '/points' },
+  { icon: ShopIcon, label: '积分&商城', color: '#fbd38d', path: '/points' },
 ]
 
 export default function Home() {
