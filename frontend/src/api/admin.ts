@@ -145,3 +145,21 @@ export const reviewMakeupRequest = (requestId: number, approved: boolean, reject
 export const getPointsStats = () => {
   return adminApi.get('/admin/points-stats')
 }
+
+
+// ========== 站点管理 ==========
+
+// 获取站点状态
+export const getSiteStatus = () => {
+  return adminApi.get('/admin/site-status')
+}
+
+// 设置站点状态
+export const setSiteStatus = (status: 'open' | 'closed') => {
+  return adminApi.post('/admin/site-status', { status })
+}
+
+// 检查站点是否开放（公开接口）
+export const checkSiteOpen = () => {
+  return adminApi.get('/admin/check-site')
+}

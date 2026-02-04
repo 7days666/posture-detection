@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Onboarding from './pages/Onboarding'
@@ -11,6 +13,9 @@ import HealthReport from './pages/HealthReport'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import PointsShop from './pages/PointsShop'
+import Maintenance from './pages/Maintenance'
+
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 // 检查是否需要引导流程
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
@@ -40,6 +45,37 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const [siteOpen, setSiteOpen] = useState<boolean | null>(null)
+  
+  useEffect(() => {
+    // 检查站点状态
+    const checkSite = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/admin/check-site`)
+        setSiteOpen(res.data.isOpen !== false)
+      } catch {
+        setSiteOpen(true) // 出错时默认开放
+      }
+    }
+    checkSite()
+  }, [])
+  
+  // 加载中
+  if (siteOpen === null) {
+    return null
+  }
+  
+  // 站点关闭时，只允许访问管理后台
+  if (!siteOpen) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="*" element={<Maintenance />} />
+      </Routes>
+    )
+  }
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

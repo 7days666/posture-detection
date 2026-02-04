@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUsers, getStats, resetUserPassword, deleteUser, getAssessments, deleteAssessment, cleanupBadData, clearUserAssessments, getAdminProducts, createProduct, updateProduct, deleteProduct, getAdminOrders, updateOrderStatus, getMakeupRequests, reviewMakeupRequest, getPointsStats } from '../api/admin'
+import { getUsers, getStats, resetUserPassword, deleteUser, getAssessments, deleteAssessment, cleanupBadData, clearUserAssessments, getAdminProducts, createProduct, updateProduct, deleteProduct, getAdminOrders, updateOrderStatus, getMakeupRequests, reviewMakeupRequest, getPointsStats, getSiteStatus, setSiteStatus } from '../api/admin'
 import './AdminDashboard.css'
 
 interface User {
@@ -114,6 +114,9 @@ export default function AdminDashboard() {
   
   // 补测申请状态
   const [makeupRequests, setMakeupRequests] = useState<MakeupRequest[]>([])
+  
+  // 站点状态
+  const [siteOpen, setSiteOpen] = useState(true)
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken')
@@ -175,6 +178,13 @@ export default function AdminDashboard() {
           setPointsStats(pointsStatsRes.data.stats)
         }
       } catch (e) { console.error('加载积分统计失败:', e) }
+
+      try {
+        const siteRes = await getSiteStatus()
+        if (siteRes.data.success) {
+          setSiteOpen(siteRes.data.status === 'open')
+        }
+      } catch (e) { console.error('加载站点状态失败:', e) }
     } catch (error) {
       console.error('加载数据失败:', error)
     } finally {
@@ -381,6 +391,29 @@ export default function AdminDashboard() {
     }
   }
 
+  // ========== 站点管理 ==========
+  const handleToggleSite = async () => {
+    const newStatus = siteOpen ? 'closed' : 'open'
+    const confirmMsg = siteOpen 
+      ? '确定要关闭站点吗？关闭后用户将无法访问。' 
+      : '确定要开启站点吗？'
+    
+    if (!confirm(confirmMsg)) return
+    
+    setActionLoading(true)
+    try {
+      const res = await setSiteStatus(newStatus)
+      if (res.data.success) {
+        setSiteOpen(newStatus === 'open')
+        setMessage(res.data.message)
+      }
+    } catch (error) {
+      setMessage('操作失败')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken')
     navigate('/admin')
@@ -435,7 +468,16 @@ export default function AdminDashboard() {
     <div className="admin-dashboard">
       <header className="admin-header">
         <h1>脊安守护 - 管理后台</h1>
-        <button className="logout-btn" onClick={handleLogout}>退出登录</button>
+        <div className="header-actions">
+          <button 
+            className={`site-toggle-btn ${siteOpen ? 'site-open' : 'site-closed'}`}
+            onClick={handleToggleSite}
+            disabled={actionLoading}
+          >
+            {siteOpen ? '🟢 站点运行中' : '🔴 站点已关闭'}
+          </button>
+          <button className="logout-btn" onClick={handleLogout}>退出登录</button>
+        </div>
       </header>
 
       {message && (

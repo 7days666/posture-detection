@@ -599,3 +599,62 @@ adminRoutes.get('/points-stats', adminAuth, async (c) => {
     return c.json({ success: false, message: '服务器错误' }, 500)
   }
 })
+
+// ========== 站点管理 ==========
+
+// 获取站点状态
+adminRoutes.get('/site-status', adminAuth, async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      "SELECT value FROM site_settings WHERE key = 'site_status'"
+    ).first<{ value: string }>()
+    
+    return c.json({
+      success: true,
+      status: result?.value || 'open'
+    })
+  } catch (error) {
+    console.error('获取站点状态错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 设置站点状态（开站/关站）
+adminRoutes.post('/site-status', adminAuth, async (c) => {
+  try {
+    const { status } = await c.req.json()
+    
+    if (!['open', 'closed'].includes(status)) {
+      return c.json({ success: false, message: '无效的状态' }, 400)
+    }
+    
+    await c.env.DB.prepare(
+      "INSERT OR REPLACE INTO site_settings (key, value, updated_at) VALUES ('site_status', ?, CURRENT_TIMESTAMP)"
+    ).bind(status).run()
+    
+    return c.json({
+      success: true,
+      message: status === 'open' ? '站点已开启' : '站点已关闭',
+      status
+    })
+  } catch (error) {
+    console.error('设置站点状态错误:', error)
+    return c.json({ success: false, message: '服务器错误' }, 500)
+  }
+})
+
+// 公开接口：检查站点状态（不需要认证）
+adminRoutes.get('/check-site', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      "SELECT value FROM site_settings WHERE key = 'site_status'"
+    ).first<{ value: string }>()
+    
+    return c.json({
+      success: true,
+      isOpen: result?.value !== 'closed'
+    })
+  } catch (error) {
+    return c.json({ success: true, isOpen: true })
+  }
+})

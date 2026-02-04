@@ -581,3 +581,44 @@
 .form-group .modal-input {
   margin-bottom: 8px;
 }
+
+
+/* 站点开关按钮 */
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.site-toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.site-toggle-btn.site-open {
+  background: rgba(72, 187, 120, 0.2);
+  color: #276749;
+}
+
+.site-toggle-btn.site-open:hover {
+  background: rgba(72, 187, 120, 0.3);
+}
+
+.site-toggle-btn.site-closed {
+  background: rgba(245, 101, 101, 0.2);
+  color: #c53030;
+}
+
+.site-toggle-btn.site-closed:hover {
+  background: rgba(245, 101, 101, 0.3);
+}
+
+.site-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
