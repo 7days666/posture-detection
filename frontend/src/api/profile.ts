@@ -18,7 +18,7 @@ api.interceptors.request.use(config => {
 })
 
 export interface ProfileData {
-  ageGroup: 'child' | 'teen'
+  ageGroup: 'child' | 'teen' | 'youth'
   gender: string
   birthYear: string
   age: string
@@ -35,6 +35,20 @@ export interface ProfileData {
   sittingHours?: string
   exerciseFreqTeen?: string
   postureSymptoms?: string
+  // 青年字段
+  occupation?: string
+  occupationOther?: string
+  exerciseHabit?: string
+  exerciseWeekly?: string
+  sittingHoursYouth?: string
+  screenTimeYouth?: string
+  badPostureHabits?: string
+  spinePostureIssues?: string
+  chronicPain?: string
+  chronicPainOther?: string
+  postureCorrection?: string
+  postureCorrectionOther?: string
+  postureEducation?: string
   // 共有
   spineIssues: string
   consentAgreed: boolean

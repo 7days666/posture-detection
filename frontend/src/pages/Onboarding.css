@@ -107,6 +107,23 @@
   margin-top: 20px;
 }
 
+.type-cards.three-cols {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.type-cards.three-cols .option-card {
+  padding: 20px 12px;
+}
+
+.type-cards.three-cols .option-card h3 {
+  font-size: 16px;
+}
+
+.type-cards.three-cols .option-card p {
+  font-size: 12px;
+}
+
 .option-card {
   background: white;
   border: 2px solid #e2e8f0;

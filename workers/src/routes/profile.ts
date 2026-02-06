@@ -50,6 +50,8 @@ profileRoutes.post('/', async (c) => {
           height = ?, weight = ?,
           is_rapid_growth = ?, screen_time_child = ?, exercise_freq_child = ?, daily_posture = ?,
           school_stage = ?, height_growth = ?, sitting_hours = ?, exercise_freq_teen = ?, posture_symptoms = ?,
+          occupation = ?, exercise_habit = ?, exercise_weekly = ?, sitting_hours_youth = ?, screen_time_youth = ?,
+          bad_posture_habits = ?, spine_posture_issues = ?, chronic_pain = ?, posture_correction = ?, posture_education = ?,
           spine_issues = ?, consent_agreed = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
@@ -58,6 +60,8 @@ profileRoutes.post('/', async (c) => {
         data.height, data.weight,
         data.isRapidGrowth || null, data.screenTimeChild || null, data.exerciseFreqChild || null, data.dailyPosture || null,
         data.schoolStage || null, data.heightGrowth || null, data.sittingHours || null, data.exerciseFreqTeen || null, data.postureSymptoms || null,
+        data.occupation || null, data.exerciseHabit || null, data.exerciseWeekly || null, data.sittingHoursYouth || null, data.screenTimeYouth || null,
+        data.badPostureHabits || null, data.spinePostureIssues || null, data.chronicPain || null, data.postureCorrection || null, data.postureEducation || null,
         data.spineIssues || null, data.consentAgreed ? 1 : 0,
         userId
       ).run()
@@ -68,13 +72,17 @@ profileRoutes.post('/', async (c) => {
           user_id, age_group, gender, birth_year, age, height, weight,
           is_rapid_growth, screen_time_child, exercise_freq_child, daily_posture,
           school_stage, height_growth, sitting_hours, exercise_freq_teen, posture_symptoms,
+          occupation, exercise_habit, exercise_weekly, sitting_hours_youth, screen_time_youth,
+          bad_posture_habits, spine_posture_issues, chronic_pain, posture_correction, posture_education,
           spine_issues, consent_agreed
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         userId, data.ageGroup, data.gender, birthYear, age,
         data.height, data.weight,
         data.isRapidGrowth || null, data.screenTimeChild || null, data.exerciseFreqChild || null, data.dailyPosture || null,
         data.schoolStage || null, data.heightGrowth || null, data.sittingHours || null, data.exerciseFreqTeen || null, data.postureSymptoms || null,
+        data.occupation || null, data.exerciseHabit || null, data.exerciseWeekly || null, data.sittingHoursYouth || null, data.screenTimeYouth || null,
+        data.badPostureHabits || null, data.spinePostureIssues || null, data.chronicPain || null, data.postureCorrection || null, data.postureEducation || null,
         data.spineIssues || null, data.consentAgreed ? 1 : 0
       ).run()
     }
@@ -118,6 +126,16 @@ profileRoutes.get('/', async (c) => {
       sittingHours: result.sitting_hours,
       exerciseFreqTeen: result.exercise_freq_teen,
       postureSymptoms: result.posture_symptoms,
+      occupation: result.occupation,
+      exerciseHabit: result.exercise_habit,
+      exerciseWeekly: result.exercise_weekly,
+      sittingHoursYouth: result.sitting_hours_youth,
+      screenTimeYouth: result.screen_time_youth,
+      badPostureHabits: result.bad_posture_habits,
+      spinePostureIssues: result.spine_posture_issues,
+      chronicPain: result.chronic_pain,
+      postureCorrection: result.posture_correction,
+      postureEducation: result.posture_education,
       spineIssues: result.spine_issues,
       consentAgreed: result.consent_agreed === 1
     }

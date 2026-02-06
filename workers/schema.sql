@@ -31,6 +31,18 @@ CREATE TABLE IF NOT EXISTS profiles (
   exercise_freq_teen TEXT,
   posture_symptoms TEXT,
   
+  -- 青年特有字段
+  occupation TEXT,
+  exercise_habit TEXT,
+  exercise_weekly TEXT,
+  sitting_hours_youth TEXT,
+  screen_time_youth TEXT,
+  bad_posture_habits TEXT,
+  spine_posture_issues TEXT,
+  chronic_pain TEXT,
+  posture_correction TEXT,
+  posture_education TEXT,
+  
   -- 共有字段
   spine_issues TEXT,
   

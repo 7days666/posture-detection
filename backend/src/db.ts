@@ -13,7 +13,7 @@ export interface User {
 export interface Profile {
   id: number
   userId: number
-  ageGroup: 'child' | 'teen'
+  ageGroup: 'child' | 'teen' | 'youth'
   gender: 'male' | 'female'
   age: string
   height: string
