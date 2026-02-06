@@ -23,7 +23,7 @@ interface ChildFormData {
 interface TeenFormData {
   ageGroup: 'teen'
   gender: string
-  birthYear: string
+  age: string
   height: string
   weight: string
   schoolStage: string
@@ -59,7 +59,6 @@ interface YouthFormData {
 
 const currentYear = new Date().getFullYear()
 const childBirthYears = Array.from({ length: 10 }, (_, i) => currentYear - 12 + i) // 3-12岁
-const teenBirthYears = Array.from({ length: 6 }, (_, i) => currentYear - 18 + i) // 13-18岁
 
 const pageVariants = {
   initial: { opacity: 0, x: 50 },
@@ -98,7 +97,7 @@ export default function Onboarding() {
   })
 
   const [teenForm, setTeenForm] = useState<TeenFormData>({
-    ageGroup: 'teen', gender: '', birthYear: '', height: '', weight: '',
+    ageGroup: 'teen', gender: '', age: '', height: '', weight: '',
     schoolStage: '', heightGrowth: '', spineIssues: [], postureSymptoms: [],
     sittingHours: '', exerciseFreq: '', consentAgreed: false
   })
@@ -152,7 +151,7 @@ export default function Onboarding() {
       if (step === 3) return childForm.screenTime && childForm.exerciseFreq && childForm.dailyPosture.length > 0
       if (step === 4) return childForm.consentAgreed
     } else if (ageGroup === 'teen') {
-      if (step === 1) return teenForm.gender && teenForm.birthYear && teenForm.height && teenForm.weight
+      if (step === 1) return teenForm.gender && teenForm.age && teenForm.height && teenForm.weight
       if (step === 2) return teenForm.schoolStage && teenForm.heightGrowth && teenForm.spineIssues.length > 0
       if (step === 3) return teenForm.postureSymptoms.length > 0 && teenForm.sittingHours && teenForm.exerciseFreq
       if (step === 4) return teenForm.consentAgreed
@@ -184,8 +183,8 @@ export default function Onboarding() {
           }
         } else if (ageGroup === 'teen') {
           profileData = {
-            ageGroup: 'teen', gender: teenForm.gender, birthYear: teenForm.birthYear,
-            age: calculateAge(teenForm.birthYear)?.toString() || '', height: teenForm.height, weight: teenForm.weight,
+            ageGroup: 'teen', gender: teenForm.gender, birthYear: '',
+            age: teenForm.age, height: teenForm.height, weight: teenForm.weight,
             spineIssues: teenForm.spineIssues.join(','), consentAgreed: true,
             schoolStage: teenForm.schoolStage, heightGrowth: teenForm.heightGrowth,
             sittingHours: teenForm.sittingHours, exerciseFreqTeen: teenForm.exerciseFreq,
@@ -302,11 +301,11 @@ export default function Onboarding() {
     </motion.div>
   )
 
-  // 步骤1 - 基本信息（儿童/青少年）
+  // 步骤1 - 基本信息（儿童用出生年份，青少年用年龄输入）
   const renderStep1ChildTeen = () => {
-    const form = ageGroup === 'child' ? childForm : teenForm
-    const setForm = ageGroup === 'child' ? setChildForm : setTeenForm
-    const birthYears = ageGroup === 'child' ? childBirthYears : teenBirthYears
+    const isChild = ageGroup === 'child'
+    const form = isChild ? childForm : teenForm
+    const setForm = isChild ? setChildForm : setTeenForm
     const bmi = calculateBMI(form.height, form.weight)
     const bmiStatus = bmi ? getBMIStatus(parseFloat(bmi)) : null
 
@@ -327,16 +326,25 @@ export default function Onboarding() {
           </div>
         </motion.div>
         <motion.div className="form-section" variants={itemVariants} custom={2} initial="hidden" animate="visible">
-          <label className="section-label"><span className="label-num">2</span>出生年份</label>
-          <div className="select-wrapper">
-            <select className="form-select" value={form.birthYear} onChange={e => setForm((p: any) => ({ ...p, birthYear: e.target.value }))}>
-              <option value="">请选择出生年份</option>
-              {birthYears.map(y => <option key={y} value={y}>{y}年</option>)}
-            </select>
-            <AnimatePresence>
-              {form.birthYear && <motion.span className="age-badge" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>{calculateAge(form.birthYear)}岁</motion.span>}
-            </AnimatePresence>
-          </div>
+          {isChild ? (
+            <>
+              <label className="section-label"><span className="label-num">2</span>出生年份</label>
+              <div className="select-wrapper">
+                <select className="form-select" value={(form as ChildFormData).birthYear} onChange={e => setForm((p: any) => ({ ...p, birthYear: e.target.value }))}>
+                  <option value="">请选择出生年份</option>
+                  {childBirthYears.map(y => <option key={y} value={y}>{y}年</option>)}
+                </select>
+                <AnimatePresence>
+                  {(form as ChildFormData).birthYear && <motion.span className="age-badge" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>{calculateAge((form as ChildFormData).birthYear)}岁</motion.span>}
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            <>
+              <label className="section-label"><span className="label-num">2</span>年龄</label>
+              <div className="input-group"><input type="number" className="form-input" placeholder="请输入年龄" value={(form as TeenFormData).age} onChange={e => setForm((p: any) => ({ ...p, age: e.target.value }))} /><span className="input-suffix">岁</span></div>
+            </>
+          )}
         </motion.div>
         <motion.div className="form-section" variants={itemVariants} custom={3} initial="hidden" animate="visible">
           <label className="section-label"><span className="label-num">3</span>身高 <span className="label-hint">最近一次体检数据即可</span></label>
