@@ -26,12 +26,19 @@ interface TeenFormData {
   age: string
   height: string
   weight: string
-  schoolStage: string
-  heightGrowth: string
-  spineIssues: string[]
-  postureSymptoms: string[]
-  sittingHours: string
-  exerciseFreq: string
+  occupation: string
+  occupationOther: string
+  exerciseHabit: string
+  exerciseWeekly: string
+  sittingHoursYouth: string
+  screenTimeYouth: string
+  badPostureHabits: string[]
+  spinePostureIssues: string[]
+  chronicPain: string[]
+  chronicPainOther: string
+  postureCorrection: string[]
+  postureCorrectionOther: string
+  postureEducation: string
   consentAgreed: boolean
 }
 
@@ -98,8 +105,11 @@ export default function Onboarding() {
 
   const [teenForm, setTeenForm] = useState<TeenFormData>({
     ageGroup: 'teen', gender: '', age: '', height: '', weight: '',
-    schoolStage: '', heightGrowth: '', spineIssues: [], postureSymptoms: [],
-    sittingHours: '', exerciseFreq: '', consentAgreed: false
+    occupation: '', occupationOther: '', exerciseHabit: '', exerciseWeekly: '',
+    sittingHoursYouth: '', screenTimeYouth: '', badPostureHabits: [],
+    spinePostureIssues: [], chronicPain: [], chronicPainOther: '',
+    postureCorrection: [], postureCorrectionOther: '', postureEducation: '',
+    consentAgreed: false
   })
 
   const [youthForm, setYouthForm] = useState<YouthFormData>({
@@ -136,8 +146,7 @@ export default function Onboarding() {
   }
 
   const getSteps = () => {
-    if (ageGroup === 'youth') return ['类型选择', '基本信息', '运动与习惯', '体态与健康', '知情同意']
-    if (ageGroup === 'teen') return ['类型选择', '基本信息', '学段与体态', '生活习惯', '知情同意']
+    if (ageGroup === 'youth' || ageGroup === 'teen') return ['类型选择', '基本信息', '运动与习惯', '体态与健康', '知情同意']
     return ['类型选择', '基本信息', '生长发育', '生活习惯', '知情同意']
   }
   const steps = getSteps()
@@ -152,8 +161,8 @@ export default function Onboarding() {
       if (step === 4) return childForm.consentAgreed
     } else if (ageGroup === 'teen') {
       if (step === 1) return teenForm.gender && teenForm.age && teenForm.height && teenForm.weight
-      if (step === 2) return teenForm.schoolStage && teenForm.heightGrowth && teenForm.spineIssues.length > 0
-      if (step === 3) return teenForm.postureSymptoms.length > 0 && teenForm.sittingHours && teenForm.exerciseFreq
+      if (step === 2) return teenForm.occupation && (teenForm.occupation !== '其他' || teenForm.occupationOther) && teenForm.exerciseHabit && teenForm.exerciseWeekly && teenForm.sittingHoursYouth && teenForm.screenTimeYouth
+      if (step === 3) return teenForm.badPostureHabits.length > 0 && teenForm.spinePostureIssues.length > 0 && teenForm.chronicPain.length > 0 && teenForm.postureCorrection.length > 0 && teenForm.postureEducation
       if (step === 4) return teenForm.consentAgreed
     } else if (ageGroup === 'youth') {
       if (step === 1) return youthForm.gender && youthForm.age && youthForm.height && youthForm.weight
@@ -185,10 +194,15 @@ export default function Onboarding() {
           profileData = {
             ageGroup: 'teen', gender: teenForm.gender, birthYear: '',
             age: teenForm.age, height: teenForm.height, weight: teenForm.weight,
-            spineIssues: teenForm.spineIssues.join(','), consentAgreed: true,
-            schoolStage: teenForm.schoolStage, heightGrowth: teenForm.heightGrowth,
-            sittingHours: teenForm.sittingHours, exerciseFreqTeen: teenForm.exerciseFreq,
-            postureSymptoms: teenForm.postureSymptoms.join(','),
+            spineIssues: teenForm.spinePostureIssues.join(','), consentAgreed: true,
+            occupation: teenForm.occupation === '其他' ? teenForm.occupationOther : teenForm.occupation,
+            exerciseHabit: teenForm.exerciseHabit, exerciseWeekly: teenForm.exerciseWeekly,
+            sittingHoursYouth: teenForm.sittingHoursYouth, screenTimeYouth: teenForm.screenTimeYouth,
+            badPostureHabits: teenForm.badPostureHabits.join(','),
+            spinePostureIssues: teenForm.spinePostureIssues.join(','),
+            chronicPain: teenForm.chronicPain.includes('其他') ? [...teenForm.chronicPain.filter(v => v !== '其他'), teenForm.chronicPainOther].join(',') : teenForm.chronicPain.join(','),
+            postureCorrection: teenForm.postureCorrection.includes('其他') ? [...teenForm.postureCorrection.filter(v => v !== '其他'), teenForm.postureCorrectionOther].join(',') : teenForm.postureCorrection.join(','),
+            postureEducation: teenForm.postureEducation,
           }
         } else {
           profileData = {
@@ -301,16 +315,68 @@ export default function Onboarding() {
     </motion.div>
   )
 
-  // 步骤1 - 基本信息（儿童用出生年份，青少年用年龄输入）
-  const renderStep1ChildTeen = () => {
-    const isChild = ageGroup === 'child'
-    const form = isChild ? childForm : teenForm
-    const setForm = isChild ? setChildForm : setTeenForm
-    const bmi = calculateBMI(form.height, form.weight)
+  // 步骤1 - 儿童基本信息（出生年份选择）
+  const renderStep1Child = () => {
+    const bmi = calculateBMI(childForm.height, childForm.weight)
     const bmiStatus = bmi ? getBMIStatus(parseFloat(bmi)) : null
 
     return (
       <motion.div className="step-panel" key="step1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+        <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">基本信息</motion.h2>
+        <motion.div className="form-section" variants={itemVariants} custom={1} initial="hidden" animate="visible">
+          <label className="section-label"><span className="label-num">1</span>性别</label>
+          <div className="gender-row">
+            <OptionCard selected={childForm.gender === '男'} onClick={() => setChildForm(p => ({ ...p, gender: '男' }))}>
+              <div className="gender-icon male"><svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="10" cy="14" r="5" stroke="currentColor" strokeWidth="2"/><path d="M14 10l6-6M20 4v5M15 4h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></div>
+              <span>男</span>
+            </OptionCard>
+            <OptionCard selected={childForm.gender === '女'} onClick={() => setChildForm(p => ({ ...p, gender: '女' }))}>
+              <div className="gender-icon female"><svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="12" cy="9" r="5" stroke="currentColor" strokeWidth="2"/><path d="M12 14v7M9 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></div>
+              <span>女</span>
+            </OptionCard>
+          </div>
+        </motion.div>
+        <motion.div className="form-section" variants={itemVariants} custom={2} initial="hidden" animate="visible">
+          <label className="section-label"><span className="label-num">2</span>出生年份</label>
+          <div className="select-wrapper">
+            <select className="form-select" value={childForm.birthYear} onChange={e => setChildForm(p => ({ ...p, birthYear: e.target.value }))}>
+              <option value="">请选择出生年份</option>
+              {childBirthYears.map(y => <option key={y} value={y}>{y}年</option>)}
+            </select>
+            <AnimatePresence>
+              {childForm.birthYear && <motion.span className="age-badge" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>{calculateAge(childForm.birthYear)}岁</motion.span>}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+        <motion.div className="form-section" variants={itemVariants} custom={3} initial="hidden" animate="visible">
+          <label className="section-label"><span className="label-num">3</span>身高 <span className="label-hint">最近一次体检数据即可</span></label>
+          <div className="input-group"><input type="number" className="form-input" placeholder="请输入身高" value={childForm.height} onChange={e => setChildForm(p => ({ ...p, height: e.target.value }))} /><span className="input-suffix">cm</span></div>
+        </motion.div>
+        <motion.div className="form-section" variants={itemVariants} custom={4} initial="hidden" animate="visible">
+          <label className="section-label"><span className="label-num">4</span>体重 <span className="label-hint">最近一次测量数据即可</span></label>
+          <div className="input-group"><input type="number" className="form-input" placeholder="请输入体重" value={childForm.weight} onChange={e => setChildForm(p => ({ ...p, weight: e.target.value }))} /><span className="input-suffix">kg</span></div>
+        </motion.div>
+        <AnimatePresence>
+          {bmi && bmiStatus && (
+            <motion.div className="bmi-card" initial={{ opacity: 0, y: 20, height: 0 }} animate={{ opacity: 1, y: 0, height: 'auto' }} exit={{ opacity: 0, y: -10, height: 0 }} style={{ backgroundColor: bmiStatus.bg }}>
+              <div className="bmi-info"><span className="bmi-label">BMI 指数</span><span className="bmi-value" style={{ color: bmiStatus.color }}>{bmi}</span></div>
+              <motion.span className="bmi-tag" style={{ backgroundColor: bmiStatus.color }} initial={{ scale: 0 }} animate={{ scale: 1 }}>{bmiStatus.text}</motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    )
+  }
+
+  // 步骤1 - 青少年/青年基本信息（年龄输入）
+  const renderStep1YouthTeen = () => {
+    const form = ageGroup === 'teen' ? teenForm : youthForm
+    const setForm = ageGroup === 'teen' ? setTeenForm : setYouthForm
+    const bmi = calculateBMI(form.height, form.weight)
+    const bmiStatus = bmi ? getBMIStatus(parseFloat(bmi)) : null
+
+    return (
+      <motion.div className="step-panel" key="step1-yt" variants={pageVariants} initial="initial" animate="animate" exit="exit">
         <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">基本信息</motion.h2>
         <motion.div className="form-section" variants={itemVariants} custom={1} initial="hidden" animate="visible">
           <label className="section-label"><span className="label-num">1</span>性别</label>
@@ -326,25 +392,8 @@ export default function Onboarding() {
           </div>
         </motion.div>
         <motion.div className="form-section" variants={itemVariants} custom={2} initial="hidden" animate="visible">
-          {isChild ? (
-            <>
-              <label className="section-label"><span className="label-num">2</span>出生年份</label>
-              <div className="select-wrapper">
-                <select className="form-select" value={(form as ChildFormData).birthYear} onChange={e => setForm((p: any) => ({ ...p, birthYear: e.target.value }))}>
-                  <option value="">请选择出生年份</option>
-                  {childBirthYears.map(y => <option key={y} value={y}>{y}年</option>)}
-                </select>
-                <AnimatePresence>
-                  {(form as ChildFormData).birthYear && <motion.span className="age-badge" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>{calculateAge((form as ChildFormData).birthYear)}岁</motion.span>}
-                </AnimatePresence>
-              </div>
-            </>
-          ) : (
-            <>
-              <label className="section-label"><span className="label-num">2</span>年龄</label>
-              <div className="input-group"><input type="number" className="form-input" placeholder="请输入年龄" value={(form as TeenFormData).age} onChange={e => setForm((p: any) => ({ ...p, age: e.target.value }))} /><span className="input-suffix">岁</span></div>
-            </>
-          )}
+          <label className="section-label"><span className="label-num">2</span>年龄</label>
+          <div className="input-group"><input type="number" className="form-input" placeholder="请输入年龄" value={form.age} onChange={e => setForm((p: any) => ({ ...p, age: e.target.value }))} /><span className="input-suffix">岁</span></div>
         </motion.div>
         <motion.div className="form-section" variants={itemVariants} custom={3} initial="hidden" animate="visible">
           <label className="section-label"><span className="label-num">3</span>身高 <span className="label-hint">最近一次体检数据即可</span></label>
@@ -353,51 +402,6 @@ export default function Onboarding() {
         <motion.div className="form-section" variants={itemVariants} custom={4} initial="hidden" animate="visible">
           <label className="section-label"><span className="label-num">4</span>体重 <span className="label-hint">最近一次测量数据即可</span></label>
           <div className="input-group"><input type="number" className="form-input" placeholder="请输入体重" value={form.weight} onChange={e => setForm((p: any) => ({ ...p, weight: e.target.value }))} /><span className="input-suffix">kg</span></div>
-        </motion.div>
-        <AnimatePresence>
-          {bmi && bmiStatus && (
-            <motion.div className="bmi-card" initial={{ opacity: 0, y: 20, height: 0 }} animate={{ opacity: 1, y: 0, height: 'auto' }} exit={{ opacity: 0, y: -10, height: 0 }} style={{ backgroundColor: bmiStatus.bg }}>
-              <div className="bmi-info"><span className="bmi-label">BMI 指数</span><span className="bmi-value" style={{ color: bmiStatus.color }}>{bmi}</span></div>
-              <motion.span className="bmi-tag" style={{ backgroundColor: bmiStatus.color }} initial={{ scale: 0 }} animate={{ scale: 1 }}>{bmiStatus.text}</motion.span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    )
-  }
-
-  // 步骤1 - 青年基本信息
-  const renderStep1Youth = () => {
-    const bmi = calculateBMI(youthForm.height, youthForm.weight)
-    const bmiStatus = bmi ? getBMIStatus(parseFloat(bmi)) : null
-
-    return (
-      <motion.div className="step-panel" key="step1-youth" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-        <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">基本信息</motion.h2>
-        <motion.div className="form-section" variants={itemVariants} custom={1} initial="hidden" animate="visible">
-          <label className="section-label"><span className="label-num">1</span>性别</label>
-          <div className="gender-row">
-            <OptionCard selected={youthForm.gender === '男'} onClick={() => setYouthForm(p => ({ ...p, gender: '男' }))}>
-              <div className="gender-icon male"><svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="10" cy="14" r="5" stroke="currentColor" strokeWidth="2"/><path d="M14 10l6-6M20 4v5M15 4h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></div>
-              <span>男</span>
-            </OptionCard>
-            <OptionCard selected={youthForm.gender === '女'} onClick={() => setYouthForm(p => ({ ...p, gender: '女' }))}>
-              <div className="gender-icon female"><svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="12" cy="9" r="5" stroke="currentColor" strokeWidth="2"/><path d="M12 14v7M9 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></div>
-              <span>女</span>
-            </OptionCard>
-          </div>
-        </motion.div>
-        <motion.div className="form-section" variants={itemVariants} custom={2} initial="hidden" animate="visible">
-          <label className="section-label"><span className="label-num">2</span>年龄</label>
-          <div className="input-group"><input type="number" className="form-input" placeholder="请输入年龄" value={youthForm.age} onChange={e => setYouthForm(p => ({ ...p, age: e.target.value }))} /><span className="input-suffix">岁</span></div>
-        </motion.div>
-        <motion.div className="form-section" variants={itemVariants} custom={3} initial="hidden" animate="visible">
-          <label className="section-label"><span className="label-num">3</span>身高 <span className="label-hint">最近一次体检数据即可</span></label>
-          <div className="input-group"><input type="number" className="form-input" placeholder="请输入身高" value={youthForm.height} onChange={e => setYouthForm(p => ({ ...p, height: e.target.value }))} /><span className="input-suffix">cm</span></div>
-        </motion.div>
-        <motion.div className="form-section" variants={itemVariants} custom={4} initial="hidden" animate="visible">
-          <label className="section-label"><span className="label-num">4</span>体重 <span className="label-hint">最近一次测量数据即可</span></label>
-          <div className="input-group"><input type="number" className="form-input" placeholder="请输入体重" value={youthForm.weight} onChange={e => setYouthForm(p => ({ ...p, weight: e.target.value }))} /><span className="input-suffix">kg</span></div>
         </motion.div>
         <AnimatePresence>
           {bmi && bmiStatus && (
@@ -434,30 +438,54 @@ export default function Onboarding() {
     </motion.div>
   )
 
-  // 青少年步骤2 - 学段与体态
+  // 青少年步骤2 - 与青年相同（职业/运动/习惯）
   const renderTeenStep2 = () => (
     <motion.div className="step-panel" key="teen-step2" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-      <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">学段与体态</motion.h2>
+      <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">运动与生活习惯</motion.h2>
       <motion.div className="form-section" variants={itemVariants} custom={1} initial="hidden" animate="visible">
-        <label className="section-label"><span className="label-num">5</span>学段</label>
-        <div className="gender-row">
-          <OptionCard selected={teenForm.schoolStage === '初中'} onClick={() => setTeenForm(p => ({ ...p, schoolStage: '初中' }))}><span>初中</span></OptionCard>
-          <OptionCard selected={teenForm.schoolStage === '高中'} onClick={() => setTeenForm(p => ({ ...p, schoolStage: '高中' }))}><span>高中</span></OptionCard>
+        <label className="section-label"><span className="label-num">5</span>职业或学业阶段</label>
+        <div className="option-list">
+          {['本科生', '研究生', '职场人员', '自由职业者', '其他'].map((opt, i) => (
+            <RadioItem key={opt} selected={teenForm.occupation === opt} onClick={() => setTeenForm(p => ({ ...p, occupation: opt }))} delay={i}>{opt}</RadioItem>
+          ))}
         </div>
+        <AnimatePresence>
+          {teenForm.occupation === '其他' && (
+            <motion.div className="input-group" style={{ marginTop: 10 }} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+              <input type="text" className="form-input" placeholder="请填写您的职业" value={teenForm.occupationOther} onChange={e => setTeenForm(p => ({ ...p, occupationOther: e.target.value }))} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
       <motion.div className="form-section" variants={itemVariants} custom={2} initial="hidden" animate="visible">
-        <label className="section-label"><span className="label-num">6</span>近一年身高增长情况</label>
+        <label className="section-label"><span className="label-num">6</span>是否经常进行体育锻炼？</label>
         <div className="option-list">
-          {['≥5 cm', '<5 cm', '不确定'].map((opt, i) => (
-            <RadioItem key={opt} selected={teenForm.heightGrowth === opt} onClick={() => setTeenForm(p => ({ ...p, heightGrowth: opt }))} delay={i}>{opt}</RadioItem>
+          {['是', '否', '偶尔'].map((opt, i) => (
+            <RadioItem key={opt} selected={teenForm.exerciseHabit === opt} onClick={() => setTeenForm(p => ({ ...p, exerciseHabit: opt }))} delay={i}>{opt}</RadioItem>
           ))}
         </div>
       </motion.div>
       <motion.div className="form-section" variants={itemVariants} custom={3} initial="hidden" animate="visible">
-        <label className="section-label"><span className="label-num">7</span>是否曾被提示存在体态或脊柱问题？<span className="label-hint">可多选</span></label>
+        <label className="section-label"><span className="label-num">7</span>平均每周锻炼时长（中高强度运动）</label>
         <div className="option-list">
-          {['无', '脊柱侧弯', '高低肩', '含胸/驼背', '扁平足', '其他'].map((opt, i) => (
-            <CheckboxItem key={opt} selected={teenForm.spineIssues.includes(opt)} onClick={() => toggleMultiSelect('teen', 'spineIssues', opt)} delay={i}>{opt}</CheckboxItem>
+          {['＜1 次', '1–2 次', '3–4 次', '≥5 次'].map((opt, i) => (
+            <RadioItem key={opt} selected={teenForm.exerciseWeekly === opt} onClick={() => setTeenForm(p => ({ ...p, exerciseWeekly: opt }))} delay={i}>{opt}</RadioItem>
+          ))}
+        </div>
+      </motion.div>
+      <motion.div className="form-section" variants={itemVariants} custom={4} initial="hidden" animate="visible">
+        <label className="section-label"><span className="label-num">8</span>每天坐着工作的时间</label>
+        <div className="option-list">
+          {['＜4 小时', '4–6 小时', '6–8 小时', '≥8 小时'].map((opt, i) => (
+            <RadioItem key={opt} selected={teenForm.sittingHoursYouth === opt} onClick={() => setTeenForm(p => ({ ...p, sittingHoursYouth: opt }))} delay={i}>{opt}</RadioItem>
+          ))}
+        </div>
+      </motion.div>
+      <motion.div className="form-section" variants={itemVariants} custom={5} initial="hidden" animate="visible">
+        <label className="section-label"><span className="label-num">9</span>每日电子屏幕使用时间（学习/工作+娱乐）</label>
+        <div className="option-list">
+          {['＜2 小时', '2–4 小时', '4–6 小时', '≥6 小时'].map((opt, i) => (
+            <RadioItem key={opt} selected={teenForm.screenTimeYouth === opt} onClick={() => setTeenForm(p => ({ ...p, screenTimeYouth: opt }))} delay={i}>{opt}</RadioItem>
           ))}
         </div>
       </motion.div>
@@ -609,32 +637,61 @@ export default function Onboarding() {
     </motion.div>
   )
 
-  // 青少年步骤3 - 症状与生活习惯
+  // 青少年步骤3 - 体态与健康（与青年相同）
   const renderTeenStep3 = () => (
     <motion.div className="step-panel" key="teen-step3" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-      <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">症状与生活习惯</motion.h2>
+      <motion.h2 variants={itemVariants} custom={0} initial="hidden" animate="visible">体态与健康状况</motion.h2>
       <motion.div className="form-section" variants={itemVariants} custom={1} initial="hidden" animate="visible">
-        <label className="section-label"><span className="label-num">8</span>是否出现以下情况？<span className="label-hint">可多选</span></label>
+        <label className="section-label"><span className="label-num">10</span>是否有不良体态习惯？<span className="label-hint">可多选</span></label>
         <div className="option-list">
-          {['肩膀一高一低', '背部一侧更突出', '弯腰时背部不对称', '久坐或运动后背部不适', '无以上情况'].map((opt, i) => (
-            <CheckboxItem key={opt} selected={teenForm.postureSymptoms.includes(opt)} onClick={() => toggleMultiSelect('teen', 'postureSymptoms', opt)} delay={i}>{opt}</CheckboxItem>
+          {['长时间低头', '低头看手机', '长时间坐姿不正', '长时间保持同一姿势工作（伏案或站立）', '单肩背包', '无以上情况'].map((opt, i) => (
+            <CheckboxItem key={opt} selected={teenForm.badPostureHabits.includes(opt)} onClick={() => toggleMultiSelect('teen', 'badPostureHabits', opt)} delay={i}>{opt}</CheckboxItem>
           ))}
         </div>
       </motion.div>
       <motion.div className="form-section" variants={itemVariants} custom={2} initial="hidden" animate="visible">
-        <label className="section-label"><span className="label-num">9</span>每日久坐/伏案时间</label>
+        <label className="section-label"><span className="label-num">11</span>是否有脊柱或体态问题？<span className="label-hint">可多选</span></label>
         <div className="option-list">
-          {['<2 小时', '2-4 小时', '4-6 小时', '≥6 小时'].map((opt, i) => (
-            <RadioItem key={opt} selected={teenForm.sittingHours === opt} onClick={() => setTeenForm(p => ({ ...p, sittingHours: opt }))} delay={i}>{opt}</RadioItem>
+          {['无', '脊柱侧弯', '含胸/驼背', '高低肩', '腰部不适', '颈部/肩部疼痛', '其他'].map((opt, i) => (
+            <CheckboxItem key={opt} selected={teenForm.spinePostureIssues.includes(opt)} onClick={() => toggleMultiSelect('teen', 'spinePostureIssues', opt)} delay={i}>{opt}</CheckboxItem>
           ))}
         </div>
       </motion.div>
       <motion.div className="form-section" variants={itemVariants} custom={3} initial="hidden" animate="visible">
-        <label className="section-label"><span className="label-num">10</span>每周中高强度体育活动（≥30分钟/次）</label>
+        <label className="section-label"><span className="label-num">12</span>是否有长期身体不适或疼痛问题？<span className="label-hint">可多选</span></label>
         <div className="option-list">
-          {['<1 次', '1-2 次', '3-4 次', '≥5 次'].map((opt, i) => (
-            <RadioItem key={opt} selected={teenForm.exerciseFreq === opt} onClick={() => setTeenForm(p => ({ ...p, exerciseFreq: opt }))} delay={i}>{opt}</RadioItem>
+          {['无', '颈部疼痛', '腰背痛', '膝盖/关节痛', '肩膀僵硬', '下背部僵硬', '其他'].map((opt, i) => (
+            <CheckboxItem key={opt} selected={teenForm.chronicPain.includes(opt)} onClick={() => toggleMultiSelect('teen', 'chronicPain', opt)} delay={i}>{opt}</CheckboxItem>
           ))}
+        </div>
+        <AnimatePresence>
+          {teenForm.chronicPain.includes('其他') && (
+            <motion.div className="input-group" style={{ marginTop: 10 }} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+              <input type="text" className="form-input" placeholder="请填写其他不适" value={teenForm.chronicPainOther} onChange={e => setTeenForm(p => ({ ...p, chronicPainOther: e.target.value }))} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+      <motion.div className="form-section" variants={itemVariants} custom={4} initial="hidden" animate="visible">
+        <label className="section-label"><span className="label-num">13</span>进行过哪种类型的体态调整或矫正？<span className="label-hint">可多选</span></label>
+        <div className="option-list">
+          {['无', '姿势训练', '瑜伽/普拉提', '按摩或理疗', '健身训练', '其他'].map((opt, i) => (
+            <CheckboxItem key={opt} selected={teenForm.postureCorrection.includes(opt)} onClick={() => toggleMultiSelect('teen', 'postureCorrection', opt)} delay={i}>{opt}</CheckboxItem>
+          ))}
+        </div>
+        <AnimatePresence>
+          {teenForm.postureCorrection.includes('其他') && (
+            <motion.div className="input-group" style={{ marginTop: 10 }} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+              <input type="text" className="form-input" placeholder="请填写其他方式" value={teenForm.postureCorrectionOther} onChange={e => setTeenForm(p => ({ ...p, postureCorrectionOther: e.target.value }))} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+      <motion.div className="form-section" variants={itemVariants} custom={5} initial="hidden" animate="visible">
+        <label className="section-label"><span className="label-num">14</span>是否参与过体态健康相关的教育或培训？</label>
+        <div className="option-list">
+          <RadioItem selected={teenForm.postureEducation === '是'} onClick={() => setTeenForm(p => ({ ...p, postureEducation: '是' }))}>是</RadioItem>
+          <RadioItem selected={teenForm.postureEducation === '否'} onClick={() => setTeenForm(p => ({ ...p, postureEducation: '否' }))}>否</RadioItem>
         </div>
       </motion.div>
     </motion.div>
@@ -684,7 +741,7 @@ export default function Onboarding() {
 
   const renderStepContent = () => {
     if (step === 0) return renderStep0()
-    if (step === 1) return ageGroup === 'youth' ? renderStep1Youth() : renderStep1ChildTeen()
+    if (step === 1) return ageGroup === 'youth' || ageGroup === 'teen' ? renderStep1YouthTeen() : renderStep1Child()
     if (step === 2) {
       if (ageGroup === 'child') return renderChildStep2()
       if (ageGroup === 'teen') return renderTeenStep2()

@@ -88,10 +88,7 @@ export default function Home() {
     if (profile?.ageGroup === 'child') {
       return profile?.exerciseFreqChild || '--'
     }
-    if (profile?.ageGroup === 'youth') {
-      return profile?.exerciseWeekly || '--'
-    }
-    return profile?.exerciseFreqTeen || '--'
+    return profile?.exerciseWeekly || '--'
   }
 
   // 获取体态问题
@@ -185,9 +182,9 @@ export default function Home() {
 
           <div className="profile-extra">
             <div className="extra-item">
-              <span className="extra-label">{profile?.ageGroup === 'teen' ? '学段' : profile?.ageGroup === 'youth' ? '职业' : '生长期'}</span>
+              <span className="extra-label">{profile?.ageGroup === 'child' ? '生长期' : '职业'}</span>
               <span className="extra-value">
-                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : profile?.ageGroup === 'youth' ? (profile?.occupation || '--') : (profile?.isRapidGrowth || '--')}
+                {profile?.ageGroup === 'child' ? (profile?.isRapidGrowth || '--') : (profile?.occupation || '--')}
               </span>
             </div>
             <div className="extra-item">

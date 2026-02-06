@@ -99,10 +99,7 @@ export default function Profile() {
     if (profile?.ageGroup === 'child') {
       return profile?.exerciseFreqChild || '--'
     }
-    if (profile?.ageGroup === 'youth') {
-      return profile?.exerciseWeekly || '--'
-    }
-    return profile?.exerciseFreqTeen || '--'
+    return profile?.exerciseWeekly || '--'
   }
 
   // 获取屏幕/久坐时间
@@ -110,10 +107,7 @@ export default function Profile() {
     if (profile?.ageGroup === 'child') {
       return { label: '屏幕时间', value: profile?.screenTimeChild || '--' }
     }
-    if (profile?.ageGroup === 'youth') {
-      return { label: '久坐时间', value: profile?.sittingHoursYouth || '--' }
-    }
-    return { label: '久坐时间', value: profile?.sittingHours || '--' }
+    return { label: '久坐时间', value: profile?.sittingHoursYouth || '--' }
   }
 
   // 计算BMI
@@ -176,9 +170,9 @@ export default function Profile() {
               <span className="info-value">{profile?.age || '--'}岁</span>
             </div>
             <div className="info-item">
-              <span className="info-label">{profile?.ageGroup === 'teen' ? '学段' : profile?.ageGroup === 'youth' ? '职业' : '生长期'}</span>
+              <span className="info-label">{profile?.ageGroup === 'child' ? '生长期' : '职业'}</span>
               <span className="info-value">
-                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : profile?.ageGroup === 'youth' ? (profile?.occupation || '--') : (profile?.isRapidGrowth || '--')}
+                {profile?.ageGroup === 'child' ? (profile?.isRapidGrowth || '--') : (profile?.occupation || '--')}
               </span>
             </div>
             <div className="info-item">
