@@ -294,21 +294,21 @@ export default function Onboarding() {
       <motion.p className="step-desc" variants={itemVariants} custom={1} initial="hidden" animate="visible">根据年龄段选择，我们将提供针对性的评估方案</motion.p>
       <div className="type-cards three-cols">
         <OptionCard selected={ageGroup === 'child'} onClick={() => setAgeGroup('child')} delay={2}>
-          <motion.div className="type-icon" animate={{ color: ageGroup === 'child' ? '#4ecdc4' : '#a0aec0' }}>
-            <svg viewBox="0 0 48 48" fill="none" width="48" height="48"><circle cx="24" cy="14" r="8" stroke="currentColor" strokeWidth="2.5"/><path d="M12 44c0-8 5-14 12-14s12 6 12 14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>
-          </motion.div>
+          <div className="type-icon">
+            <img src="/儿童.jpg" alt="儿童" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
           <h3>儿童</h3><p>3-12岁</p>
         </OptionCard>
         <OptionCard selected={ageGroup === 'teen'} onClick={() => setAgeGroup('teen')} delay={3}>
-          <motion.div className="type-icon" animate={{ color: ageGroup === 'teen' ? '#4ecdc4' : '#a0aec0' }}>
-            <svg viewBox="0 0 48 48" fill="none" width="48" height="48"><circle cx="24" cy="12" r="7" stroke="currentColor" strokeWidth="2.5"/><path d="M24 19v16M16 27h16M18 44l6-9 6 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </motion.div>
+          <div className="type-icon">
+            <img src="/青少年.png" alt="青少年" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
           <h3>青少年</h3><p>13-18岁</p>
         </OptionCard>
         <OptionCard selected={ageGroup === 'youth'} onClick={() => setAgeGroup('youth')} delay={4}>
-          <motion.div className="type-icon" animate={{ color: ageGroup === 'youth' ? '#4ecdc4' : '#a0aec0' }}>
-            <svg viewBox="0 0 48 48" fill="none" width="48" height="48"><circle cx="24" cy="11" r="7" stroke="currentColor" strokeWidth="2.5"/><path d="M16 44V28a8 8 0 0116 0v16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/><path d="M20 34h8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>
-          </motion.div>
+          <div className="type-icon">
+            <img src="/青年.png" alt="青年" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+          </div>
           <h3>青年</h3><p>19-25岁</p>
         </OptionCard>
       </div>
