@@ -307,7 +307,7 @@ export default function Onboarding() {
         </OptionCard>
         <OptionCard selected={ageGroup === 'youth'} onClick={() => setAgeGroup('youth')} delay={4}>
           <div className="type-icon">
-            <img src="/青年.png" alt="青年" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+            <img src="/青年.png" alt="青年" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', objectPosition: 'top' }} />
           </div>
           <h3>青年</h3><p>19-25岁</p>
         </OptionCard>
