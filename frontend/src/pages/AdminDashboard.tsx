@@ -432,6 +432,7 @@ export default function AdminDashboard() {
   const getAgeGroupText = (ageGroup?: string) => {
     if (ageGroup === 'child') return '儿童'
     if (ageGroup === 'teen') return '青少年'
+    if (ageGroup === 'youth') return '青年'
     return '-'
   }
 

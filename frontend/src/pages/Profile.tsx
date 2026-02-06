@@ -85,7 +85,9 @@ export default function Profile() {
   }
 
   const getAgeGroupLabel = () => {
-    return profile?.ageGroup === 'child' ? '儿童' : '青少年'
+    if (profile?.ageGroup === 'child') return '儿童'
+    if (profile?.ageGroup === 'youth') return '青年'
+    return '青少年'
   }
 
   const getGenderLabel = () => {
@@ -97,6 +99,9 @@ export default function Profile() {
     if (profile?.ageGroup === 'child') {
       return profile?.exerciseFreqChild || '--'
     }
+    if (profile?.ageGroup === 'youth') {
+      return profile?.exerciseWeekly || '--'
+    }
     return profile?.exerciseFreqTeen || '--'
   }
 
@@ -104,6 +109,9 @@ export default function Profile() {
   const getScreenOrSittingTime = () => {
     if (profile?.ageGroup === 'child') {
       return { label: '屏幕时间', value: profile?.screenTimeChild || '--' }
+    }
+    if (profile?.ageGroup === 'youth') {
+      return { label: '久坐时间', value: profile?.sittingHoursYouth || '--' }
     }
     return { label: '久坐时间', value: profile?.sittingHours || '--' }
   }
@@ -168,9 +176,9 @@ export default function Profile() {
               <span className="info-value">{profile?.age || '--'}岁</span>
             </div>
             <div className="info-item">
-              <span className="info-label">{profile?.ageGroup === 'teen' ? '学段' : '生长期'}</span>
+              <span className="info-label">{profile?.ageGroup === 'teen' ? '学段' : profile?.ageGroup === 'youth' ? '职业' : '生长期'}</span>
               <span className="info-value">
-                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : (profile?.isRapidGrowth || '--')}
+                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : profile?.ageGroup === 'youth' ? (profile?.occupation || '--') : (profile?.isRapidGrowth || '--')}
               </span>
             </div>
             <div className="info-item">

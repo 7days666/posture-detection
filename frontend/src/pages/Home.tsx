@@ -74,7 +74,9 @@ export default function Home() {
   }
 
   const getAgeGroupLabel = () => {
-    return profile?.ageGroup === 'child' ? '儿童' : '青少年'
+    if (profile?.ageGroup === 'child') return '儿童'
+    if (profile?.ageGroup === 'youth') return '青年'
+    return '青少年'
   }
 
   const getGenderLabel = () => {
@@ -85,6 +87,9 @@ export default function Home() {
   const getExerciseFreq = () => {
     if (profile?.ageGroup === 'child') {
       return profile?.exerciseFreqChild || '--'
+    }
+    if (profile?.ageGroup === 'youth') {
+      return profile?.exerciseWeekly || '--'
     }
     return profile?.exerciseFreqTeen || '--'
   }
@@ -180,9 +185,9 @@ export default function Home() {
 
           <div className="profile-extra">
             <div className="extra-item">
-              <span className="extra-label">{profile?.ageGroup === 'teen' ? '学段' : '生长期'}</span>
+              <span className="extra-label">{profile?.ageGroup === 'teen' ? '学段' : profile?.ageGroup === 'youth' ? '职业' : '生长期'}</span>
               <span className="extra-value">
-                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : (profile?.isRapidGrowth || '--')}
+                {profile?.ageGroup === 'teen' ? (profile?.schoolStage || '--') : profile?.ageGroup === 'youth' ? (profile?.occupation || '--') : (profile?.isRapidGrowth || '--')}
               </span>
             </div>
             <div className="extra-item">
