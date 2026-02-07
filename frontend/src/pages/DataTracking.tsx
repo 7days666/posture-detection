@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import TabBar from '../components/TabBar'
 import {
@@ -46,6 +47,7 @@ interface DashboardData {
 }
 
 export default function DataTracking() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'overview' | 'posture' | 'exercise'>('overview')
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<DashboardData | null>(null)
@@ -339,22 +341,64 @@ export default function DataTracking() {
                 </div>
               ) : (
                 <div className="empty-state" style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
-                  <p>暂无运动记录</p>
-                  <p style={{ fontSize: 14, marginTop: 8 }}>开始运动后，记录将显示在这里</p>
+                  <div style={{ marginBottom: 16 }}>
+                    <svg viewBox="0 0 64 64" fill="none" width="64" height="64">
+                      <circle cx="32" cy="32" r="30" stroke="#d1d5db" strokeWidth="2" strokeDasharray="4 4"/>
+                      <path d="M22 42V30a2 2 0 012-2h4a2 2 0 012 2v12" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M30 42V24a2 2 0 012-2h4a2 2 0 012 2v18" stroke="#6ee7b7" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M38 42V27a2 2 0 012-2h4a2 2 0 012 2v15" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="18" y1="42" x2="48" y2="42" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: '#374151' }}>暂无运动记录</p>
+                  <p style={{ fontSize: 14, marginTop: 8, lineHeight: 1.6 }}>
+                    运动记录来自「数字教练」中的矫正训练。<br/>
+                    完成体态检测后，系统会为你生成个性化的矫正方案，<br/>
+                    每次训练的时长和完成度都会自动记录在这里。
+                  </p>
+                  <button
+                    onClick={() => navigate('/maintenance')}
+                    style={{
+                      marginTop: 20,
+                      padding: '10px 24px',
+                      background: 'linear-gradient(135deg, #4ecdc4, #44b09e)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 20,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    前往数字教练
+                  </button>
                 </div>
               )}
             </section>
 
             {/* 运动建议 */}
             <section className="exercise-suggestions">
-              <h2>调整建议</h2>
+              <h2>如何开始？</h2>
               <div className="suggestion-card">
-                <p>根据你的运动完成情况，AI建议：</p>
-                <ul>
-                  <li>{(exerciseStats?.total || 0) >= 5 ? '运动频率良好，继续保持' : '增加每周运动频次至5次'}</li>
-                  <li>{(exerciseStats?.avg_completion || 0) >= 80 ? '完成度优秀' : '尝试提高每次运动的完成度'}</li>
-                  <li>添加核心稳定性训练，增强脊柱支撑</li>
-                </ul>
+                {exerciseRecords.length > 0 ? (
+                  <>
+                    <p>根据你的运动完成情况，AI建议：</p>
+                    <ul>
+                      <li>{(exerciseStats?.total || 0) >= 5 ? '运动频率良好，继续保持' : '增加每周运动频次至5次'}</li>
+                      <li>{(exerciseStats?.avg_completion || 0) >= 80 ? '完成度优秀' : '尝试提高每次运动的完成度'}</li>
+                      <li>添加核心稳定性训练，增强脊柱支撑</li>
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <p style={{ marginBottom: 12 }}>只需三步，即可开始记录你的矫正运动：</p>
+                    <ul>
+                      <li><strong>第一步：</strong>在首页完成 AI 体态检测，获取你的体态评估报告</li>
+                      <li><strong>第二步：</strong>前往「数字教练」，系统会根据检测结果生成专属矫正方案</li>
+                      <li><strong>第三步：</strong>跟随教练完成训练，运动数据将自动同步到这里</li>
+                    </ul>
+                  </>
+                )}
               </div>
             </section>
           </>
